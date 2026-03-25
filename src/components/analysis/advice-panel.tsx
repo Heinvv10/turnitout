@@ -35,6 +35,7 @@ export function AdvicePanel() {
   const { selectedModule, apiKey } = useSettingsStore();
   const [advice, setAdvice] = useState<AdviceResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
 
   const hasResults =
@@ -55,6 +56,7 @@ export function AdvicePanel() {
   const getAdvice = async () => {
     if (!currentPaper?.plainText) return;
     setLoading(true);
+    setError("");
     try {
       const res = await fetch("/api/get-advice", {
         method: "POST",
@@ -102,7 +104,9 @@ export function AdvicePanel() {
       setAdvice(data);
       setCheckedItems(new Set());
     } catch (err) {
-      console.error("Advice failed:", err);
+      const msg = err instanceof Error ? err.message : "Failed to get advice";
+      console.error("Advice failed:", msg);
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -141,10 +145,17 @@ export function AdvicePanel() {
             on all your results.
           </p>
         </div>
-        <Button onClick={getAdvice}>
-          <Lightbulb className="mr-2 h-4 w-4" />
-          Get Improvement Advice
+        <Button onClick={getAdvice} disabled={loading}>
+          {loading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Lightbulb className="mr-2 h-4 w-4" />
+          )}
+          {loading ? "Getting advice..." : "Get Improvement Advice"}
         </Button>
+        {error && (
+          <p className="text-xs text-red-500 max-w-xs">{error}</p>
+        )}
       </div>
     );
   }

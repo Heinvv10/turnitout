@@ -18,10 +18,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Truncate text for advice - first 3000 chars is enough for context
+    const truncatedText = text.length > 3000 ? text.slice(0, 3000) + "\n\n[...truncated]" : text;
+
     const response = await callClaude(
       ADVICE_SYSTEM_PROMPT,
-      buildAdviceUserPrompt(text, moduleCode || "", assessmentName || "", results || {}),
+      buildAdviceUserPrompt(truncatedText, moduleCode || "", assessmentName || "", results || {}),
       apiKey,
+      undefined,
+      8192,
     );
 
     const result = parseClaudeJSON(response);
