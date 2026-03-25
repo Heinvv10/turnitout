@@ -9,7 +9,7 @@ import { usePaperStore } from "@/store/paper-store";
 import { EditorToolbar } from "./editor-toolbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Upload, BookOpen, FileText } from "lucide-react";
+import { Upload, BookOpen, FileText, Trash2 } from "lucide-react";
 
 function countWords(text: string): number {
   return text
@@ -190,6 +190,27 @@ export function PaperEditor() {
     [bodyEditor, refEditor, setPaper],
   );
 
+  const { clearResults } = usePaperStore();
+
+  const handleClearAll = useCallback(() => {
+    bodyEditor?.commands.clearContent();
+    refEditor?.commands.clearContent();
+    clearResults();
+    setPaper({
+      id: crypto.randomUUID(),
+      moduleCode: "",
+      title: "Untitled Paper",
+      content: "",
+      plainText: "",
+      wordCount: 0,
+      references: "",
+      referencesHtml: "",
+      referenceCount: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+  }, [bodyEditor, refEditor, clearResults, setPaper]);
+
   const bodyWordCount = currentPaper?.wordCount || 0;
   const refCount = currentPaper?.referenceCount || 0;
 
@@ -224,6 +245,17 @@ export function PaperEditor() {
               <Upload className="mr-1 h-3 w-3" />
               .docx
             </Button>
+            {bodyWordCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 text-[10px] text-destructive hover:text-destructive"
+                onClick={handleClearAll}
+              >
+                <Trash2 className="mr-1 h-3 w-3" />
+                Clear
+              </Button>
+            )}
           </div>
         </div>
         <EditorToolbar editor={bodyEditor} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useSettingsStore } from "@/store/settings-store";
 import { usePaperStore } from "@/store/paper-store";
 import { MODULES } from "@/lib/constants";
@@ -22,6 +22,7 @@ import {
   Eye,
   Edit3,
   AlertTriangle,
+  Wand2,
 } from "lucide-react";
 
 /**
@@ -161,21 +162,50 @@ export function TemplateExport() {
   const [lecturer, setLecturer] = useState(
     lecturers[selectedModule] || "",
   );
+  const { apiKey } = useSettingsStore();
   const [exporting, setExporting] = useState(false);
+  const [aiSplitting, setAiSplitting] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
 
-  // Auto-parse sections from editor content
+  // Auto-parse sections from editor content (regex-based)
   const autoSections = useMemo(() => {
     if (!currentPaper?.plainText) {
       return { introduction: "", body: "", conclusion: "", references: "" };
     }
     const parsed = parseSections(currentPaper.plainText);
-    // Use separate references field from the editor if available
     if (currentPaper.references) {
       parsed.references = currentPaper.references;
     }
     return parsed;
   }, [currentPaper?.plainText, currentPaper?.references]);
+
+  // AI-powered section split
+  const aiSplitSections = useCallback(async () => {
+    const text = currentPaper?.plainText;
+    if (!text) return;
+    setAiSplitting(true);
+    try {
+      const fullText = currentPaper.references
+        ? `${text}\n\nReference List\n${currentPaper.references}`
+        : text;
+      const res = await fetch("/api/split-sections", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: fullText, apiKey }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      if (data.introduction) setIntroOverride(data.introduction);
+      if (data.body) setBodyOverride(data.body);
+      if (data.conclusion) setConclusionOverride(data.conclusion);
+      if (data.references) setReferencesOverride(data.references);
+      setActiveTab("sections");
+    } catch (err) {
+      console.error("AI split failed:", err);
+    } finally {
+      setAiSplitting(false);
+    }
+  }, [currentPaper, apiKey]);
 
   // Editable overrides
   const [introOverride, setIntroOverride] = useState("");
@@ -391,9 +421,25 @@ export function TemplateExport() {
 
         {/* SECTIONS TAB */}
         <TabsContent value="sections" className="space-y-3 pt-2">
-          <p className="text-[10px] text-muted-foreground">
-            Sections auto-detected from your essay. Edit below to override.
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] text-muted-foreground">
+              Sections auto-detected from headings. No headings? Use AI split.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-6 gap-1 text-[10px]"
+              disabled={!currentPaper?.plainText || aiSplitting}
+              onClick={aiSplitSections}
+            >
+              {aiSplitting ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Wand2 className="h-3 w-3" />
+              )}
+              {aiSplitting ? "Splitting..." : "AI Split"}
+            </Button>
+          </div>
 
           {[
             {
