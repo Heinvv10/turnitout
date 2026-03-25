@@ -44,62 +44,84 @@ function parseSections(text: string): {
   };
 
   for (const line of lines) {
-    const lower = line.trim().toLowerCase();
+    const stripped = line.trim();
+    const lower = stripped.toLowerCase().replace(/\s+/g, " ");
 
-    if (
-      lower.match(
-        /^(1\.?\s*)?introduction\s*$/,
-      )
-    ) {
+    // Match introduction: "1. Introduction", "INTRODUCTION", "1.  INTRODUCTION", "Introduction"
+    if (lower.match(/^(\d\.?\s*)?introduction\.?\s*$/)) {
       currentSection = "introduction";
       continue;
     }
-    if (
-      lower.match(
-        /^(2\.?\s*)?body\s*$/,
-      )
-    ) {
+    // Match body: "2. Body", "BODY", but NOT sub-headings like "Body of evidence"
+    if (lower.match(/^(\d\.?\s*)?body\.?\s*$/)) {
       currentSection = "body";
       continue;
     }
-    if (
-      lower.match(
-        /^(3\.?\s*)?(conclusion|summary)\s*$/,
-      )
-    ) {
+    // Match conclusion: "2. Conclusion", "3. CONCLUSION", "Conclusion", "Summary"
+    if (lower.match(/^(\d\.?\s*)?(conclusion|summary)\.?\s*$/)) {
       currentSection = "conclusion";
       continue;
     }
-    if (
-      lower.match(
-        /^(3\.?\s*|4\.?\s*)?(reference\s*list|references|bibliography)\s*$/,
-      )
-    ) {
+    // Match references: "Reference List", "REFERENCE LIST", "3. References", "Bibliography"
+    if (lower.match(/^(\d\.?\s*)?(reference\s*list|references|bibliography)\.?\s*$/)) {
       currentSection = "references";
       continue;
     }
 
-    // Sub-headings within body stay in body
+    // If still in preamble and we hit substantial text, assume it's the start of intro
+    if (currentSection === "preamble" && stripped.length > 50) {
+      currentSection = "introduction";
+    }
+
+    // Any other heading while in introduction moves us to body
+    // (handles essays without explicit "Body" heading)
+    if (
+      currentSection === "introduction" &&
+      stripped.length < 80 &&
+      stripped.length > 3 &&
+      stripped === stripped.replace(/[a-z]/g, "") && // ALL CAPS line
+      !lower.includes("introduction")
+    ) {
+      currentSection = "body";
+      sections[currentSection].push(line);
+      continue;
+    }
+
     sections[currentSection].push(line);
   }
 
   // If no introduction detected, treat preamble as introduction
-  if (
-    sections.introduction.length === 0 &&
-    sections.preamble.length > 0
-  ) {
+  // If no intro detected, use preamble
+  if (sections.introduction.length === 0 && sections.preamble.length > 0) {
     sections.introduction = sections.preamble;
   }
 
-  // If no body detected, everything after intro is body
-  if (sections.body.length === 0) {
-    const allText = text;
-    const introEnd = sections.introduction.join("\n").length;
-    const concStart = sections.conclusion.join("\n").length;
-    if (introEnd > 0 && sections.conclusion.length > 0) {
-      // Body is between intro and conclusion
-      sections.body = [allText.slice(introEnd, allText.length - concStart)];
+  // If no explicit body/conclusion split, try to split intelligently
+  if (sections.body.length === 0 && sections.conclusion.length === 0) {
+    // Everything landed in introduction - split into intro (first para), body (middle), conclusion (last para)
+    const allLines = sections.introduction.filter((l) => l.trim().length > 0);
+    if (allLines.length >= 3) {
+      // First paragraph = intro, last paragraph = conclusion, rest = body
+      const paragraphs: string[][] = [[]];
+      for (const line of allLines) {
+        if (line.trim() === "" && paragraphs[paragraphs.length - 1].length > 0) {
+          paragraphs.push([]);
+        } else {
+          paragraphs[paragraphs.length - 1].push(line);
+        }
+      }
+      const nonEmpty = paragraphs.filter((p) => p.length > 0);
+      if (nonEmpty.length >= 3) {
+        sections.introduction = nonEmpty[0];
+        sections.conclusion = nonEmpty[nonEmpty.length - 1];
+        sections.body = nonEmpty.slice(1, -1).flat();
+      }
     }
+  } else if (sections.body.length === 0 && sections.conclusion.length > 0) {
+    // Have intro and conclusion but no body - body is everything in between
+    // This shouldn't normally happen with the new parser, but just in case
+    sections.body = sections.introduction.slice(1);
+    sections.introduction = [sections.introduction[0] || ""];
   }
 
   return {
