@@ -17,6 +17,7 @@ interface PaperState {
 
   setPaper: (paper: Paper) => void;
   updateContent: (html: string, plainText: string, wordCount: number) => void;
+  updateReferences: (html: string, plainText: string) => void;
   setAIRiskResult: (result: AIRiskResult) => void;
   setCitationResult: (result: CitationResult) => void;
   setGradingResult: (result: GradingResult) => void;
@@ -78,6 +79,23 @@ export const usePaperStore = create<PaperState>((set, get) => ({
         updatedAt: new Date().toISOString(),
       },
       resultsStale: get().analysisResults.aiRisk !== null,
+    });
+  },
+
+  updateReferences: (html, plainText) => {
+    const current = get().currentPaper;
+    if (!current) return;
+    const count = plainText
+      .split("\n")
+      .filter((l) => l.trim().length > 10).length;
+    set({
+      currentPaper: {
+        ...current,
+        referencesHtml: html,
+        references: plainText,
+        referenceCount: count,
+        updatedAt: new Date().toISOString(),
+      },
     });
   },
 

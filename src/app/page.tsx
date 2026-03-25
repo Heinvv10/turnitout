@@ -57,8 +57,13 @@ function HomeContent() {
 
     const uploadedOutline = moduleOutlines[selectedModule] || undefined;
 
+    // Combine body + references for full text analysis, but keep them separate for context
+    const fullText = currentPaper.references
+      ? `${currentPaper.plainText}\n\nReference List\n${currentPaper.references}`
+      : currentPaper.plainText;
+
     const body = {
-      text: currentPaper.plainText,
+      text: fullText,
       moduleCode: selectedModule,
       assignmentTitle: currentPaper.title,
       uploadedOutline,

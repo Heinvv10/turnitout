@@ -147,8 +147,13 @@ export function TemplateExport() {
     if (!currentPaper?.plainText) {
       return { introduction: "", body: "", conclusion: "", references: "" };
     }
-    return parseSections(currentPaper.plainText);
-  }, [currentPaper?.plainText]);
+    const parsed = parseSections(currentPaper.plainText);
+    // Use separate references field from the editor if available
+    if (currentPaper.references) {
+      parsed.references = currentPaper.references;
+    }
+    return parsed;
+  }, [currentPaper?.plainText, currentPaper?.references]);
 
   // Editable overrides
   const [introOverride, setIntroOverride] = useState("");

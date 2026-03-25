@@ -27,7 +27,12 @@ export function CitationPanel() {
       const res = await fetch("/api/check-citations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: currentPaper.plainText, apiKey }),
+        body: JSON.stringify({
+          text: currentPaper.references
+            ? `${currentPaper.plainText}\n\nReference List\n${currentPaper.references}`
+            : currentPaper.plainText,
+          apiKey,
+        }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
