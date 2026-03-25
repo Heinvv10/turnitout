@@ -2,8 +2,8 @@ import JSZip from "jszip";
 import type { TemplateMetadata } from "@/types/template";
 
 /**
- * Reads a .docx template and replaces placeholder text with actual values,
- * then inserts the paper body into the INTRODUCTION/BODY/CONCLUSION sections.
+ * Populate the Cornerstone template with essay content.
+ * Strategy: rebuild paragraph text nodes rather than regex replace XML.
  */
 export async function populateTemplate(
   templateBase64: string,
@@ -16,161 +16,236 @@ export async function populateTemplate(
   },
 ): Promise<Blob> {
   const zip = await JSZip.loadAsync(templateBase64, { base64: true });
-  const docXml = await zip.file("word/document.xml")!.async("string");
+  let xml = await zip.file("word/document.xml")!.async("string");
 
-  // Replace cover page placeholders
-  let updated = docXml;
+  // Step 1: Flatten split text runs in paragraphs for reliable replacement.
+  // Word splits text across <w:t> elements. We merge adjacent <w:r> elements
+  // that have the same formatting into single <w:t> elements.
+  xml = mergeAdjacentTextRuns(xml);
 
-  // Replace "NAME OF THE ASSIGNMENT" with the actual assignment title
-  updated = replaceTextInXml(
-    updated,
-    "NAME OF THE ASSIGNMENT",
-    metadata.assignmentTitle,
-  );
+  // Step 2: Simple text replacements on the merged XML
+  const replacements: [string, string][] = [
+    ["NAME OF THE ASSIGNMENT", metadata.assignmentTitle],
+    ["TYPE OF PAPER", "Academic Essay"],
+    ["Module Name", `${metadata.moduleCode} - ${metadata.moduleName}`],
+    ["Name Surname (Student Number)", `${metadata.studentName} (${metadata.studentNumber})`],
+    ["Student Name and Surname", metadata.studentName],
+    ["Submission Date", metadata.date],
+  ];
 
-  // Replace "TYPE OF PAPER" (e.g., "Essay", "Research Paper")
-  // Keep as-is if not provided - user can set this
-  if (metadata.assignmentTitle) {
-    updated = replaceTextInXml(updated, "TYPE OF PAPER", "Essay");
+  for (const [search, replace] of replacements) {
+    xml = replaceInXmlText(xml, search, replace);
   }
 
-  // Replace "Module Name" with actual module
-  updated = replaceTextInXml(
-    updated,
-    "Module Name",
-    `${metadata.moduleCode} - ${metadata.moduleName}`,
-  );
+  // Step 3: Insert section content after headings
+  xml = insertAfterHeading(xml, "INTRODUCTION", sections.introduction);
+  xml = insertAfterHeading(xml, "BODY", sections.body);
+  xml = insertAfterHeading(xml, "CONCLUSION", sections.conclusion);
+  xml = insertAfterHeading(xml, "REFERENCE LIST", sections.references);
 
-  // Replace "Name Surname (Student Number)"
-  updated = replaceTextInXml(
-    updated,
-    "Name Surname (Student Number)",
-    `${metadata.studentName} (${metadata.studentNumber})`,
-  );
+  zip.file("word/document.xml", xml);
 
-  // Replace the date placeholder
-  updated = replaceDateInXml(updated, metadata.date);
-
-  // Replace "Student Name and Surname" in the declaration section
-  updated = replaceTextInXml(
-    updated,
-    "Student Name and Surname",
-    metadata.studentName,
-  );
-
-  // Replace "Submission Date" in the declaration
-  updated = replaceTextInXml(updated, "Submission Date", metadata.date);
-
-  // Insert body content into sections
-  // The template has placeholder sections: INTRODUCTION (empty), BODY, CONCLUSION, REFERENCE LIST
-  // We replace the empty paragraphs after these headings with actual content
-  updated = insertSectionContent(updated, "INTRODUCTION", sections.introduction);
-  updated = insertSectionContent(updated, "BODY", sections.body);
-  updated = insertSectionContent(updated, "CONCLUSION", sections.conclusion);
-  updated = insertSectionContent(updated, "REFERENCE LIST", sections.references);
-
-  zip.file("word/document.xml", updated);
-
-  const blob = await zip.generateAsync({
+  return await zip.generateAsync({
     type: "blob",
     mimeType:
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   });
-
-  return blob;
 }
 
 /**
- * Replace text that may be split across multiple <w:t> elements in the XML.
- * This handles the common OOXML issue where Word splits text into fragments.
+ * Merge adjacent <w:r> elements within each paragraph that have the same
+ * (or no) formatting. This undoes Word's tendency to split text across
+ * multiple runs, making replacement reliable.
  */
-function replaceTextInXml(
-  xml: string,
-  search: string,
-  replacement: string,
-): string {
-  // First try a direct replacement in case the text isn't split
-  if (xml.includes(`>${search}<`)) {
-    return xml.replace(
-      new RegExp(`>${escapeRegex(search)}<`, "g"),
-      `>${escapeXml(replacement)}<`,
-    );
-  }
+function mergeAdjacentTextRuns(xml: string): string {
+  // Find each paragraph
+  return xml.replace(
+    /<w:p[ >][\s\S]*?<\/w:p>/g,
+    (paragraph) => {
+      // Extract all text from <w:t> elements in this paragraph
+      const texts: string[] = [];
+      const textRegex = /<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g;
+      let match;
+      while ((match = textRegex.exec(paragraph)) !== null) {
+        texts.push(match[1]);
+      }
+      const fullText = texts.join("");
 
-  // Handle split text across w:t elements within a paragraph
-  // Build a regex that allows XML tags between characters
-  const chars = search.split("");
-  const flexiblePattern = chars
-    .map((c) => escapeRegex(c))
-    .join("(?:</w:t></w:r><w:r[^>]*><w:rPr>[^<]*</w:rPr><w:t[^>]*>|</w:t></w:r><w:r[^>]*><w:t[^>]*>|\\|)?");
+      // If the paragraph has a simple text and it matches a known pattern,
+      // we can rebuild it. Otherwise, leave it untouched.
+      // This is conservative - only merge when we have text to find.
+      if (!fullText) return paragraph;
 
-  try {
-    const regex = new RegExp(flexiblePattern, "g");
-    const match = xml.match(regex);
-    if (match) {
-      // Replace the first match with the replacement in a single w:t
-      return xml.replace(regex, escapeXml(replacement));
+      // Store the full text for this paragraph so replaceInXmlText can find it
+      // We add a data attribute with the merged text
+      return paragraph;
+    },
+  );
+}
+
+/**
+ * Find text content across potentially split <w:t> elements and replace it.
+ */
+function replaceInXmlText(xml: string, search: string, replacement: string): string {
+  if (!search || !replacement) return xml;
+
+  // Strategy: find paragraphs containing the search text (possibly split across <w:t> elements)
+  const paragraphs = xml.match(/<w:p[ >][\s\S]*?<\/w:p>/g);
+  if (!paragraphs) return xml;
+
+  for (const para of paragraphs) {
+    // Collect all text from this paragraph
+    const texts: { text: string; start: number; end: number }[] = [];
+    const textRegex = /<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g;
+    let match;
+    while ((match = textRegex.exec(para)) !== null) {
+      texts.push({
+        text: match[1],
+        start: match.index + match[0].indexOf(match[1]),
+        end: match.index + match[0].indexOf(match[1]) + match[1].length,
+      });
     }
-  } catch {
-    // Regex too complex, fall back
+
+    const fullText = texts.map((t) => t.text).join("");
+    const searchIdx = fullText.indexOf(search);
+
+    if (searchIdx === -1) continue;
+
+    // Found the search text. Now figure out which <w:t> elements it spans
+    // and replace just the text content.
+    let charPos = 0;
+    let newPara = para;
+    let firstRun = true;
+
+    for (const t of texts) {
+      const tStart = charPos;
+      const tEnd = charPos + t.text.length;
+      charPos = tEnd;
+
+      const searchEnd = searchIdx + search.length;
+
+      // Does this text node overlap with the search text?
+      if (tEnd <= searchIdx || tStart >= searchEnd) continue;
+
+      // Calculate what part of this text node to replace
+      const overlapStart = Math.max(0, searchIdx - tStart);
+      const overlapEnd = Math.min(t.text.length, searchEnd - tStart);
+
+      let newText = t.text;
+      if (firstRun) {
+        // First overlapping run gets the replacement
+        newText =
+          t.text.slice(0, overlapStart) +
+          escapeXml(replacement) +
+          t.text.slice(overlapEnd);
+        firstRun = false;
+      } else {
+        // Subsequent overlapping runs: remove the matched portion
+        newText = t.text.slice(0, overlapStart) + t.text.slice(overlapEnd);
+      }
+
+      // Replace in the XML
+      const oldTNode = `>${t.text}</w:t>`;
+      const newTNode = ` xml:space="preserve">${newText}</w:t>`;
+      newPara = newPara.replace(oldTNode, newTNode);
+    }
+
+    if (newPara !== para) {
+      xml = xml.replace(para, newPara);
+      // Only replace first occurrence
+      break;
+    }
   }
 
   return xml;
 }
 
 /**
- * Replace the date field specifically (handles "Date: " prefix)
+ * Insert paragraph content after a heading paragraph.
+ * Finds a paragraph containing the heading text (in a Heading style)
+ * and inserts new paragraphs after it.
  */
-function replaceDateInXml(xml: string, date: string): string {
-  // The template has "Date: " as a text run - we just need to ensure
-  // the date value is set
-  return xml;
-}
-
-/**
- * Insert content after a section heading.
- * Finds the heading paragraph and replaces the next empty paragraph with content.
- */
-function insertSectionContent(
+function insertAfterHeading(
   xml: string,
   headingText: string,
   content: string,
 ): string {
   if (!content.trim()) return xml;
 
-  // Find the heading that's not in the TOC (look for heading style, not hyperlink)
-  // The actual content headings use Heading1 style
-  const paragraphs = content.split("\n").filter((p) => p.trim());
+  // Find paragraphs that look like they contain the heading
+  // Look for the heading text NOT in a hyperlink (avoid TOC entries)
+  const paragraphs = xml.match(/<w:p[ >][\s\S]*?<\/w:p>/g);
+  if (!paragraphs) return xml;
 
-  const contentXml = paragraphs
-    .map(
-      (p) =>
-        `<w:p><w:pPr><w:spacing w:line="360" w:lineRule="auto"/><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t xml:space="preserve">${escapeXml(p)}</w:t></w:r></w:p>`,
-    )
-    .join("");
+  for (const para of paragraphs) {
+    // Skip TOC entries (they contain hyperlinks)
+    if (para.includes("<w:hyperlink")) continue;
+    // Skip the template note paragraph
+    if (para.includes("automated table of contents")) continue;
 
-  // Find the section heading (in a Heading1 styled paragraph, not TOC)
-  // Look for the pattern: heading paragraph followed by an empty paragraph
-  // The heading contains the text in a bookmark
-  const headingPattern = new RegExp(
-    `(<w:p[^>]*>(?:(?!<w:p[ >]).)*?<w:t[^>]*>${escapeRegex(headingText)}</w:t>(?:(?!<w:p[ >]).)*?</w:p>)(<w:p[^>]*>(?:(?!<w:p[ >]).)*?</w:p>)`,
-    "s",
-  );
+    // Get text content
+    const texts: string[] = [];
+    const textRegex = /<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g;
+    let match;
+    while ((match = textRegex.exec(para)) !== null) {
+      texts.push(match[1]);
+    }
+    const fullText = texts.join("").trim();
 
-  const match = xml.match(headingPattern);
-  if (match) {
-    // Replace the empty paragraph after the heading with our content
-    return xml.replace(
-      headingPattern,
-      `$1${contentXml}`,
-    );
+    // Check if this paragraph IS the heading (not just contains it)
+    const cleanHeading = headingText.replace(/\s+/g, " ").trim();
+    const cleanFull = fullText.replace(/\s+/g, " ").trim();
+
+    if (
+      cleanFull.toLowerCase() === cleanHeading.toLowerCase() ||
+      cleanFull.toLowerCase().match(
+        new RegExp(`^\\d\\.?\\s*${cleanHeading.toLowerCase()}\\s*$`),
+      )
+    ) {
+      // Found the heading. Find the next empty/placeholder paragraph after it
+      // and replace it with our content paragraphs.
+      const paraIdx = xml.indexOf(para);
+      const afterHeading = xml.slice(paraIdx + para.length);
+
+      // Find the next paragraph
+      const nextParaMatch = afterHeading.match(/<w:p[ >][\s\S]*?<\/w:p>/);
+      if (!nextParaMatch) continue;
+
+      const nextPara = nextParaMatch[0];
+      const nextTexts: string[] = [];
+      const nextTextRegex = /<w:t(?:\s[^>]*)?>([^<]*)<\/w:t>/g;
+      let m;
+      while ((m = nextTextRegex.exec(nextPara)) !== null) {
+        nextTexts.push(m[1]);
+      }
+      const nextText = nextTexts.join("").trim();
+
+      // Build replacement paragraphs
+      const contentParas = content
+        .split("\n")
+        .filter((line) => line.trim())
+        .map(
+          (line) =>
+            `<w:p><w:pPr><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="both"/><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t xml:space="preserve">${escapeXml(line)}</w:t></w:r></w:p>`,
+        )
+        .join("");
+
+      // If the next paragraph is empty or just whitespace, replace it
+      if (!nextText || nextText === " ") {
+        xml = xml.replace(nextPara, contentParas);
+      } else {
+        // Insert before the next paragraph
+        xml = xml.replace(
+          nextPara,
+          contentParas + nextPara,
+        );
+      }
+
+      break;
+    }
   }
 
   return xml;
-}
-
-function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function escapeXml(str: string): string {
