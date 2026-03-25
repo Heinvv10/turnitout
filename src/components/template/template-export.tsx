@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSettingsStore } from "@/store/settings-store";
 import { usePaperStore } from "@/store/paper-store";
 import { MODULES } from "@/lib/constants";
+import { MODULE_RUBRICS } from "@/lib/module-rubrics";
 import { populateTemplate, docxToBase64 } from "@/lib/docx-handler";
 import { saveAs } from "file-saver";
 import { Button } from "@/components/ui/button";
@@ -36,11 +37,18 @@ export function TemplateExport() {
   } = useSettingsStore();
   const { currentPaper, sections } = usePaperStore();
   const module = MODULES.find((m) => m.code === selectedModule);
+  const { moduleOutlines } = useSettingsStore();
+  const outline = moduleOutlines[selectedModule] || MODULE_RUBRICS[selectedModule];
+  const firstAssessment = outline?.assessments?.find(
+    (a) => a.type !== "Summative",
+  );
 
   const [assignmentTitle, setAssignmentTitle] = useState(
-    currentPaper?.title || "",
+    currentPaper?.title || firstAssessment?.name || "",
   );
-  const [lecturer, setLecturer] = useState(lecturers[selectedModule] || "");
+  const [lecturer, setLecturer] = useState(
+    lecturers[selectedModule] || outline?.lecturer || "",
+  );
   const [exporting, setExporting] = useState(false);
 
   const sectionData = {

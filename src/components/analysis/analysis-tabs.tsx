@@ -33,40 +33,32 @@ export function AnalysisTabs() {
   const { analysisResults } = usePaperStore();
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="border-b px-4 py-3">
-        <ReadinessBadge />
-      </div>
-      <Tabs defaultValue="ai-risk" className="flex flex-1 flex-col">
-        <div className="overflow-x-auto border-b">
+    <Tabs defaultValue="ai-risk" className="flex h-full flex-col">
+      <div className="sticky top-0 z-10 bg-card border-b">
+        <div className="px-4 py-3">
+          <ReadinessBadge />
+        </div>
+        <div className="overflow-x-auto border-t">
           <TabsList className="inline-flex w-max min-w-full justify-start rounded-none bg-transparent px-2">
             <TabsTrigger value="ai-risk" className="gap-1 text-xs">
               <ShieldCheck className="h-3 w-3" />
               AI Risk
-              <TrafficDot
-                color={analysisResults.aiRisk?.trafficLight || null}
-              />
+              <TrafficDot color={analysisResults.aiRisk?.trafficLight || null} />
             </TabsTrigger>
             <TabsTrigger value="plagiarism" className="gap-1 text-xs">
               <Search className="h-3 w-3" />
               Similarity
-              <TrafficDot
-                color={analysisResults.plagiarism?.trafficLight || null}
-              />
+              <TrafficDot color={analysisResults.plagiarism?.trafficLight || null} />
             </TabsTrigger>
             <TabsTrigger value="citations" className="gap-1 text-xs">
               <BookOpen className="h-3 w-3" />
               Citations
-              <TrafficDot
-                color={analysisResults.citations?.trafficLight || null}
-              />
+              <TrafficDot color={analysisResults.citations?.trafficLight || null} />
             </TabsTrigger>
             <TabsTrigger value="grade" className="gap-1 text-xs">
               <GraduationCap className="h-3 w-3" />
               Grade
-              <TrafficDot
-                color={analysisResults.grading?.trafficLight || null}
-              />
+              <TrafficDot color={analysisResults.grading?.trafficLight || null} />
             </TabsTrigger>
             <TabsTrigger value="advice" className="gap-1 text-xs">
               <Lightbulb className="h-3 w-3" />
@@ -74,25 +66,24 @@ export function AnalysisTabs() {
             </TabsTrigger>
           </TabsList>
         </div>
-        <TabsContent value="ai-risk" className="flex-1 overflow-y-auto p-4">
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        <TabsContent value="ai-risk" className="p-4">
           <AIRiskPanel />
         </TabsContent>
-        <TabsContent
-          value="plagiarism"
-          className="flex-1 overflow-y-auto p-4"
-        >
+        <TabsContent value="plagiarism" className="p-4">
           <PlagiarismPanel />
         </TabsContent>
-        <TabsContent value="citations" className="flex-1 overflow-y-auto p-4">
+        <TabsContent value="citations" className="p-4">
           <CitationPanel />
         </TabsContent>
-        <TabsContent value="grade" className="flex-1 overflow-y-auto p-4">
+        <TabsContent value="grade" className="p-4">
           <GraderPanel />
         </TabsContent>
-        <TabsContent value="advice" className="flex-1 overflow-y-auto p-4">
+        <TabsContent value="advice" className="p-4">
           <AdvicePanel />
         </TabsContent>
-      </Tabs>
-    </div>
+      </div>
+    </Tabs>
   );
 }
