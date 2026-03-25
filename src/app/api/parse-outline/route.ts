@@ -56,11 +56,16 @@ Return valid JSON (no markdown, no commentary) with this structure:
   "learningOutcomes": ["<outcome 1>"]
 }`;
 
+    // Truncate if too long - keep first 12000 chars which should cover
+    // module info, assessments, rubrics. Skip the bulk of reading lists.
+    const truncated = text.length > 12000 ? text.slice(0, 12000) + "\n\n[...truncated]" : text;
+
     const response = await callClaude(
       systemPrompt,
-      `Parse this module outline for ${moduleCode || "unknown module"}:\n\n${text}`,
+      `Parse this module outline for ${moduleCode || "unknown module"}:\n\n${truncated}`,
       apiKey,
       "claude-haiku-4-5-20251001",
+      8192,
     );
 
     const result = parseClaudeJSON(response);

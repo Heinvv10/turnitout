@@ -228,7 +228,7 @@ function HomeContent() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Editor Panel */}
-        <div className="w-[45%] shrink-0 overflow-y-auto border-r p-4">
+        <div className="w-[60%] shrink-0 overflow-y-auto border-r p-4">
           <PaperEditor />
         </div>
 

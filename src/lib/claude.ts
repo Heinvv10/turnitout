@@ -8,6 +8,7 @@ export async function callClaude(
   userMessage: string,
   apiKey?: string,
   model?: string,
+  maxTokens?: number,
 ): Promise<string> {
   const key = apiKey || process.env.ANTHROPIC_API_KEY;
 
@@ -24,7 +25,7 @@ export async function callClaude(
     try {
       const message = await client.messages.create({
         model: model || "claude-sonnet-4-20250514",
-        max_tokens: 4096,
+        max_tokens: maxTokens || 4096,
         system: systemPrompt,
         messages: [{ role: "user", content: userMessage }],
       });
