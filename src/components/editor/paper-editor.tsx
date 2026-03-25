@@ -11,6 +11,8 @@ import { EditorToolbar } from "./editor-toolbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SectionView } from "./section-view";
+import { MODULE_RUBRICS } from "@/lib/module-rubrics";
+import { Input } from "@/components/ui/input";
 import {
   Upload,
   BookOpen,
@@ -49,6 +51,7 @@ export function PaperEditor() {
     currentPaper,
     updateContent,
     updateReferences,
+    updateTitle,
     setPaper,
     clearResults,
     sections,
@@ -56,7 +59,13 @@ export function PaperEditor() {
     isSplitting,
     setIsSplitting,
   } = usePaperStore();
-  const { apiKey } = useSettingsStore();
+  const { apiKey, selectedModule, moduleOutlines } = useSettingsStore();
+
+  // Auto-fill title from outline
+  const outline = moduleOutlines[selectedModule] || MODULE_RUBRICS[selectedModule];
+  const defaultTitle = outline?.assessments?.find(
+    (a) => a.type !== "Summative",
+  )?.name || "";
   const fileInputRef = useRef<HTMLInputElement>(null);
   const splitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -128,7 +137,7 @@ export function PaperEditor() {
         setPaper({
           id: crypto.randomUUID(),
           moduleCode: "",
-          title: "Untitled Paper",
+          title: defaultTitle || "",
           content: references ? editor.getHTML() : html,
           plainText: bodyText,
           wordCount: words,
@@ -282,6 +291,14 @@ export function PaperEditor() {
               </Button>
             )}
           </div>
+        </div>
+        <div className="border-b px-3 py-1.5">
+          <Input
+            value={currentPaper?.title || defaultTitle || ""}
+            onChange={(e) => updateTitle(e.target.value)}
+            placeholder="Essay title (e.g. PERMA Reflective Essay)"
+            className="h-7 border-0 bg-transparent px-1 text-sm font-semibold shadow-none focus-visible:ring-0 placeholder:text-muted-foreground/40"
+          />
         </div>
         <EditorToolbar editor={bodyEditor} />
         <div className="flex-1 overflow-y-auto">

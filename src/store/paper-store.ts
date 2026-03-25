@@ -25,6 +25,7 @@ interface PaperState {
   isSplitting: boolean;
 
   setPaper: (paper: Paper) => void;
+  updateTitle: (title: string) => void;
   updateContent: (html: string, plainText: string, wordCount: number) => void;
   updateReferences: (html: string, plainText: string) => void;
   setSections: (sections: SectionSplit | null) => void;
@@ -82,6 +83,12 @@ export const usePaperStore = create<PaperState>((set, get) => ({
   setIsSplitting: (v) => set({ isSplitting: v }),
 
   setPaper: (paper) => set({ currentPaper: paper, resultsStale: false }),
+
+  updateTitle: (title) => {
+    const current = get().currentPaper;
+    if (!current) return;
+    set({ currentPaper: { ...current, title } });
+  },
 
   updateContent: (html, plainText, wordCount) => {
     const current = get().currentPaper;
