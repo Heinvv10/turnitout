@@ -2,6 +2,9 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { StoredTemplate } from "@/types/template";
 import type { ModuleRubric } from "@/lib/module-rubrics";
+import type { Paper } from "@/types/paper";
+import type { SubmissionReadiness } from "@/types/analysis";
+import type { SectionSplit } from "@/store/paper-store";
 
 interface SettingsState {
   studentName: string;
@@ -13,6 +16,7 @@ interface SettingsState {
   moduleOutlines: Record<string, ModuleRubric>;
   apiKey: string;
   currentPaperId: number | null;
+  modulePapers: Record<string, { paper: Paper; sections: SectionSplit | null; results: SubmissionReadiness }>;
 
   setStudentName: (name: string) => void;
   setStudentNumber: (number: string) => void;
@@ -24,6 +28,8 @@ interface SettingsState {
   removeModuleOutline: (moduleCode: string) => void;
   setApiKey: (key: string) => void;
   setCurrentPaperId: (id: number | null) => void;
+  saveModulePaper: (moduleCode: string, paper: Paper, sections: SectionSplit | null, results: SubmissionReadiness) => void;
+  getModulePaper: (moduleCode: string) => { paper: Paper; sections: SectionSplit | null; results: SubmissionReadiness } | null;
   syncToDb: () => Promise<void>;
 }
 
@@ -39,6 +45,7 @@ export const useSettingsStore = create<SettingsState>()(
       moduleOutlines: {},
       apiKey: "",
       currentPaperId: null,
+      modulePapers: {},
 
       setStudentName: (name) => set({ studentName: name }),
       setStudentNumber: (number) => set({ studentNumber: number }),
@@ -58,6 +65,14 @@ export const useSettingsStore = create<SettingsState>()(
       },
       setApiKey: (key) => set({ apiKey: key }),
       setCurrentPaperId: (id) => set({ currentPaperId: id }),
+      saveModulePaper: (moduleCode, paper, sections, results) =>
+        set({
+          modulePapers: {
+            ...get().modulePapers,
+            [moduleCode]: { paper, sections, results },
+          },
+        }),
+      getModulePaper: (moduleCode) => get().modulePapers[moduleCode] || null,
 
       syncToDb: async () => {
         const { studentName, studentNumber, apiKey } = get();

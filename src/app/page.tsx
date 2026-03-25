@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { OutlineGate } from "@/components/analysis/outline-gate";
@@ -40,16 +40,21 @@ function HomeContent() {
     currentPaper,
     analysisResults,
     isAnalyzing,
+    sections,
     setAnalyzing,
     setAIRiskResult,
     setCitationResult,
     setGradingResult,
     setPlagiarismResult,
+    setPaper,
+    setSections,
+    clearResults,
   } = usePaperStore();
-  const { selectedModule, setSelectedModule, moduleOutlines, apiKey } =
+  const { selectedModule, setSelectedModule, moduleOutlines, apiKey, saveModulePaper, getModulePaper } =
     useSettingsStore();
   const { addEntry } = useHistoryStore();
   const searchParams = useSearchParams();
+  const prevModuleRef = useRef(selectedModule);
 
   // Handle ?module=XXXX from dashboard links
   useEffect(() => {
@@ -58,6 +63,48 @@ function HomeContent() {
       setSelectedModule(moduleParam);
     }
   }, [searchParams, setSelectedModule]);
+
+  // Save current paper and restore previous when switching modules
+  useEffect(() => {
+    const prevModule = prevModuleRef.current;
+    if (prevModule === selectedModule) return;
+
+    // Save current paper for the previous module
+    if (prevModule && currentPaper && currentPaper.plainText) {
+      saveModulePaper(prevModule, currentPaper, sections, analysisResults);
+    }
+
+    // Restore paper for the new module
+    const saved = getModulePaper(selectedModule);
+    if (saved) {
+      setPaper(saved.paper);
+      setSections(saved.sections);
+      // Restore analysis results
+      if (saved.results.aiRisk) setAIRiskResult(saved.results.aiRisk);
+      if (saved.results.citations) setCitationResult(saved.results.citations);
+      if (saved.results.grading) setGradingResult(saved.results.grading);
+      if (saved.results.plagiarism) setPlagiarismResult(saved.results.plagiarism);
+    } else {
+      // Clear for fresh module
+      clearResults();
+      setSections(null);
+      setPaper({
+        id: crypto.randomUUID(),
+        moduleCode: selectedModule,
+        title: "",
+        content: "",
+        plainText: "",
+        wordCount: 0,
+        references: "",
+        referencesHtml: "",
+        referenceCount: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+    }
+
+    prevModuleRef.current = selectedModule;
+  }, [selectedModule]);
 
   const anyLoading =
     isAnalyzing.aiRisk || isAnalyzing.citations || isAnalyzing.grading || isAnalyzing.plagiarism;
@@ -165,6 +212,13 @@ function HomeContent() {
             },
           }),
         }).catch((err) => console.error("DB history save failed:", err));
+      }
+
+      // Save paper + results for this module
+      const latestPaper = usePaperStore.getState().currentPaper;
+      const latestSections = usePaperStore.getState().sections;
+      if (latestPaper) {
+        saveModulePaper(selectedModule, latestPaper, latestSections, updatedResults);
       }
     }
   };
