@@ -4,12 +4,11 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Highlight from "@tiptap/extension-highlight";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import { usePaperStore } from "@/store/paper-store";
 import { EditorToolbar } from "./editor-toolbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Upload, BookOpen, FileText } from "lucide-react";
 
 function countWords(text: string): number {
@@ -25,6 +24,27 @@ function countReferences(text: string): number {
     .filter((l) => l.trim().length > 10).length;
 }
 
+/**
+ * Auto-detect and split pasted text into body vs references.
+ * Returns { body, references } where references is everything
+ * after a "Reference List" / "References" / "Bibliography" heading.
+ */
+function splitBodyAndReferences(text: string): {
+  body: string;
+  references: string;
+} {
+  const refMatch = text.match(
+    /\n\s*(references?|bibliography|reference\s*list)\s*\n/i,
+  );
+  if (refMatch && refMatch.index !== undefined) {
+    return {
+      body: text.slice(0, refMatch.index).trim(),
+      references: text.slice(refMatch.index + refMatch[0].length).trim(),
+    };
+  }
+  return { body: text, references: "" };
+}
+
 export function PaperEditor() {
   const { currentPaper, updateContent, updateReferences, setPaper } =
     usePaperStore();
@@ -37,7 +57,7 @@ export function PaperEditor() {
       StarterKit,
       Placeholder.configure({
         placeholder:
-          "Write your essay here (Introduction, Body, Conclusion)...\n\nDo NOT include your reference list here — use the Reference List section below.",
+          "Paste or write your full essay here (Introduction, Body, Conclusion).\n\nIf your text includes a Reference List, it will be automatically separated.",
       }),
       Highlight.configure({ multicolor: true }),
     ],
@@ -45,30 +65,55 @@ export function PaperEditor() {
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm sm:prose dark:prose-invert max-w-none min-h-[300px] p-4 focus:outline-none",
+          "prose prose-sm sm:prose dark:prose-invert max-w-none min-h-[350px] p-4 focus:outline-none",
       },
     },
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
       const text = editor.getText();
-      const words = countWords(text);
+
+      // Auto-split: detect if references were pasted into the body
+      const { body, references } = splitBodyAndReferences(text);
+
+      if (references && refEditor) {
+        // Move references to the ref editor
+        const bodyHtml = html.slice(
+          0,
+          html.toLowerCase().search(
+            /references?|bibliography|reference\s*list/i,
+          ),
+        );
+        editor.commands.setContent(
+          bodyHtml || `<p>${body.replace(/\n\n/g, "</p><p>")}</p>`,
+        );
+        refEditor.commands.setContent(
+          `<p>${references.replace(/\n/g, "</p><p>")}</p>`,
+        );
+        updateReferences(refEditor.getHTML(), references);
+      }
+
+      const words = countWords(references ? body : text);
 
       if (!currentPaper) {
         setPaper({
           id: crypto.randomUUID(),
           moduleCode: "",
           title: "Untitled Paper",
-          content: html,
-          plainText: text,
+          content: references ? editor.getHTML() : html,
+          plainText: references ? body : text,
           wordCount: words,
-          references: "",
+          references: references || "",
           referencesHtml: "",
-          referenceCount: 0,
+          referenceCount: countReferences(references || ""),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         });
       } else {
-        updateContent(html, text, words);
+        updateContent(
+          references ? editor.getHTML() : html,
+          references ? body : text,
+          words,
+        );
       }
     },
   });
@@ -80,14 +125,14 @@ export function PaperEditor() {
       StarterKit,
       Placeholder.configure({
         placeholder:
-          "Paste your reference list here...\n\nOne reference per line, Harvard format:\nAuthor, I. (Year). Title. Publisher.",
+          "Reference list appears here automatically, or paste it separately.",
       }),
     ],
     content: currentPaper?.referencesHtml || "",
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm dark:prose-invert max-w-none min-h-[120px] p-3 focus:outline-none text-xs",
+          "prose prose-sm dark:prose-invert max-w-none min-h-[80px] p-3 focus:outline-none text-xs",
       },
     },
     onUpdate: ({ editor }) => {
@@ -111,43 +156,28 @@ export function PaperEditor() {
           .extractRawText({ arrayBuffer })
           .then((r) => r.value);
 
-        // Try to split body from references
-        const refMatch = fullText.match(
-          /\n\s*(references?|bibliography|reference\s+list)\s*\n/i,
-        );
-
-        let bodyText = fullText;
-        let refText = "";
-
-        if (refMatch && refMatch.index) {
-          bodyText = fullText.slice(0, refMatch.index).trim();
-          refText = fullText
-            .slice(refMatch.index + refMatch[0].length)
-            .trim();
-        }
+        const { body, references } = splitBodyAndReferences(fullText);
 
         bodyEditor?.commands.setContent(
-          `<p>${bodyText.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br>")}</p>`,
+          `<p>${body.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br>")}</p>`,
         );
 
-        if (refText && refEditor) {
+        if (references && refEditor) {
           refEditor.commands.setContent(
-            `<p>${refText.replace(/\n/g, "</p><p>")}</p>`,
+            `<p>${references.replace(/\n/g, "</p><p>")}</p>`,
           );
         }
-
-        const bodyWords = countWords(bodyText);
 
         setPaper({
           id: crypto.randomUUID(),
           moduleCode: "",
           title: file.name.replace(".docx", ""),
           content: bodyEditor?.getHTML() || "",
-          plainText: bodyText,
-          wordCount: bodyWords,
-          references: refText,
+          plainText: body,
+          wordCount: countWords(body),
+          references: references,
           referencesHtml: refEditor?.getHTML() || "",
-          referenceCount: countReferences(refText),
+          referenceCount: countReferences(references),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         });
@@ -164,13 +194,15 @@ export function PaperEditor() {
   const refCount = currentPaper?.referenceCount || 0;
 
   return (
-    <div className="flex h-full flex-col gap-3">
+    <div className="flex h-full flex-col gap-2">
       {/* Essay Body */}
       <div className="flex flex-1 flex-col rounded-lg border bg-card">
         <div className="flex items-center justify-between border-b bg-muted/30 px-3 py-1.5">
           <div className="flex items-center gap-2">
             <FileText className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-xs font-medium">Essay Body</span>
+            <span className="text-xs font-medium">
+              Essay (Introduction + Body + Conclusion)
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="font-mono text-[10px]">
@@ -190,7 +222,7 @@ export function PaperEditor() {
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="mr-1 h-3 w-3" />
-              Upload .docx
+              .docx
             </Button>
           </div>
         </div>
@@ -211,7 +243,7 @@ export function PaperEditor() {
             {refCount} references
           </Badge>
         </div>
-        <div className="max-h-[200px] overflow-y-auto">
+        <div className="max-h-[180px] overflow-y-auto">
           <EditorContent editor={refEditor} />
         </div>
       </div>
