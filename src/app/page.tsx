@@ -15,7 +15,15 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Loader2, PlayCircle, PanelRightOpen } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { TemplateExport } from "@/components/template/template-export";
+import { Loader2, PlayCircle, PanelRightOpen, Download } from "lucide-react";
 
 export default function Home() {
   return (
@@ -170,18 +178,33 @@ function HomeContent() {
             ? `${currentPaper.wordCount} words`
             : "Start writing to begin"}
         </p>
-        <Button
-          onClick={runAllChecks}
-          disabled={!currentPaper?.plainText || anyLoading}
-          size="sm"
-        >
-          {anyLoading ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <PlayCircle className="mr-2 h-4 w-4" />
-          )}
-          Run All Checks
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={runAllChecks}
+            disabled={!currentPaper?.plainText || anyLoading}
+            size="sm"
+          >
+            {anyLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <PlayCircle className="mr-2 h-4 w-4" />
+            )}
+            Run All Checks
+          </Button>
+
+          <Dialog>
+            <DialogTrigger className="inline-flex items-center justify-center gap-1.5 rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50">
+              <Download className="h-3.5 w-3.5" />
+              Export .docx
+            </DialogTrigger>
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Export to Word Template</DialogTitle>
+              </DialogHeader>
+              <TemplateExport />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden">

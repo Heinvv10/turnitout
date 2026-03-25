@@ -9,15 +9,26 @@ import type {
   TrafficLight,
 } from "@/types/analysis";
 
+export interface SectionSplit {
+  introduction: string;
+  body: string;
+  conclusion: string;
+  references: string;
+}
+
 interface PaperState {
   currentPaper: Paper | null;
   analysisResults: SubmissionReadiness;
   isAnalyzing: { aiRisk: boolean; citations: boolean; grading: boolean; plagiarism: boolean };
   resultsStale: boolean;
+  sections: SectionSplit | null;
+  isSplitting: boolean;
 
   setPaper: (paper: Paper) => void;
   updateContent: (html: string, plainText: string, wordCount: number) => void;
   updateReferences: (html: string, plainText: string) => void;
+  setSections: (sections: SectionSplit | null) => void;
+  setIsSplitting: (v: boolean) => void;
   setAIRiskResult: (result: AIRiskResult) => void;
   setCitationResult: (result: CitationResult) => void;
   setGradingResult: (result: GradingResult) => void;
@@ -64,6 +75,11 @@ export const usePaperStore = create<PaperState>((set, get) => ({
   analysisResults: { ...emptyResults },
   isAnalyzing: { aiRisk: false, citations: false, grading: false, plagiarism: false },
   resultsStale: false,
+  sections: null,
+  isSplitting: false,
+
+  setSections: (sections) => set({ sections }),
+  setIsSplitting: (v) => set({ isSplitting: v }),
 
   setPaper: (paper) => set({ currentPaper: paper, resultsStale: false }),
 

@@ -4,31 +4,30 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Highlight from "@tiptap/extension-highlight";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useEffect } from "react";
 import { usePaperStore } from "@/store/paper-store";
+import { useSettingsStore } from "@/store/settings-store";
 import { EditorToolbar } from "./editor-toolbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Upload, BookOpen, FileText, Trash2 } from "lucide-react";
+import {
+  Upload,
+  BookOpen,
+  FileText,
+  Trash2,
+  Wand2,
+  Loader2,
+  CheckCircle,
+} from "lucide-react";
 
 function countWords(text: string): number {
-  return text
-    .trim()
-    .split(/\s+/)
-    .filter((w) => w.length > 0).length;
+  return text.trim().split(/\s+/).filter((w) => w.length > 0).length;
 }
 
 function countReferences(text: string): number {
-  return text
-    .split("\n")
-    .filter((l) => l.trim().length > 10).length;
+  return text.split("\n").filter((l) => l.trim().length > 10).length;
 }
 
-/**
- * Auto-detect and split pasted text into body vs references.
- * Returns { body, references } where references is everything
- * after a "Reference List" / "References" / "Bibliography" heading.
- */
 function splitBodyAndReferences(text: string): {
   body: string;
   references: string;
@@ -46,18 +45,60 @@ function splitBodyAndReferences(text: string): {
 }
 
 export function PaperEditor() {
-  const { currentPaper, updateContent, updateReferences, setPaper } =
-    usePaperStore();
+  const {
+    currentPaper,
+    updateContent,
+    updateReferences,
+    setPaper,
+    clearResults,
+    sections,
+    setSections,
+    isSplitting,
+    setIsSplitting,
+  } = usePaperStore();
+  const { apiKey } = useSettingsStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const splitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Essay body editor
+  // Auto AI-split when content changes (debounced)
+  const triggerAiSplit = useCallback(
+    async (bodyText: string, refText: string) => {
+      if (!apiKey || bodyText.length < 100) return;
+      setIsSplitting(true);
+      try {
+        const fullText = refText
+          ? `${bodyText}\n\nReference List\n${refText}`
+          : bodyText;
+        const res = await fetch("/api/split-sections", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: fullText, apiKey }),
+        });
+        const data = await res.json();
+        if (!data.error) {
+          setSections({
+            introduction: data.introduction || "",
+            body: data.body || "",
+            conclusion: data.conclusion || "",
+            references: data.references || refText || "",
+          });
+        }
+      } catch {
+        // Silent fail - sections stay empty
+      } finally {
+        setIsSplitting(false);
+      }
+    },
+    [apiKey, setSections, setIsSplitting],
+  );
+
   const bodyEditor = useEditor({
     immediatelyRender: false,
     extensions: [
       StarterKit,
       Placeholder.configure({
         placeholder:
-          "Paste or write your full essay here (Introduction, Body, Conclusion).\n\nIf your text includes a Reference List, it will be automatically separated.",
+          "Paste your full essay here...\n\nIt will be automatically split into Introduction, Body, and Conclusion.",
       }),
       Highlight.configure({ multicolor: true }),
     ],
@@ -71,28 +112,17 @@ export function PaperEditor() {
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
       const text = editor.getText();
-
-      // Auto-split: detect if references were pasted into the body
       const { body, references } = splitBodyAndReferences(text);
 
       if (references && refEditor) {
-        // Move references to the ref editor
-        const bodyHtml = html.slice(
-          0,
-          html.toLowerCase().search(
-            /references?|bibliography|reference\s*list/i,
-          ),
-        );
-        editor.commands.setContent(
-          bodyHtml || `<p>${body.replace(/\n\n/g, "</p><p>")}</p>`,
-        );
         refEditor.commands.setContent(
           `<p>${references.replace(/\n/g, "</p><p>")}</p>`,
         );
         updateReferences(refEditor.getHTML(), references);
       }
 
-      const words = countWords(references ? body : text);
+      const bodyText = references ? body : text;
+      const words = countWords(bodyText);
 
       if (!currentPaper) {
         setPaper({
@@ -100,7 +130,7 @@ export function PaperEditor() {
           moduleCode: "",
           title: "Untitled Paper",
           content: references ? editor.getHTML() : html,
-          plainText: references ? body : text,
+          plainText: bodyText,
           wordCount: words,
           references: references || "",
           referencesHtml: "",
@@ -111,34 +141,36 @@ export function PaperEditor() {
       } else {
         updateContent(
           references ? editor.getHTML() : html,
-          references ? body : text,
+          bodyText,
           words,
         );
       }
+
+      // Debounced AI split
+      if (splitTimeoutRef.current) clearTimeout(splitTimeoutRef.current);
+      splitTimeoutRef.current = setTimeout(() => {
+        triggerAiSplit(bodyText, references || currentPaper?.references || "");
+      }, 2000);
     },
   });
 
-  // Reference list editor
   const refEditor = useEditor({
     immediatelyRender: false,
     extensions: [
       StarterKit,
       Placeholder.configure({
-        placeholder:
-          "Reference list appears here automatically, or paste it separately.",
+        placeholder: "Reference list (auto-detected or paste here)",
       }),
     ],
     content: currentPaper?.referencesHtml || "",
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm dark:prose-invert max-w-none min-h-[80px] p-3 focus:outline-none text-xs",
+          "prose prose-sm dark:prose-invert max-w-none min-h-[60px] p-3 focus:outline-none text-xs",
       },
     },
     onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
-      const text = editor.getText();
-      updateReferences(html, text);
+      updateReferences(editor.getHTML(), editor.getText());
     },
   });
 
@@ -146,22 +178,16 @@ export function PaperEditor() {
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file || !file.name.endsWith(".docx")) return;
-
       try {
         const mammoth = await import("mammoth");
         const arrayBuffer = await file.arrayBuffer();
-        const result = await mammoth.convertToHtml({ arrayBuffer });
-        const fullHtml = result.value;
         const fullText = await mammoth
           .extractRawText({ arrayBuffer })
           .then((r) => r.value);
+        const result = await mammoth.convertToHtml({ arrayBuffer });
 
         const { body, references } = splitBodyAndReferences(fullText);
-
-        bodyEditor?.commands.setContent(
-          `<p>${body.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br>")}</p>`,
-        );
-
+        bodyEditor?.commands.setContent(result.value);
         if (references && refEditor) {
           refEditor.commands.setContent(
             `<p>${references.replace(/\n/g, "</p><p>")}</p>`,
@@ -175,27 +201,28 @@ export function PaperEditor() {
           content: bodyEditor?.getHTML() || "",
           plainText: body,
           wordCount: countWords(body),
-          references: references,
+          references,
           referencesHtml: refEditor?.getHTML() || "",
           referenceCount: countReferences(references),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         });
-      } catch (err) {
-        console.error("Failed to parse .docx file:", err);
-      }
 
+        // Trigger AI split
+        triggerAiSplit(body, references);
+      } catch (err) {
+        console.error("Failed to parse .docx:", err);
+      }
       if (fileInputRef.current) fileInputRef.current.value = "";
     },
-    [bodyEditor, refEditor, setPaper],
+    [bodyEditor, refEditor, setPaper, triggerAiSplit],
   );
-
-  const { clearResults } = usePaperStore();
 
   const handleClearAll = useCallback(() => {
     bodyEditor?.commands.clearContent();
     refEditor?.commands.clearContent();
     clearResults();
+    setSections(null);
     setPaper({
       id: crypto.randomUUID(),
       moduleCode: "",
@@ -209,7 +236,7 @@ export function PaperEditor() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
-  }, [bodyEditor, refEditor, clearResults, setPaper]);
+  }, [bodyEditor, refEditor, clearResults, setSections, setPaper]);
 
   const bodyWordCount = currentPaper?.wordCount || 0;
   const refCount = currentPaper?.referenceCount || 0;
@@ -221,9 +248,7 @@ export function PaperEditor() {
         <div className="flex items-center justify-between border-b bg-muted/30 px-3 py-1.5">
           <div className="flex items-center gap-2">
             <FileText className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-xs font-medium">
-              Essay (Introduction + Body + Conclusion)
-            </span>
+            <span className="text-xs font-medium">Essay</span>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="font-mono text-[10px]">
@@ -262,6 +287,47 @@ export function PaperEditor() {
         <div className="flex-1 overflow-y-auto">
           <EditorContent editor={bodyEditor} />
         </div>
+
+        {/* Section split status bar */}
+        {bodyWordCount > 0 && (
+          <div className="flex items-center gap-2 border-t bg-muted/20 px-3 py-1.5 text-[10px]">
+            {isSplitting ? (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                <span className="text-muted-foreground">
+                  Detecting sections...
+                </span>
+              </>
+            ) : sections ? (
+              <>
+                <CheckCircle className="h-3 w-3 text-green-500" />
+                <span className="text-muted-foreground">
+                  Intro: {countWords(sections.introduction)}w
+                </span>
+                <span className="text-muted-foreground">·</span>
+                <span className="text-muted-foreground">
+                  Body: {countWords(sections.body)}w
+                </span>
+                <span className="text-muted-foreground">·</span>
+                <span className="text-muted-foreground">
+                  Conclusion: {countWords(sections.conclusion)}w
+                </span>
+                {sections.references && (
+                  <>
+                    <span className="text-muted-foreground">·</span>
+                    <span className="text-muted-foreground">
+                      Refs: {countReferences(sections.references)}
+                    </span>
+                  </>
+                )}
+              </>
+            ) : (
+              <span className="text-muted-foreground">
+                Sections will be auto-detected after you paste your essay
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Reference List */}
@@ -275,7 +341,7 @@ export function PaperEditor() {
             {refCount} references
           </Badge>
         </div>
-        <div className="max-h-[180px] overflow-y-auto">
+        <div className="max-h-[150px] overflow-y-auto">
           <EditorContent editor={refEditor} />
         </div>
       </div>

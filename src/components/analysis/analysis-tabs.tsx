@@ -8,12 +8,10 @@ import { GraderPanel } from "./grader-panel";
 import { ReadinessBadge } from "./readiness-badge";
 import { PlagiarismPanel } from "./plagiarism-panel";
 import { AdvicePanel } from "./advice-panel";
-import { TemplateExport } from "@/components/template/template-export";
 import {
   ShieldCheck,
   BookOpen,
   GraduationCap,
-  FileOutput,
   Search,
   Lightbulb,
 } from "lucide-react";
@@ -74,13 +72,6 @@ export function AnalysisTabs() {
               <Lightbulb className="h-3 w-3" />
               Advice
             </TabsTrigger>
-            <TabsTrigger
-              value="export"
-              className="gap-1 text-xs bg-primary/5 font-medium"
-            >
-              <FileOutput className="h-3 w-3" />
-              Export .docx
-            </TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="ai-risk" className="flex-1 overflow-y-auto p-4">
@@ -100,9 +91,6 @@ export function AnalysisTabs() {
         </TabsContent>
         <TabsContent value="advice" className="flex-1 overflow-y-auto p-4">
           <AdvicePanel />
-        </TabsContent>
-        <TabsContent value="export" className="flex-1 overflow-y-auto">
-          <TemplateExport />
         </TabsContent>
       </Tabs>
     </div>
