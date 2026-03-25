@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSettingsStore } from "@/store/settings-store";
 import { MODULES } from "@/lib/constants";
+import { db } from "@/lib/db-client";
 import {
   Dialog,
   DialogContent,
@@ -34,7 +35,7 @@ export function SettingsDialog() {
   const [localKey, setLocalKey] = useState(apiKey);
   const [localLecturers, setLocalLecturers] = useState(lecturers);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setStudentName(name);
     setStudentNumber(number);
     setApiKey(localKey);
@@ -42,6 +43,8 @@ export function SettingsDialog() {
       setLecturer(code, lecturer);
     });
     setOpen(false);
+    // Sync to database
+    setTimeout(() => useSettingsStore.getState().syncToDb(), 100);
   };
 
   return (

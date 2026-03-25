@@ -6,20 +6,25 @@ import type { ModuleRubric } from "@/lib/module-rubrics";
 interface SettingsState {
   studentName: string;
   studentNumber: string;
+  studentDbId: number | null;
   selectedModule: string;
   template: StoredTemplate | null;
   lecturers: Record<string, string>;
   moduleOutlines: Record<string, ModuleRubric>;
   apiKey: string;
+  currentPaperId: number | null;
 
   setStudentName: (name: string) => void;
   setStudentNumber: (number: string) => void;
+  setStudentDbId: (id: number | null) => void;
   setSelectedModule: (code: string) => void;
   setTemplate: (template: StoredTemplate | null) => void;
   setLecturer: (moduleCode: string, lecturer: string) => void;
   setModuleOutline: (moduleCode: string, outline: ModuleRubric) => void;
   removeModuleOutline: (moduleCode: string) => void;
   setApiKey: (key: string) => void;
+  setCurrentPaperId: (id: number | null) => void;
+  syncToDb: () => Promise<void>;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -27,14 +32,17 @@ export const useSettingsStore = create<SettingsState>()(
     (set, get) => ({
       studentName: "",
       studentNumber: "",
+      studentDbId: null,
       selectedModule: "ACDF5150",
       template: null,
       lecturers: {},
       moduleOutlines: {},
       apiKey: "",
+      currentPaperId: null,
 
       setStudentName: (name) => set({ studentName: name }),
       setStudentNumber: (number) => set({ studentNumber: number }),
+      setStudentDbId: (id) => set({ studentDbId: id }),
       setSelectedModule: (code) => set({ selectedModule: code }),
       setTemplate: (template) => set({ template }),
       setLecturer: (moduleCode, lecturer) =>
@@ -49,6 +57,31 @@ export const useSettingsStore = create<SettingsState>()(
         set({ moduleOutlines: outlines });
       },
       setApiKey: (key) => set({ apiKey: key }),
+      setCurrentPaperId: (id) => set({ currentPaperId: id }),
+
+      syncToDb: async () => {
+        const { studentName, studentNumber, apiKey } = get();
+        if (!studentName || !studentNumber) return;
+
+        try {
+          const res = await fetch("/api/db", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "upsertStudent",
+              name: studentName,
+              studentNumber,
+              apiKey,
+            }),
+          });
+          const student = await res.json();
+          if (student?.id) {
+            set({ studentDbId: student.id });
+          }
+        } catch (err) {
+          console.error("Failed to sync student to DB:", err);
+        }
+      },
     }),
     { name: "turnitout-settings" },
   ),

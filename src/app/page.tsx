@@ -98,7 +98,7 @@ function HomeContent() {
     setAnalyzing("grading", false);
     setAnalyzing("plagiarism", false);
 
-    // Save to history
+    // Save to history (localStorage)
     const updatedResults = usePaperStore.getState().analysisResults;
     if (currentPaper) {
       addEntry({
@@ -109,6 +109,30 @@ function HomeContent() {
         wordCount: currentPaper.wordCount,
         readiness: updatedResults,
       });
+
+      // Save to database
+      const { studentDbId } = useSettingsStore.getState();
+      if (studentDbId) {
+        fetch("/api/db", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "saveHistory",
+            studentId: studentDbId,
+            paperTitle: currentPaper.title || "Untitled",
+            moduleCode: selectedModule,
+            wordCount: currentPaper.wordCount,
+            overallScore: updatedResults.overall,
+            trafficLight: updatedResults.trafficLight,
+            resultsSummary: {
+              aiRisk: updatedResults.aiRisk?.overallScore ?? null,
+              similarity: updatedResults.plagiarism?.overallSimilarity ?? null,
+              citations: updatedResults.citations?.score ?? null,
+              grade: updatedResults.grading?.totalScore ?? null,
+            },
+          }),
+        }).catch((err) => console.error("DB history save failed:", err));
+      }
     }
   };
 
