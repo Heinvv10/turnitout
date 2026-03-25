@@ -43,20 +43,26 @@ export function TemplateExport() {
     (a) => a.type !== "Summative",
   );
 
-  const [assignmentTitle, setAssignmentTitle] = useState("");
-  const [lecturer, setLecturer] = useState("");
+  const paperTitle = currentPaper?.title || "";
+  const defaultTitle = paperTitle || firstAssessment?.name || "";
+  const defaultLecturer = lecturers[selectedModule] || outline?.lecturer || "";
 
-  // Auto-fill from outline when it loads
+  const [assignmentTitle, setAssignmentTitle] = useState(defaultTitle);
+  const [lecturer, setLecturer] = useState(defaultLecturer);
+
+  // Sync when paper title or outline changes
   useEffect(() => {
-    if (!assignmentTitle && firstAssessment?.name) {
+    if (currentPaper?.title) {
+      setAssignmentTitle(currentPaper.title);
+    } else if (firstAssessment?.name) {
       setAssignmentTitle(firstAssessment.name);
     }
-    if (!lecturer && outline?.lecturer) {
-      setLecturer(outline.lecturer);
-    } else if (!lecturer && lecturers[selectedModule]) {
-      setLecturer(lecturers[selectedModule]);
-    }
-  }, [outline, firstAssessment, selectedModule, lecturers]);
+  }, [currentPaper?.title, firstAssessment?.name]);
+
+  useEffect(() => {
+    const lec = lecturers[selectedModule] || outline?.lecturer || "";
+    if (lec) setLecturer(lec);
+  }, [outline?.lecturer, lecturers, selectedModule]);
   const [exporting, setExporting] = useState(false);
 
   const sectionData = {
