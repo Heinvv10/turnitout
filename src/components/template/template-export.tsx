@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSettingsStore } from "@/store/settings-store";
 import { usePaperStore } from "@/store/paper-store";
 import { MODULES } from "@/lib/constants";
@@ -43,12 +43,20 @@ export function TemplateExport() {
     (a) => a.type !== "Summative",
   );
 
-  const [assignmentTitle, setAssignmentTitle] = useState(
-    currentPaper?.title || firstAssessment?.name || "",
-  );
-  const [lecturer, setLecturer] = useState(
-    lecturers[selectedModule] || outline?.lecturer || "",
-  );
+  const [assignmentTitle, setAssignmentTitle] = useState("");
+  const [lecturer, setLecturer] = useState("");
+
+  // Auto-fill from outline when it loads
+  useEffect(() => {
+    if (!assignmentTitle && firstAssessment?.name) {
+      setAssignmentTitle(firstAssessment.name);
+    }
+    if (!lecturer && outline?.lecturer) {
+      setLecturer(outline.lecturer);
+    } else if (!lecturer && lecturers[selectedModule]) {
+      setLecturer(lecturers[selectedModule]);
+    }
+  }, [outline, firstAssessment, selectedModule, lecturers]);
   const [exporting, setExporting] = useState(false);
 
   const sectionData = {
