@@ -128,3 +128,46 @@
     @apply font-sans;
   }
 }
+
+/* Tiptap editor styles */
+.tiptap p.is-editor-empty:first-child::before {
+  color: var(--muted-foreground);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.tiptap {
+  > * + * {
+    margin-top: 0.75em;
+  }
+
+  h1 { font-size: 1.5rem; font-weight: 700; }
+  h2 { font-size: 1.25rem; font-weight: 600; }
+  h3 { font-size: 1.1rem; font-weight: 600; }
+
+  ul, ol {
+    padding-left: 1.5rem;
+  }
+  ul { list-style-type: disc; }
+  ol { list-style-type: decimal; }
+
+  blockquote {
+    border-left: 3px solid var(--border);
+    padding-left: 1rem;
+    margin-left: 0;
+    color: var(--muted-foreground);
+  }
+
+  mark {
+    background-color: oklch(0.9 0.15 90);
+    border-radius: 2px;
+    padding: 1px 2px;
+  }
+
+  .dark & mark {
+    background-color: oklch(0.4 0.1 90);
+  }
+}
