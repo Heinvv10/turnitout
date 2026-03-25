@@ -23,7 +23,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { TemplateExport } from "@/components/template/template-export";
-import { Loader2, PlayCircle, PanelRightOpen, Download } from "lucide-react";
+import { DocumentPreview } from "@/components/template/document-preview";
+import { Tabs as ExportTabs, TabsContent as ETC, TabsList as ETL, TabsTrigger as ETT } from "@/components/ui/tabs";
+import { Loader2, PlayCircle, PanelRightOpen, Download, Eye, Settings2 } from "lucide-react";
 
 export default function Home() {
   return (
@@ -197,11 +199,28 @@ function HomeContent() {
               <Download className="h-3.5 w-3.5" />
               Export .docx
             </DialogTrigger>
-            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Export to Word Template</DialogTitle>
               </DialogHeader>
-              <TemplateExport />
+              <ExportTabs defaultValue="preview">
+                <ETL className="w-full">
+                  <ETT value="preview" className="flex-1 gap-1 text-xs">
+                    <Eye className="h-3 w-3" />
+                    Document Preview
+                  </ETT>
+                  <ETT value="settings" className="flex-1 gap-1 text-xs">
+                    <Settings2 className="h-3 w-3" />
+                    Export Settings
+                  </ETT>
+                </ETL>
+                <ETC value="preview" className="max-h-[60vh] overflow-y-auto mt-2">
+                  <DocumentPreview />
+                </ETC>
+                <ETC value="settings" className="mt-2">
+                  <TemplateExport />
+                </ETC>
+              </ExportTabs>
             </DialogContent>
           </Dialog>
         </div>
@@ -209,12 +228,12 @@ function HomeContent() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Editor Panel */}
-        <div className="flex-1 overflow-y-auto border-r p-4">
+        <div className="w-[45%] shrink-0 overflow-y-auto border-r p-4">
           <PaperEditor />
         </div>
 
         {/* Analysis Panel - Desktop */}
-        <div className="hidden w-[420px] shrink-0 overflow-y-auto bg-card lg:block">
+        <div className="hidden flex-1 overflow-y-auto bg-card lg:block">
           <AnalysisTabs />
         </div>
 
