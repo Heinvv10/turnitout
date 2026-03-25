@@ -60,6 +60,7 @@ Return valid JSON (no markdown, no commentary) with this structure:
       systemPrompt,
       `Parse this module outline for ${moduleCode || "unknown module"}:\n\n${text}`,
       apiKey,
+      "claude-haiku-4-5-20251001",
     );
 
     const result = parseClaudeJSON(response);

@@ -47,25 +47,16 @@ export function OutlineGate() {
         } else if (file.name.endsWith(".txt")) {
           text = await file.text();
         } else if (file.name.endsWith(".pdf")) {
-          const arrayBuffer = await file.arrayBuffer();
-          const bytes = new Uint8Array(arrayBuffer);
-          const decoder = new TextDecoder("utf-8", { fatal: false });
-          const raw = decoder.decode(bytes);
-          const textParts: string[] = [];
-          const streamRegex = /stream\s*([\s\S]*?)\s*endstream/g;
-          let match;
-          while ((match = streamRegex.exec(raw)) !== null) {
-            const cleaned = match[1]
-              .replace(/[^\x20-\x7E\n\r]/g, " ")
-              .trim();
-            if (cleaned.length > 20) textParts.push(cleaned);
-          }
-          text = textParts.join("\n");
-          if (text.length < 100) {
-            text = raw
-              .replace(/[^\x20-\x7E\n\r]/g, " ")
-              .replace(/\s+/g, " ");
-          }
+          // Use server-side PDF extraction
+          const formData = new FormData();
+          formData.append("file", file);
+          const pdfRes = await fetch("/api/extract-pdf", {
+            method: "POST",
+            body: formData,
+          });
+          const pdfData = await pdfRes.json();
+          if (pdfData.error) throw new Error(pdfData.error);
+          text = pdfData.text || "";
         }
 
         if (text.length < 100) {

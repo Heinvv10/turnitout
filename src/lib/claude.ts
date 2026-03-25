@@ -1,13 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk";
 
 /**
- * Call Claude via the Anthropic SDK.
- * The API key is passed from the client (stored in localStorage).
+ * Call Claude via the Anthropic SDK with retry logic for overloaded errors.
  */
 export async function callClaude(
   systemPrompt: string,
   userMessage: string,
   apiKey?: string,
+  model?: string,
 ): Promise<string> {
   const key = apiKey || process.env.ANTHROPIC_API_KEY;
 
@@ -18,15 +18,35 @@ export async function callClaude(
   }
 
   const client = new Anthropic({ apiKey: key });
+  const maxRetries = 3;
 
-  const message = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 4096,
-    system: systemPrompt,
-    messages: [{ role: "user", content: userMessage }],
-  });
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const message = await client.messages.create({
+        model: model || "claude-sonnet-4-20250514",
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userMessage }],
+      });
 
-  const text =
-    message.content[0].type === "text" ? message.content[0].text : "";
-  return text;
+      const text =
+        message.content[0].type === "text" ? message.content[0].text : "";
+      return text;
+    } catch (err: unknown) {
+      const isOverloaded =
+        err instanceof Error &&
+        (err.message.includes("overloaded") ||
+          err.message.includes("529") ||
+          err.message.includes("rate"));
+
+      if (isOverloaded && attempt < maxRetries) {
+        const delay = attempt * 3000;
+        await new Promise((r) => setTimeout(r, delay));
+        continue;
+      }
+      throw err;
+    }
+  }
+
+  throw new Error("Failed after retries");
 }
