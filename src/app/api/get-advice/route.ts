@@ -8,7 +8,7 @@ import { parseClaudeJSON } from "@/lib/parse-json";
 
 export async function POST(request: Request) {
   try {
-    const { text, moduleCode, assessmentName, results, apiKey } =
+    const { text, moduleCode, assessmentName, results, apiKey, verifiedData } =
       await request.json();
 
     if (!text || text.trim().length < 50) {
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
     const response = await callClaude(
       ADVICE_SYSTEM_PROMPT,
-      buildAdviceUserPrompt(truncatedText, moduleCode || "", assessmentName || "", results || {}),
+      buildAdviceUserPrompt(truncatedText, moduleCode || "", assessmentName || "", results || {}, verifiedData),
       apiKey,
       undefined,
       8192,

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
+import { MODULE_RUBRICS } from "@/lib/module-rubrics";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -31,8 +32,8 @@ interface AdviceResult {
 }
 
 export function AdvicePanel() {
-  const { currentPaper, analysisResults } = usePaperStore();
-  const { selectedModule, apiKey } = useSettingsStore();
+  const { currentPaper, analysisResults, sections } = usePaperStore();
+  const { selectedModule, apiKey, moduleOutlines } = useSettingsStore();
   const [advice, setAdvice] = useState<AdviceResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -97,6 +98,24 @@ export function AdvicePanel() {
               : null,
           },
           apiKey,
+          verifiedData: {
+            wordCount: currentPaper.wordCount,
+            referenceCount: currentPaper.referenceCount,
+            wordCountRequirement: (() => {
+              const outline = moduleOutlines[selectedModule] || MODULE_RUBRICS[selectedModule];
+              const assessment = outline?.assessments?.find((a: { type: string }) => a.type !== "Summative");
+              return assessment?.wordCount || "";
+            })(),
+            turnitinThreshold: (() => {
+              const outline = moduleOutlines[selectedModule] || MODULE_RUBRICS[selectedModule];
+              return outline?.turnitinThreshold || 25;
+            })(),
+            sections: sections ? {
+              introduction: sections.introduction.split(/\s+/).filter(Boolean).length,
+              body: sections.body.split(/\s+/).filter(Boolean).length,
+              conclusion: sections.conclusion.split(/\s+/).filter(Boolean).length,
+            } : undefined,
+          },
         }),
       });
       const data = await res.json();
