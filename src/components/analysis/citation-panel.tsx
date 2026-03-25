@@ -44,10 +44,10 @@ export function CitationPanel() {
       <div className="flex flex-col items-center gap-4 py-8 text-center">
         <BookOpen className="h-12 w-12 text-muted-foreground/40" />
         <div>
-          <p className="font-medium">APA 7th Citation Checker</p>
+          <p className="font-medium">Harvard Citation Checker</p>
           <p className="text-sm text-muted-foreground">
             Validates your in-text citations, cross-references against your
-            reference list, and checks APA 7th edition formatting.
+            reference list, and checks Cornerstone Harvard referencing format.
           </p>
         </div>
         <Button onClick={runCheck} disabled={!currentPaper?.plainText}>

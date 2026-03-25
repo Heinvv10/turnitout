@@ -70,31 +70,49 @@ function HomeContent() {
     setAnalyzing("grading", true);
     setAnalyzing("plagiarism", true);
 
-    const safeFetch = async (url: string) => {
-      const r = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await r.json();
-      if (data.error) throw new Error(data.error);
-      return data;
+    const safeFetch = async (url: string, retries = 2): Promise<unknown> => {
+      for (let i = 0; i <= retries; i++) {
+        try {
+          const r = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+          const data = await r.json();
+          if (data.error?.includes("overloaded") || data.error?.includes("529")) {
+            if (i < retries) { await new Promise(r => setTimeout(r, (i + 1) * 3000)); continue; }
+          }
+          if (data.error) throw new Error(data.error);
+          return data;
+        } catch (err) {
+          if (i < retries && err instanceof Error && (err.message.includes("overloaded") || err.message.includes("529"))) {
+            await new Promise(r => setTimeout(r, (i + 1) * 3000));
+            continue;
+          }
+          throw err;
+        }
+      }
+      throw new Error("Failed after retries");
     };
 
-    const [aiRes, citRes, gradeRes, plagRes] = await Promise.allSettled([
+    // Run in two batches to avoid rate limits
+    const [aiRes, citRes] = await Promise.allSettled([
       safeFetch("/api/analyze-ai-risk"),
       safeFetch("/api/check-citations"),
+    ]);
+
+    if (aiRes.status === "fulfilled") setAIRiskResult(aiRes.value as Parameters<typeof setAIRiskResult>[0]);
+    if (citRes.status === "fulfilled") setCitationResult(citRes.value as Parameters<typeof setCitationResult>[0]);
+    setAnalyzing("aiRisk", false);
+    setAnalyzing("citations", false);
+
+    const [gradeRes, plagRes] = await Promise.allSettled([
       safeFetch("/api/grade-paper"),
       safeFetch("/api/check-plagiarism"),
     ]);
 
-    if (aiRes.status === "fulfilled") setAIRiskResult(aiRes.value);
-    if (citRes.status === "fulfilled") setCitationResult(citRes.value);
-    if (gradeRes.status === "fulfilled") setGradingResult(gradeRes.value);
-    if (plagRes.status === "fulfilled") setPlagiarismResult(plagRes.value);
-
-    setAnalyzing("aiRisk", false);
-    setAnalyzing("citations", false);
+    if (gradeRes.status === "fulfilled") setGradingResult(gradeRes.value as Parameters<typeof setGradingResult>[0]);
+    if (plagRes.status === "fulfilled") setPlagiarismResult(plagRes.value as Parameters<typeof setPlagiarismResult>[0]);
     setAnalyzing("grading", false);
     setAnalyzing("plagiarism", false);
 
