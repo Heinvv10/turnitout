@@ -10,12 +10,12 @@ import { useSettingsStore } from "@/store/settings-store";
 import { EditorToolbar } from "./editor-toolbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SectionView } from "./section-view";
 import {
   Upload,
   BookOpen,
   FileText,
   Trash2,
-  Wand2,
   Loader2,
   CheckCircle,
 } from "lucide-react";
@@ -287,6 +287,9 @@ export function PaperEditor() {
         <div className="flex-1 overflow-y-auto">
           <EditorContent editor={bodyEditor} />
         </div>
+
+        {/* Visual section breakdown */}
+        <SectionView />
 
         {/* Section split status bar */}
         {bodyWordCount > 0 && (
