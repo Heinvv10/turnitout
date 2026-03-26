@@ -27,6 +27,7 @@ import {
 import { TemplateExport } from "@/components/template/template-export";
 import { DocumentPreview } from "@/components/template/document-preview";
 import { Tabs as ExportTabs, TabsContent as ETC, TabsList as ETL, TabsTrigger as ETT } from "@/components/ui/tabs";
+import { ChatPanel } from "@/components/coach/chat-panel";
 import { Loader2, PlayCircle, PanelRightOpen, Download, Eye, Settings2 } from "lucide-react";
 
 export default function Home() {
@@ -339,7 +340,7 @@ function HomeContent() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Editor Panel */}
-        <div className="w-[60%] shrink-0 overflow-y-auto border-r p-4">
+        <div className="w-full lg:w-[60%] shrink-0 overflow-y-auto lg:border-r p-4">
           <PaperEditor />
         </div>
 
@@ -360,6 +361,9 @@ function HomeContent() {
           </Sheet>
         </div>
       </div>
+
+      {/* Writing Coach Chat */}
+      <ChatPanel />
     </div>
   );
 }

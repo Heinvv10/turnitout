@@ -148,7 +148,7 @@ export function Header() {
               </p>
             </div>
           </Link>
-          <nav className="flex items-center gap-1 ml-4">
+          <nav className="hidden sm:flex items-center gap-1 ml-4">
             <Link href="/">
               <Button
                 variant={pathname === "/" ? "secondary" : "ghost"}
@@ -171,7 +171,7 @@ export function Header() {
 
         <div className="flex items-center gap-3">
           <Select value={selectedModule} onValueChange={(v) => v && setSelectedModule(v)}>
-            <SelectTrigger className="w-[180px] sm:w-[260px]">
+            <SelectTrigger className="w-[120px] sm:w-[180px] md:w-[260px]">
               <SelectValue placeholder="Select module" />
             </SelectTrigger>
             <SelectContent>

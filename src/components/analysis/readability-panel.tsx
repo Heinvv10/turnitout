@@ -14,6 +14,7 @@ import {
   CheckCircle,
   Info,
 } from "lucide-react";
+import { WordCloud } from "./word-cloud";
 
 function getEaseColor(ease: number): string {
   if (ease >= 30 && ease <= 60) return "bg-green-500";
@@ -207,6 +208,9 @@ export function ReadabilityPanel() {
               : "High passive voice -- consider using more active constructions"}
         </p>
       </Card>
+
+      {/* Word Frequency Cloud */}
+      <WordCloud />
     </div>
   );
 }
