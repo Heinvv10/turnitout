@@ -21,6 +21,7 @@ import {
   Loader2,
   CheckCircle,
 } from "lucide-react";
+import { OutlineGenerator } from "./outline-generator";
 
 function countWords(text: string): number {
   return text.trim().split(/\s+/).filter((w) => w.length > 0).length;
@@ -270,6 +271,9 @@ export function PaperEditor() {
               className="hidden"
               onChange={handleDocxUpload}
             />
+            {bodyWordCount < 50 && (
+              <OutlineGenerator editor={bodyEditor} />
+            )}
             <Button
               variant="ghost"
               size="sm"

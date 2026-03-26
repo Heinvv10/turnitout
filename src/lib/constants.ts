@@ -101,6 +101,13 @@ export const RUBRIC_CATEGORIES = [
   },
 ] as const;
 
+export const SEMESTER_DATES = {
+  2026: {
+    semester1Start: "2026-02-09", // Week 1 starts
+    semester2Start: "2026-07-20", // Approximate
+  },
+} as const;
+
 export function getSAGrade(score: number): string {
   for (const grade of SA_GRADE_SCALE) {
     if (score >= grade.min) {

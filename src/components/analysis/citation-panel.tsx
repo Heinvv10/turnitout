@@ -1,13 +1,36 @@
 "use client";
 
+import { useState } from "react";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen, Loader2, AlertCircle, CheckCircle } from "lucide-react";
+import {
+  BookOpen,
+  Loader2,
+  AlertCircle,
+  CheckCircle,
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+  ArrowRight,
+} from "lucide-react";
 import { FixGuide, getFixGuide } from "./fix-guide";
+
+interface FormattedCitation {
+  original: string;
+  corrected: string;
+  changes: string[];
+}
+
+interface FormatResult {
+  formatted: FormattedCitation[];
+  allCorrected: string;
+  issueCount: number;
+  summary: string;
+}
 
 export function CitationPanel() {
   const {
@@ -16,10 +39,16 @@ export function CitationPanel() {
     isAnalyzing,
     setAnalyzing,
     setCitationResult,
+    updateReferences,
   } = usePaperStore();
-  const { apiKey } = useSettingsStore();
+  const { apiKey, referencingStyle } = useSettingsStore();
   const result = analysisResults.citations;
   const loading = isAnalyzing.citations;
+
+  const [formatResult, setFormatResult] = useState<FormatResult | null>(null);
+  const [isFormatting, setIsFormatting] = useState(false);
+  const [showFormatted, setShowFormatted] = useState(false);
+  const [formatError, setFormatError] = useState<string | null>(null);
 
   const runCheck = async () => {
     if (!currentPaper?.plainText) return;
@@ -43,6 +72,55 @@ export function CitationPanel() {
     } finally {
       setAnalyzing("citations", false);
     }
+  };
+
+  const runFormat = async () => {
+    if (!currentPaper?.references) return;
+    setIsFormatting(true);
+    setFormatError(null);
+    try {
+      const res = await fetch("/api/format-citation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          citations: currentPaper.references,
+          referencingStyle: referencingStyle || "harvard",
+          apiKey,
+        }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setFormatResult(data);
+      setShowFormatted(true);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Formatting failed";
+      setFormatError(message);
+    } finally {
+      setIsFormatting(false);
+    }
+  };
+
+  const applyFixes = () => {
+    if (!formatResult?.allCorrected) return;
+    const correctedText = formatResult.allCorrected;
+    // Convert asterisk-marked italics to HTML <em> for the HTML version
+    const correctedHtml = correctedText
+      .split("\n")
+      .filter((line) => line.trim())
+      .map((line) => {
+        const htmlLine = line.replace(
+          /\*([^*]+)\*/g,
+          "<em>$1</em>",
+        );
+        return `<p>${htmlLine}</p>`;
+      })
+      .join("");
+    // Plain text strips the asterisks
+    const plainText = correctedText.replace(/\*/g, "");
+    updateReferences(correctedHtml, plainText);
+    setFormatResult(null);
+    setShowFormatted(false);
   };
 
   if (!result && !loading) {
@@ -146,6 +224,104 @@ export function CitationPanel() {
           ))}
         </div>
       )}
+
+      {/* Format References Section */}
+      <div className="border-t pt-4">
+        <Button
+          onClick={runFormat}
+          disabled={!currentPaper?.references || isFormatting}
+          variant="outline"
+          className="w-full"
+        >
+          {isFormatting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Formatting references...
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Format References ({(referencingStyle || "harvard").toUpperCase()})
+            </>
+          )}
+        </Button>
+
+        {formatError && (
+          <div className="mt-2 flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-400">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            {formatError}
+          </div>
+        )}
+
+        {formatResult && (
+          <div className="mt-3 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium">{formatResult.summary}</p>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowFormatted(!showFormatted)}
+              >
+                {showFormatted ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+
+            {showFormatted && (
+              <div className="space-y-3">
+                {formatResult.formatted.map((item, i) => (
+                  <Card key={i} className="p-3 space-y-2">
+                    <div>
+                      <p className="text-[10px] font-medium uppercase text-muted-foreground mb-1">
+                        Original
+                      </p>
+                      <p className="text-xs text-muted-foreground line-through">
+                        {item.original}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 text-muted-foreground">
+                      <ArrowRight className="h-3 w-3" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-medium uppercase text-green-600 dark:text-green-400 mb-1">
+                        Corrected
+                      </p>
+                      <p className="text-xs font-medium">
+                        {item.corrected}
+                      </p>
+                    </div>
+                    {item.changes.length > 0 && (
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {item.changes.map((change, j) => (
+                          <Badge
+                            key={j}
+                            variant="secondary"
+                            className="text-[9px]"
+                          >
+                            {change}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </Card>
+                ))}
+
+                <Button
+                  onClick={applyFixes}
+                  className="w-full"
+                  size="sm"
+                >
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Apply Fixes to Reference Editor
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
