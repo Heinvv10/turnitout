@@ -182,9 +182,9 @@ export function GraderPanel() {
   if (!activeRubric && !loading && !result) {
     return (
       <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <FileText className="h-12 w-12 text-muted-foreground/40" />
+        <FileText className="h-14 w-14 text-primary/30" />
         <div>
-          <p className="font-medium">Upload Module Outline First</p>
+          <p className="text-lg font-medium">Upload Module Outline First</p>
           <p className="text-sm text-muted-foreground">
             Upload the module outline PDF for <strong>{moduleName}</strong> so
             the grader can use the <strong>exact rubric</strong> your lecturer
@@ -231,9 +231,9 @@ export function GraderPanel() {
   if (!result && !loading) {
     return (
       <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <GraduationCap className="h-12 w-12 text-muted-foreground/40" />
+        <GraduationCap className="h-14 w-14 text-primary/30" />
         <div>
-          <p className="font-medium">Academic Grader</p>
+          <p className="text-lg font-medium">Academic Grader</p>
           <p className="text-sm text-muted-foreground">
             Using the <strong>official Cornerstone rubric</strong> for{" "}
             <strong>{activeRubric?.moduleName || moduleName}</strong>
@@ -271,7 +271,7 @@ export function GraderPanel() {
         )}
 
         {selectedBrief && (
-          <Card className="w-full p-3 text-left text-xs">
+          <Card className="w-full p-4 shadow-sm text-left text-xs">
             <p className="mb-1 font-medium">{selectedBrief.name}</p>
             <p className="text-muted-foreground line-clamp-3">
               {selectedBrief.question}
@@ -337,7 +337,7 @@ export function GraderPanel() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium">Predicted Grade</p>
-          <p className={`text-2xl font-bold ${scoreColor}`}>
+          <p className={`text-3xl font-bold tabular-nums ${scoreColor}`}>
             {result.saGrade}
           </p>
         </div>
@@ -348,7 +348,7 @@ export function GraderPanel() {
 
       <div className="space-y-3">
         {result.rubricScores.map((rubric, i) => (
-          <Card key={i} className="p-3">
+          <Card key={i} className="p-4 shadow-sm">
             <div className="mb-1 flex items-center justify-between">
               <p className="text-sm font-medium">{rubric.category}</p>
               <span className="text-sm font-mono">
@@ -357,7 +357,7 @@ export function GraderPanel() {
             </div>
             <Progress
               value={(rubric.score / rubric.maxScore) * 100}
-              className="mb-2 h-1.5"
+              className="mb-2 h-2"
             />
             <p className="text-xs text-muted-foreground">{rubric.feedback}</p>
             {rubric.improvements.length > 0 && (
@@ -378,7 +378,7 @@ export function GraderPanel() {
       </div>
 
       {result.strengths && result.strengths.length > 0 && (
-        <Card className="bg-green-50 p-3 dark:bg-green-950/30">
+        <Card className="bg-green-50 p-4 shadow-sm dark:bg-green-950/30">
           <p className="mb-1 text-xs font-medium uppercase text-green-700 dark:text-green-400">
             Strengths
           </p>
@@ -394,7 +394,7 @@ export function GraderPanel() {
         </Card>
       )}
 
-      <Card className="p-3">
+      <Card className="p-4 shadow-sm">
         <p className="text-xs font-medium uppercase text-muted-foreground">
           Overall Feedback
         </p>

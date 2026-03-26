@@ -107,7 +107,7 @@ export function SectionView() {
 
   return (
     <div className="space-y-1 border-t bg-muted/20 px-3 py-2">
-      <p className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
+      <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
         Detected Sections
       </p>
       {secs.map(({ label, text, color, badge }) => {
@@ -129,16 +129,16 @@ export function SectionView() {
             className={`rounded border-l-[3px] px-3 py-2 ${color}`}
           >
             <div className="mb-1 flex items-center justify-between">
-              <Badge className={`text-[9px] px-1.5 py-0 ${badge}`}>
+              <Badge className={`text-[11px] px-1.5 py-0 ${badge}`}>
                 {label}
               </Badge>
               <div className="flex items-center gap-2">
                 {target && (
-                  <span className="text-[8px] text-muted-foreground/70">
+                  <span className="text-[11px] text-muted-foreground/70">
                     {target.min}-{target.max}w
                   </span>
                 )}
-                <span className="text-[9px] text-muted-foreground">
+                <span className="text-[11px] text-muted-foreground">
                   {wc} words
                 </span>
               </div>
@@ -147,7 +147,7 @@ export function SectionView() {
             {/* Progress bar with target */}
             {target && progressColor && progressPct !== null && (
               <div className="mb-1.5">
-                <div className="relative h-1.5 w-full rounded-full bg-muted/50 overflow-hidden">
+                <div className="relative h-2 w-full rounded-full bg-muted/50 overflow-hidden">
                   <div
                     className={`absolute inset-y-0 left-0 rounded-full transition-all ${progressBarColors[progressColor]}`}
                     style={{ width: `${Math.min(progressPct, 100)}%` }}
@@ -162,7 +162,7 @@ export function SectionView() {
                 </div>
                 <div className="mt-0.5 flex justify-end">
                   <span
-                    className={`text-[8px] font-medium ${
+                    className={`text-[11px] font-medium ${
                       progressColor === "green"
                         ? "text-green-600 dark:text-green-400"
                         : progressColor === "yellow"

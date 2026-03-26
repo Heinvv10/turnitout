@@ -56,9 +56,9 @@ export function ReadabilityPanel() {
   if (!currentPaper?.plainText || currentPaper.plainText.trim().length < 50) {
     return (
       <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <BarChart3 className="h-12 w-12 text-muted-foreground/40" />
+        <BarChart3 className="h-14 w-14 text-primary/30" />
         <div>
-          <p className="font-medium">Readability Analysis</p>
+          <p className="text-lg font-medium">Readability Analysis</p>
           <p className="text-sm text-muted-foreground">
             Write at least 50 characters to see readability metrics.
           </p>
@@ -81,11 +81,11 @@ export function ReadabilityPanel() {
       </div>
 
       {/* Grade Level - Big number */}
-      <Card className="p-4 text-center">
+      <Card className="p-4 text-center shadow-sm">
         <p className="text-xs uppercase text-muted-foreground">
           Flesch-Kincaid Grade Level
         </p>
-        <p className="text-4xl font-bold tabular-nums">
+        <p className="text-5xl font-bold tabular-nums">
           {result.fleschKincaid}
         </p>
         <Badge
@@ -97,7 +97,7 @@ export function ReadabilityPanel() {
       </Card>
 
       {/* Flesch Reading Ease gauge */}
-      <Card className="p-4">
+      <Card className="p-4 shadow-sm">
         <div className="mb-2 flex items-center justify-between">
           <p className="text-xs uppercase text-muted-foreground">
             Flesch Reading Ease
@@ -121,52 +121,52 @@ export function ReadabilityPanel() {
             style={{ left: "60%" }}
           />
         </div>
-        <p className="mt-1.5 text-[10px] text-muted-foreground">
+        <p className="mt-1.5 text-xs text-muted-foreground">
           {getEaseLabel(result.fleschEase)} -- Academic sweet spot: 30-60
         </p>
       </Card>
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-3">
-        <Card className="p-3 text-center">
-          <p className="text-[10px] uppercase text-muted-foreground">
+        <Card className="p-3 text-center shadow-sm">
+          <p className="text-xs uppercase text-muted-foreground">
             Avg Sentence Length
           </p>
           <p className="text-lg font-semibold tabular-nums">
             {result.avgSentenceLength}
           </p>
-          <p className="text-[10px] text-muted-foreground">words</p>
+          <p className="text-xs text-muted-foreground">words</p>
         </Card>
-        <Card className="p-3 text-center">
-          <p className="text-[10px] uppercase text-muted-foreground">
+        <Card className="p-3 text-center shadow-sm">
+          <p className="text-xs uppercase text-muted-foreground">
             Avg Syllables/Word
           </p>
           <p className="text-lg font-semibold tabular-nums">
             {result.avgSyllablesPerWord}
           </p>
-          <p className="text-[10px] text-muted-foreground">syllables</p>
+          <p className="text-xs text-muted-foreground">syllables</p>
         </Card>
-        <Card className="p-3 text-center">
-          <p className="text-[10px] uppercase text-muted-foreground">
+        <Card className="p-3 text-center shadow-sm">
+          <p className="text-xs uppercase text-muted-foreground">
             Paragraphs
           </p>
           <p className="text-lg font-semibold tabular-nums">
             {result.paragraphCount}
           </p>
         </Card>
-        <Card className="p-3 text-center">
-          <p className="text-[10px] uppercase text-muted-foreground">
+        <Card className="p-3 text-center shadow-sm">
+          <p className="text-xs uppercase text-muted-foreground">
             Avg Paragraph Length
           </p>
           <p className="text-lg font-semibold tabular-nums">
             {result.avgParagraphLength}
           </p>
-          <p className="text-[10px] text-muted-foreground">words</p>
+          <p className="text-xs text-muted-foreground">words</p>
         </Card>
       </div>
 
       {/* Long sentences warning */}
-      <Card className="p-3">
+      <Card className="p-4 shadow-sm">
         <div className="flex items-center gap-2">
           {result.longSentences > 3 ? (
             <AlertTriangle className="h-4 w-4 shrink-0 text-yellow-500" />
@@ -189,7 +189,7 @@ export function ReadabilityPanel() {
       </Card>
 
       {/* Passive voice */}
-      <Card className="p-3">
+      <Card className="p-4 shadow-sm">
         <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Info className="h-4 w-4 shrink-0 text-blue-500" />
@@ -199,8 +199,8 @@ export function ReadabilityPanel() {
             {result.passiveVoice}%
           </span>
         </div>
-        <Progress value={result.passiveVoice} className="h-1.5" />
-        <p className="mt-1.5 text-[10px] text-muted-foreground">
+        <Progress value={result.passiveVoice} className="h-2.5" />
+        <p className="mt-1.5 text-xs text-muted-foreground">
           {result.passiveVoice >= 10 && result.passiveVoice <= 20
             ? "Normal range for academic writing (10-20%)"
             : result.passiveVoice < 10

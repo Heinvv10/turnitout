@@ -98,9 +98,9 @@ export function AdvicePanel() {
   if (!hasResults && !advice && !loading) {
     return (
       <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <Lightbulb className="h-12 w-12 text-muted-foreground/40" />
+        <Lightbulb className="h-14 w-14 text-primary/30" />
         <div>
-          <p className="font-medium">Improvement Advice</p>
+          <p className="text-lg font-medium">Improvement Advice</p>
           <p className="text-sm text-muted-foreground">
             Run the checks first, then get personalised advice.
           </p>
@@ -115,7 +115,7 @@ export function AdvicePanel() {
       <div className="flex flex-col items-center gap-4 py-8 text-center">
         <Lightbulb className="h-12 w-12 text-yellow-500/60" />
         <div>
-          <p className="font-medium">Ready for Advice</p>
+          <p className="text-lg font-medium">Ready for Advice</p>
           <p className="text-sm text-muted-foreground">
             Your checks are complete. Get personalised improvement advice.
           </p>
@@ -155,7 +155,7 @@ export function AdvicePanel() {
             </p>
           </div>
           {advice.critical.map((item, i) => (
-            <Card key={i} className="border-red-200 bg-red-50/50 p-3 dark:border-red-900 dark:bg-red-950/20">
+            <Card key={i} className="border-red-200 bg-red-50/50 p-4 shadow-sm dark:border-red-900 dark:bg-red-950/20">
               <p className="mb-1 text-sm font-medium">{item.area}</p>
               <p className="mb-2 text-xs text-muted-foreground">{item.detail}</p>
               <div className="rounded bg-white/80 p-2 text-xs dark:bg-black/20">
@@ -175,7 +175,7 @@ export function AdvicePanel() {
             </p>
           </div>
           {advice.recommended.map((item, i) => (
-            <Card key={i} className="border-yellow-200 bg-yellow-50/50 p-3 dark:border-yellow-900 dark:bg-yellow-950/20">
+            <Card key={i} className="border-yellow-200 bg-yellow-50/50 p-4 shadow-sm dark:border-yellow-900 dark:bg-yellow-950/20">
               <p className="mb-1 text-sm font-medium">{item.area}</p>
               <p className="mb-2 text-xs text-muted-foreground">{item.detail}</p>
               <div className="rounded bg-white/80 p-2 text-xs dark:bg-black/20">
@@ -195,7 +195,7 @@ export function AdvicePanel() {
             </p>
           </div>
           {advice.polish.map((item, i) => (
-            <Card key={i} className="p-3">
+            <Card key={i} className="p-4 shadow-sm">
               <p className="mb-1 text-sm font-medium">{item.area}</p>
               <p className="text-xs text-muted-foreground">{item.detail}</p>
               <p className="mt-1 text-xs"><span className="font-medium">Tip: </span>{item.action}</p>
@@ -207,14 +207,14 @@ export function AdvicePanel() {
       {advice.checklist && advice.checklist.length > 0 && (
         <div className="space-y-2">
           <p className="text-sm font-semibold">Pre-Submission Checklist</p>
-          <Card className="p-3">
+          <Card className="p-4 shadow-sm">
             {advice.checklist.map((item, i) => (
               <button key={i} onClick={() => toggleCheck(i)} className="flex w-full items-start gap-2 rounded p-1.5 text-left text-xs hover:bg-muted/50">
                 {checkedItems.has(i) ? <CheckSquare className="mt-0.5 h-3.5 w-3.5 shrink-0 text-green-500" /> : <Square className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
                 <span className={checkedItems.has(i) ? "line-through text-muted-foreground" : ""}>{item}</span>
               </button>
             ))}
-            <div className="mt-2 text-center text-[10px] text-muted-foreground">
+            <div className="mt-2 text-center text-xs text-muted-foreground">
               {checkedItems.size}/{advice.checklist.length} completed
             </div>
           </Card>

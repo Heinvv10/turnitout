@@ -19,7 +19,7 @@ export function FixGuide({ issue, approaches, example, resource }: FixGuideProps
     <div className="mt-2 rounded-lg border border-blue-200 bg-blue-50/50 p-2.5 dark:border-blue-900 dark:bg-blue-950/20">
       <div className="mb-1.5 flex items-center gap-1.5">
         <Lightbulb className="h-3 w-3 text-blue-500" />
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+        <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
           How to fix this
         </span>
       </div>
@@ -35,11 +35,11 @@ export function FixGuide({ issue, approaches, example, resource }: FixGuideProps
 
       {example && (
         <div className="mt-2 rounded bg-white/60 p-2 dark:bg-black/20">
-          <p className="text-[10px] text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             <span className="font-medium text-red-500">Avoid:</span>{" "}
             {example.bad}
           </p>
-          <p className="mt-0.5 text-[10px] text-muted-foreground">
+          <p className="mt-0.5 text-xs text-muted-foreground">
             <span className="font-medium text-blue-500">Why:</span>{" "}
             {example.why}
           </p>
@@ -51,7 +51,7 @@ export function FixGuide({ issue, approaches, example, resource }: FixGuideProps
           href={resource.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-1.5 flex items-center gap-1 text-[10px] text-blue-500 hover:underline"
+          className="mt-1.5 flex items-center gap-1 text-xs text-blue-500 hover:underline"
         >
           <BookOpen className="h-2.5 w-2.5" />
           {resource.label}

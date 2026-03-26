@@ -137,7 +137,7 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="border-b bg-card px-4 py-3">
+    <header className="border-b bg-card px-4 py-3 dark:border-b-primary/10">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-3">

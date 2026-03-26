@@ -99,7 +99,7 @@ export function WordCloud() {
           Recalculate
         </Button>
       </div>
-      <p className="mb-3 text-[10px] text-muted-foreground">
+      <p className="mb-3 text-xs text-muted-foreground">
         Top 30 most-used words (excluding common words)
       </p>
 
@@ -139,7 +139,7 @@ export function WordCloud() {
       )}
 
       {/* Color legend */}
-      <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-[9px] text-muted-foreground">
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1">
           <span className="inline-block h-2 w-2 rounded-full bg-red-500" />
           High

@@ -79,9 +79,9 @@ export function GrammarPanel() {
   if (!result && !loading) {
     return (
       <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <SpellCheck className="h-12 w-12 text-muted-foreground/40" />
+        <SpellCheck className="h-14 w-14 text-primary/30" />
         <div>
-          <p className="font-medium">Grammar & Spelling Checker</p>
+          <p className="text-lg font-medium">Grammar & Spelling Checker</p>
           <p className="text-sm text-muted-foreground">
             Checks grammar, spelling, and punctuation using{" "}
             {language === "en-ZA"
@@ -132,7 +132,7 @@ export function GrammarPanel() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium">Grammar Score</p>
-          <p className={`text-2xl font-bold ${scoreColor}`}>
+          <p className={`text-3xl font-bold tabular-nums ${scoreColor}`}>
             {result.score}/100
           </p>
         </div>
@@ -146,7 +146,7 @@ export function GrammarPanel() {
         </div>
       </div>
 
-      <Progress value={result.score} className="h-2" />
+      <Progress value={result.score} className="h-2.5" />
 
       <p className="text-sm text-muted-foreground">{result.summary}</p>
 
@@ -202,15 +202,15 @@ export function GrammarPanel() {
 
 function IssueCard({ issue }: { issue: GrammarIssue }) {
   return (
-    <Card className={`border-l-4 ${severityBorder(issue.severity)} p-3`}>
+    <Card className={`border-l-4 ${severityBorder(issue.severity)} p-4 shadow-sm`}>
       <div className="flex items-start gap-2">
         {severityIcon(issue.severity)}
         <div className="flex-1 min-w-0 space-y-1.5">
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant={typeBadgeVariant(issue.type)} className="text-[10px]">
+            <Badge variant={typeBadgeVariant(issue.type)} className="text-xs">
               {issue.type.replace("_", " ")}
             </Badge>
-            <span className="text-[10px] text-muted-foreground">{issue.location}</span>
+            <span className="text-xs text-muted-foreground">{issue.location}</span>
           </div>
           <div className="text-xs">
             <span className="line-through text-red-600/70">{issue.text}</span>

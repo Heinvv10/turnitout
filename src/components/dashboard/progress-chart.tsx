@@ -64,7 +64,7 @@ export function ProgressChart({ moduleCode }: { moduleCode: string }) {
           return (
             <div key={key}>
               <div className="mb-1 flex items-center justify-between">
-                <span className="text-[10px] font-medium text-muted-foreground">
+                <span className="text-xs font-medium text-muted-foreground">
                   {label}
                   {inverted ? " (lower is better)" : ""}
                 </span>
@@ -93,7 +93,7 @@ export function ProgressChart({ moduleCode }: { moduleCode: string }) {
                         style={{ height: `${pct}%` }}
                       />
                       {/* Tooltip on hover */}
-                      <div className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-popover px-1 py-0.5 text-[8px] text-popover-foreground opacity-0 shadow-sm group-hover:opacity-100">
+                      <div className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-popover px-1 py-0.5 text-[11px] text-popover-foreground opacity-0 shadow-sm group-hover:opacity-100">
                         D{i + 1}: {val}%
                       </div>
                     </div>
@@ -106,7 +106,7 @@ export function ProgressChart({ moduleCode }: { moduleCode: string }) {
       </div>
 
       {/* Draft timeline */}
-      <div className="mt-3 flex justify-between text-[8px] text-muted-foreground/60">
+      <div className="mt-3 flex justify-between text-[11px] text-muted-foreground/60">
         {snapshots.map((s, i) => (
           <span key={s.id}>D{i + 1}</span>
         ))}
@@ -133,7 +133,7 @@ function DiffBadge({
     : "text-red-600 dark:text-red-400";
 
   return (
-    <span className={`text-[9px] font-medium ${color}`}>
+    <span className={`text-[11px] font-medium ${color}`}>
       {diff > 0 ? "+" : ""}
       {diff}%
     </span>

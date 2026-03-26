@@ -61,9 +61,9 @@ export function OriginalityPanel() {
   if (!result && !loading) {
     return (
       <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <Fingerprint className="h-12 w-12 text-muted-foreground/40" />
+        <Fingerprint className="h-14 w-14 text-primary/30" />
         <div>
-          <p className="font-medium">Originality Check</p>
+          <p className="text-lg font-medium">Originality Check</p>
           <p className="text-sm text-muted-foreground">
             Checks for similarity to known sources, uncited content,
             patchwriting, and close paraphrasing. Cornerstone threshold:{" "}
@@ -119,7 +119,7 @@ export function OriginalityPanel() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium">Similarity Score</p>
-          <p className={`text-2xl font-bold ${scoreColor}`}>
+          <p className={`text-3xl font-bold tabular-nums ${scoreColor}`}>
             {result.overallSimilarity}%
           </p>
         </div>
@@ -140,7 +140,7 @@ export function OriginalityPanel() {
           title="Cornerstone threshold: 25%"
         />
       </div>
-      <div className="flex justify-between text-[10px] text-muted-foreground">
+      <div className="flex justify-between text-xs text-muted-foreground">
         <span>0% Original</span>
         <span className="font-medium text-red-600">25% Threshold</span>
         <span>100%</span>
@@ -150,7 +150,7 @@ export function OriginalityPanel() {
 
       {/* Plagiarism Warning */}
       {(result.uncitedMatches || 0) > 0 && (
-        <Card className="border-red-300 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/30">
+        <Card className="border-red-300 bg-red-50 p-4 shadow-sm dark:border-red-800 dark:bg-red-950/30">
           <div className="flex items-start gap-2">
             <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
             <div>
@@ -177,7 +177,7 @@ export function OriginalityPanel() {
       )}
 
       {(result.uncitedMatches || 0) === 0 && result.overallSimilarity < 25 && (
-        <Card className="border-green-300 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/30">
+        <Card className="border-green-300 bg-green-50 p-4 shadow-sm dark:border-green-800 dark:bg-green-950/30">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-green-600" />
             <div>
@@ -194,7 +194,7 @@ export function OriginalityPanel() {
       )}
 
       {result.overallSimilarity >= 25 && (result.uncitedMatches || 0) === 0 && (
-        <Card className="border-yellow-300 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-950/30">
+        <Card className="border-yellow-300 bg-yellow-50 p-4 shadow-sm dark:border-yellow-800 dark:bg-yellow-950/30">
           <div className="flex items-start gap-2">
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600" />
             <div>
@@ -214,25 +214,25 @@ export function OriginalityPanel() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
-        <Card className="p-2 text-center">
+        <Card className="p-3 text-center shadow-sm">
           <div className="flex items-center justify-center gap-1">
             <CheckCircle className="h-3 w-3 text-green-500" />
             <span className="text-lg font-bold">
               {result.citedProperly || 0}
             </span>
           </div>
-          <p className="text-[10px] text-muted-foreground">Properly Cited</p>
+          <p className="text-xs text-muted-foreground">Properly Cited</p>
         </Card>
-        <Card className="p-2 text-center">
+        <Card className="p-3 text-center shadow-sm">
           <div className="flex items-center justify-center gap-1">
             <AlertTriangle className="h-3 w-3 text-yellow-500" />
             <span className="text-lg font-bold">
               {result.uncitedMatches || 0}
             </span>
           </div>
-          <p className="text-[10px] text-muted-foreground">Needs Citation</p>
+          <p className="text-xs text-muted-foreground">Needs Citation</p>
         </Card>
-        <Card className="p-2 text-center">
+        <Card className="p-3 text-center shadow-sm">
           <div className="flex items-center justify-center gap-1">
             {result.selfPlagiarismRisk ? (
               <FileWarning className="h-3 w-3 text-red-500" />
@@ -243,7 +243,7 @@ export function OriginalityPanel() {
               {result.selfPlagiarismRisk ? "Risk" : "Clear"}
             </span>
           </div>
-          <p className="text-[10px] text-muted-foreground">Self-Plagiarism</p>
+          <p className="text-xs text-muted-foreground">Self-Plagiarism</p>
         </Card>
       </div>
 
@@ -264,7 +264,7 @@ export function OriginalityPanel() {
             return (
               <Card
                 key={i}
-                className="border-red-200 bg-red-50/30 p-3 dark:border-red-900 dark:bg-red-950/10"
+                className="border-red-200 bg-red-50/30 p-4 shadow-sm dark:border-red-900 dark:bg-red-950/10"
               >
                 <div className="mb-1 flex items-center justify-between">
                   <Badge
@@ -285,7 +285,7 @@ export function OriginalityPanel() {
                 <p className="mb-1 text-xs text-muted-foreground line-clamp-2">
                   &ldquo;{match.passage}&rdquo;
                 </p>
-                <p className="mb-1 text-[10px] text-muted-foreground">
+                <p className="mb-1 text-xs text-muted-foreground">
                   Likely source: {match.possibleSource}
                 </p>
                 <div className="rounded bg-white/60 p-2 text-xs dark:bg-black/20">
@@ -314,7 +314,7 @@ export function OriginalityPanel() {
           {okMatches.map((match, i) => (
             <Card
               key={i}
-              className="border-green-200 bg-green-50/30 p-3 dark:border-green-900 dark:bg-green-950/10"
+              className="border-green-200 bg-green-50/30 p-4 shadow-sm dark:border-green-900 dark:bg-green-950/10"
             >
               <div className="mb-1 flex items-center justify-between">
                 <Badge variant="outline">Common Knowledge</Badge>

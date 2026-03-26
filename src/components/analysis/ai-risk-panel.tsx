@@ -42,9 +42,9 @@ export function AIRiskPanel() {
   if (!result && !loading) {
     return (
       <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <ShieldCheck className="h-12 w-12 text-muted-foreground/40" />
+        <ShieldCheck className="h-14 w-14 text-primary/30" />
         <div>
-          <p className="font-medium">AI Writing Risk Scanner</p>
+          <p className="text-lg font-medium">AI Writing Risk Scanner</p>
           <p className="text-sm text-muted-foreground">
             Checks for patterns that Turnitin flags: predictable writing, uniform
             sentences, generic vocabulary, and formulaic transitions.
@@ -83,7 +83,7 @@ export function AIRiskPanel() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium">Overall AI Risk Score</p>
-          <p className={`text-2xl font-bold ${scoreColor}`}>
+          <p className={`text-3xl font-bold tabular-nums ${scoreColor}`}>
             {result.overallScore}%
           </p>
         </div>
@@ -94,7 +94,7 @@ export function AIRiskPanel() {
 
       <Progress
         value={result.overallScore}
-        className="h-2"
+        className="h-2.5"
       />
 
       <p className="text-sm text-muted-foreground">{result.summary}</p>
@@ -119,7 +119,7 @@ export function AIRiskPanel() {
           Paragraph Analysis
         </p>
         {result.paragraphs.map((para) => (
-          <Card key={para.index} className="p-3">
+          <Card key={para.index} className="p-4 shadow-sm">
             <div className="mb-2 flex items-center justify-between">
               <span className="text-xs text-muted-foreground">
                 Paragraph {para.index + 1}
@@ -144,7 +144,7 @@ export function AIRiskPanel() {
                 key={fi}
                 className="mb-1 flex items-start gap-1.5 text-xs"
               >
-                <Badge variant="outline" className="shrink-0 text-[10px]">
+                <Badge variant="outline" className="shrink-0 text-xs">
                   {flag.type}
                 </Badge>
                 <span className="text-muted-foreground">{flag.detail}</span>

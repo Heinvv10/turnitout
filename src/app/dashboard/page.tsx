@@ -186,21 +186,21 @@ function ModuleCard({
 }) {
   return (
     <Link href={`/?module=${code}`}>
-      <Card className="cursor-pointer p-4 transition-colors hover:bg-accent">
+      <Card className="cursor-pointer p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
         <div className="mb-2 flex items-center justify-between">
-          <span className="font-mono text-xs text-muted-foreground">
+          <span className="font-mono text-xs text-primary/60">
             {code}
           </span>
           {hasOutline ? (
             <Badge
               variant="default"
-              className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 text-[10px]"
+              className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 text-xs"
             >
               <FileText className="mr-1 h-2.5 w-2.5" />
               Outline
             </Badge>
           ) : (
-            <Badge variant="outline" className="text-[10px]">
+            <Badge variant="outline" className="text-xs">
               No outline
             </Badge>
           )}

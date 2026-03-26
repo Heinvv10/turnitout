@@ -41,7 +41,7 @@ function SourceCard({
   };
 
   return (
-    <Card className="p-3 space-y-2">
+    <Card className="p-4 shadow-sm space-y-2">
       <div className="flex items-start justify-between gap-2">
         <p className="text-sm font-semibold leading-tight">
           {source.title}
@@ -69,7 +69,7 @@ function SourceCard({
       )}
 
       <div className="flex items-center gap-2 flex-wrap">
-        <Badge variant="outline" className="text-[10px]">
+        <Badge variant="outline" className="text-xs">
           Cited by {source.citedBy}
         </Badge>
         {source.url && (
@@ -77,7 +77,7 @@ function SourceCard({
             href={source.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline"
+            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
           >
             <ExternalLink className="h-3 w-3" />
             Open Access
@@ -92,7 +92,7 @@ function SourceCard({
             }
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[10px] text-muted-foreground hover:underline"
+            className="text-xs text-muted-foreground hover:underline"
           >
             DOI
           </a>
@@ -103,7 +103,7 @@ function SourceCard({
         <div>
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground"
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
           >
             {expanded ? (
               <ChevronUp className="h-3 w-3" />
@@ -123,13 +123,13 @@ function SourceCard({
       <Separator />
 
       <div className="flex items-center gap-2">
-        <p className="flex-1 text-[10px] text-muted-foreground leading-snug line-clamp-2">
+        <p className="flex-1 text-xs text-muted-foreground leading-snug line-clamp-2">
           {citation}
         </p>
         <Button
           variant="outline"
           size="sm"
-          className="h-7 gap-1 text-[10px] shrink-0"
+          className="h-7 gap-1 text-xs shrink-0"
           onClick={copyCitation}
         >
           {copied ? (
@@ -185,9 +185,9 @@ export function SourcesPanel() {
   if (!currentPaper?.plainText && !loading) {
     return (
       <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <BookMarked className="h-12 w-12 text-muted-foreground/40" />
+        <BookMarked className="h-14 w-14 text-primary/30" />
         <div>
-          <p className="font-medium">Find Academic Sources</p>
+          <p className="text-lg font-medium">Find Academic Sources</p>
           <p className="text-sm text-muted-foreground">
             Paste your essay first, then discover relevant
             peer-reviewed papers.
@@ -216,7 +216,7 @@ export function SourcesPanel() {
       <div className="flex flex-col items-center gap-4 py-8 text-center">
         <BookMarked className="h-12 w-12 text-primary/60" />
         <div>
-          <p className="font-medium">Find Academic Sources</p>
+          <p className="text-lg font-medium">Find Academic Sources</p>
           <p className="text-sm text-muted-foreground">
             Discover relevant peer-reviewed papers based on your
             essay topic.
@@ -242,7 +242,7 @@ export function SourcesPanel() {
           Search terms:
         </span>
         {sources.searchTerms.map((term) => (
-          <Badge key={term} variant="secondary" className="text-[10px]">
+          <Badge key={term} variant="secondary" className="text-xs">
             {term}
           </Badge>
         ))}

@@ -82,11 +82,11 @@ export function ReadinessBadge() {
 
   return (
     <div className="space-y-2">
-      <div className={`rounded-lg p-3 ${bgClass}`}>
+      <div className={`rounded-xl p-4 ${bgClass} ${overall && overall >= 80 ? "animate-glow-pulse" : ""}`}>
         <div className="flex items-center gap-2">
           <Icon className={`h-5 w-5 ${colorClass}`} />
           <div className="flex-1">
-            <p className={`text-sm font-semibold ${colorClass}`}>
+            <p className={`text-lg font-bold ${colorClass}`}>
               Submission Readiness: {overall}%
             </p>
             {resultsStale && (
@@ -113,7 +113,7 @@ export function ReadinessBadge() {
         </div>
 
         {/* Quick stats row */}
-        <div className="mt-2 flex gap-3 text-[10px] text-muted-foreground">
+        <div className="mt-2 flex gap-3 text-xs text-muted-foreground">
           {aiRisk && (
             <span>
               AI Risk: <strong>{aiRisk.overallScore}%</strong>
@@ -196,7 +196,7 @@ function WordCountBar({
   return (
     <div className="rounded-lg bg-muted/50 px-3 py-2">
       <div className="mb-1 flex items-center justify-between">
-        <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+        <span className="flex items-center gap-1 text-xs text-muted-foreground">
           <Hash className="h-2.5 w-2.5" />
           Word Count
         </span>
@@ -206,7 +206,7 @@ function WordCountBar({
           {status === "over" && ` (${current - max} over)`}
         </span>
       </div>
-      <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-muted">
+      <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
         <div
           className={`h-full rounded-full transition-all ${barColor}`}
           style={{ width: `${pct}%` }}

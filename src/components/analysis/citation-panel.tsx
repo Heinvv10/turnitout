@@ -126,9 +126,9 @@ export function CitationPanel() {
   if (!result && !loading) {
     return (
       <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <BookOpen className="h-12 w-12 text-muted-foreground/40" />
+        <BookOpen className="h-14 w-14 text-primary/30" />
         <div>
-          <p className="font-medium">Harvard Citation Checker</p>
+          <p className="text-lg font-medium">Harvard Citation Checker</p>
           <p className="text-sm text-muted-foreground">
             Validates your in-text citations, cross-references against your
             reference list, and checks Cornerstone Harvard referencing format.
@@ -167,7 +167,7 @@ export function CitationPanel() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium">Citation Score</p>
-          <p className={`text-2xl font-bold ${scoreColor}`}>
+          <p className={`text-3xl font-bold tabular-nums ${scoreColor}`}>
             {result.score}%
           </p>
         </div>
@@ -176,15 +176,15 @@ export function CitationPanel() {
         </Button>
       </div>
 
-      <Progress value={result.score} className="h-2" />
+      <Progress value={result.score} className="h-2.5" />
 
       <div className="grid grid-cols-2 gap-3">
-        <Card className="p-3 text-center">
-          <p className="text-2xl font-bold">{result.inTextCitations?.length || 0}</p>
+        <Card className="p-3 text-center shadow-sm">
+          <p className="text-3xl font-bold tabular-nums">{result.inTextCitations?.length || 0}</p>
           <p className="text-xs text-muted-foreground">In-text Citations</p>
         </Card>
-        <Card className="p-3 text-center">
-          <p className="text-2xl font-bold">{result.references?.length || 0}</p>
+        <Card className="p-3 text-center shadow-sm">
+          <p className="text-3xl font-bold tabular-nums">{result.references?.length || 0}</p>
           <p className="text-xs text-muted-foreground">References</p>
         </Card>
       </div>
@@ -200,10 +200,10 @@ export function CitationPanel() {
             Issues ({result.issues.length})
           </p>
           {result.issues.map((issue, i) => (
-            <Card key={i} className="p-3">
+            <Card key={i} className="p-4 shadow-sm">
               <div className="mb-1 flex items-center gap-2">
                 <AlertCircle className="h-3.5 w-3.5 text-yellow-500" />
-                <Badge variant="outline" className="text-[10px]">
+                <Badge variant="outline" className="text-xs">
                   {issue.type.replace(/_/g, " ")}
                 </Badge>
                 <span className="text-xs text-muted-foreground">
@@ -273,9 +273,9 @@ export function CitationPanel() {
             {showFormatted && (
               <div className="space-y-3">
                 {formatResult.formatted.map((item, i) => (
-                  <Card key={i} className="p-3 space-y-2">
+                  <Card key={i} className="p-4 shadow-sm space-y-2">
                     <div>
-                      <p className="text-[10px] font-medium uppercase text-muted-foreground mb-1">
+                      <p className="text-xs font-medium uppercase text-muted-foreground mb-1">
                         Original
                       </p>
                       <p className="text-xs text-muted-foreground line-through">
@@ -286,7 +286,7 @@ export function CitationPanel() {
                       <ArrowRight className="h-3 w-3" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-medium uppercase text-green-600 dark:text-green-400 mb-1">
+                      <p className="text-xs font-medium uppercase text-green-600 dark:text-green-400 mb-1">
                         Corrected
                       </p>
                       <p className="text-xs font-medium">
@@ -299,7 +299,7 @@ export function CitationPanel() {
                           <Badge
                             key={j}
                             variant="secondary"
-                            className="text-[9px]"
+                            className="text-[11px]"
                           >
                             {change}
                           </Badge>

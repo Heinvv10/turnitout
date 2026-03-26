@@ -254,14 +254,14 @@ export function PaperEditor() {
   return (
     <div className="flex h-full flex-col gap-2">
       {/* Essay Body */}
-      <div className="flex flex-1 flex-col rounded-lg border bg-card">
+      <div className="flex flex-1 flex-col rounded-xl shadow-sm border bg-card">
         <div className="flex items-center justify-between border-b bg-muted/30 px-3 py-1.5">
           <div className="flex items-center gap-2">
             <FileText className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-xs font-medium">Essay</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="font-mono text-[10px]">
+            <Badge variant="secondary" className="font-mono text-xs">
               {bodyWordCount} words
             </Badge>
             <input
@@ -277,7 +277,7 @@ export function PaperEditor() {
             <Button
               variant="ghost"
               size="sm"
-              className="h-6 text-[10px]"
+              className="h-7 text-xs"
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="mr-1 h-3 w-3" />
@@ -287,7 +287,7 @@ export function PaperEditor() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 text-[10px] text-destructive hover:text-destructive"
+                className="h-7 text-xs text-destructive hover:text-destructive"
                 onClick={handleClearAll}
               >
                 <Trash2 className="mr-1 h-3 w-3" />
@@ -314,7 +314,7 @@ export function PaperEditor() {
 
         {/* Section split status bar */}
         {bodyWordCount > 0 && (
-          <div className="flex items-center gap-2 border-t bg-muted/20 px-3 py-1.5 text-[10px]">
+          <div className="flex items-center gap-2 border-t bg-muted/20 px-3 py-1.5 text-xs">
             {isSplitting ? (
               <>
                 <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
@@ -355,13 +355,13 @@ export function PaperEditor() {
       </div>
 
       {/* Reference List */}
-      <div className="flex flex-col rounded-lg border bg-card">
+      <div className="flex flex-col rounded-xl shadow-sm border bg-card">
         <div className="flex items-center justify-between border-b bg-muted/30 px-3 py-1.5">
           <div className="flex items-center gap-2">
             <BookOpen className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-xs font-medium">Reference List</span>
           </div>
-          <Badge variant="secondary" className="font-mono text-[10px]">
+          <Badge variant="secondary" className="font-mono text-xs">
             {refCount} references
           </Badge>
         </div>
