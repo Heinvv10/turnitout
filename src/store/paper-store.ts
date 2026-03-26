@@ -4,6 +4,7 @@ import type {
   AIRiskResult,
   CitationResult,
   GradingResult,
+  GrammarResult,
   PlagiarismResult,
   SubmissionReadiness,
   TrafficLight,
@@ -19,7 +20,7 @@ export interface SectionSplit {
 interface PaperState {
   currentPaper: Paper | null;
   analysisResults: SubmissionReadiness;
-  isAnalyzing: { aiRisk: boolean; citations: boolean; grading: boolean; plagiarism: boolean };
+  isAnalyzing: { aiRisk: boolean; citations: boolean; grading: boolean; plagiarism: boolean; grammar: boolean };
   resultsStale: boolean;
   sections: SectionSplit | null;
   isSplitting: boolean;
@@ -34,8 +35,9 @@ interface PaperState {
   setCitationResult: (result: CitationResult) => void;
   setGradingResult: (result: GradingResult) => void;
   setPlagiarismResult: (result: PlagiarismResult) => void;
+  setGrammarResult: (result: GrammarResult) => void;
   setAnalyzing: (
-    key: "aiRisk" | "citations" | "grading" | "plagiarism",
+    key: "aiRisk" | "citations" | "grading" | "plagiarism" | "grammar",
     value: boolean,
   ) => void;
   clearResults: () => void;
@@ -51,6 +53,7 @@ function computeOverall(results: SubmissionReadiness): {
   if (results.citations) scores.push(results.citations.score);
   if (results.grading) scores.push(results.grading.totalScore);
   if (results.plagiarism) scores.push(100 - results.plagiarism.overallSimilarity);
+  if (results.grammar) scores.push(results.grammar.score);
 
   if (scores.length === 0) return { overall: 0, trafficLight: "red" };
 
@@ -67,6 +70,7 @@ const emptyResults: SubmissionReadiness = {
   citations: null,
   grading: null,
   plagiarism: null,
+  grammar: null,
   overall: 0,
   trafficLight: "red",
 };
@@ -74,7 +78,7 @@ const emptyResults: SubmissionReadiness = {
 export const usePaperStore = create<PaperState>((set, get) => ({
   currentPaper: null,
   analysisResults: { ...emptyResults },
-  isAnalyzing: { aiRisk: false, citations: false, grading: false, plagiarism: false },
+  isAnalyzing: { aiRisk: false, citations: false, grading: false, plagiarism: false, grammar: false },
   resultsStale: false,
   sections: null,
   isSplitting: false,
@@ -142,6 +146,12 @@ export const usePaperStore = create<PaperState>((set, get) => ({
 
   setPlagiarismResult: (result) => {
     const results = { ...get().analysisResults, plagiarism: result };
+    const { overall, trafficLight } = computeOverall(results);
+    set({ analysisResults: { ...results, overall, trafficLight } });
+  },
+
+  setGrammarResult: (result) => {
+    const results = { ...get().analysisResults, grammar: result };
     const { overall, trafficLight } = computeOverall(results);
     set({ analysisResults: { ...results, overall, trafficLight } });
   },

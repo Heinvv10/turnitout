@@ -84,11 +84,29 @@ export interface PlagiarismResult {
   selfPlagiarismRisk: boolean;
 }
 
+export interface GrammarIssue {
+  type: "grammar" | "spelling" | "punctuation" | "word_choice" | "sentence_structure";
+  severity: "error" | "warning" | "suggestion";
+  text: string;
+  correction: string;
+  explanation: string;
+  location: string;
+}
+
+export interface GrammarResult {
+  score: number;
+  trafficLight: TrafficLight;
+  errorCount: number;
+  issues: GrammarIssue[];
+  summary: string;
+}
+
 export interface SubmissionReadiness {
   aiRisk: AIRiskResult | null;
   citations: CitationResult | null;
   grading: GradingResult | null;
   plagiarism: PlagiarismResult | null;
+  grammar: GrammarResult | null;
   overall: number; // Weighted composite 0-100
   trafficLight: TrafficLight;
 }

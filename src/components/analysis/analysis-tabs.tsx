@@ -7,13 +7,19 @@ import { CitationPanel } from "./citation-panel";
 import { GraderPanel } from "./grader-panel";
 import { ReadinessBadge } from "./readiness-badge";
 import { PlagiarismPanel } from "./plagiarism-panel";
+import { ReadabilityPanel } from "./readability-panel";
+import { TonePanel } from "./tone-panel";
 import { AdvicePanel } from "./advice-panel";
+import { GrammarPanel } from "./grammar-panel";
 import {
   ShieldCheck,
   BookOpen,
   GraduationCap,
   Search,
   Lightbulb,
+  BarChart3,
+  MessageSquare,
+  SpellCheck,
 } from "lucide-react";
 
 function TrafficDot({ color }: { color: "green" | "yellow" | "red" | null }) {
@@ -60,9 +66,22 @@ export function AnalysisTabs() {
               Grade
               <TrafficDot color={analysisResults.grading?.trafficLight || null} />
             </TabsTrigger>
+            <TabsTrigger value="readability" className="gap-1 text-xs">
+              <BarChart3 className="h-3 w-3" />
+              Readability
+            </TabsTrigger>
+            <TabsTrigger value="tone" className="gap-1 text-xs">
+              <MessageSquare className="h-3 w-3" />
+              Tone
+            </TabsTrigger>
             <TabsTrigger value="advice" className="gap-1 text-xs">
               <Lightbulb className="h-3 w-3" />
               Advice
+            </TabsTrigger>
+            <TabsTrigger value="grammar" className="gap-1 text-xs">
+              <SpellCheck className="h-3 w-3" />
+              Grammar
+              <TrafficDot color={analysisResults.grammar?.trafficLight || null} />
             </TabsTrigger>
           </TabsList>
         </div>
@@ -80,8 +99,17 @@ export function AnalysisTabs() {
         <TabsContent value="grade" className="p-4">
           <GraderPanel />
         </TabsContent>
+        <TabsContent value="readability" className="p-4">
+          <ReadabilityPanel />
+        </TabsContent>
+        <TabsContent value="tone" className="p-4">
+          <TonePanel />
+        </TabsContent>
         <TabsContent value="advice" className="p-4">
           <AdvicePanel />
+        </TabsContent>
+        <TabsContent value="grammar" className="p-4">
+          <GrammarPanel />
         </TabsContent>
       </div>
     </Tabs>

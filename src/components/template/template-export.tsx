@@ -18,6 +18,7 @@ import {
   CheckCircle,
   Loader2,
   AlertTriangle,
+  FileText,
 } from "lucide-react";
 
 function countSectionWords(text: string): number {
@@ -278,18 +279,29 @@ export function TemplateExport() {
       )}
 
       {/* Export */}
-      <Button
-        onClick={handleExport}
-        disabled={!currentPaper?.plainText || exporting}
-        className="w-full bg-green-600 hover:bg-green-700"
-      >
-        {exporting ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <Download className="mr-2 h-4 w-4" />
-        )}
-        Export .docx
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          onClick={handleExport}
+          disabled={!currentPaper?.plainText || exporting}
+          className="flex-1 bg-green-600 hover:bg-green-700"
+        >
+          {exporting ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Download className="mr-2 h-4 w-4" />
+          )}
+          Export .docx
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => window.open("/preview", "_blank")}
+          disabled={!currentPaper?.plainText}
+          className="flex-1"
+        >
+          <FileText className="mr-2 h-4 w-4" />
+          Save as PDF
+        </Button>
+      </div>
 
       <p className="text-center text-[9px] text-muted-foreground">
         {studentNumber || "student"}_{selectedModule}_
