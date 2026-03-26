@@ -15,6 +15,7 @@ import {
   FileWarning,
   Repeat,
 } from "lucide-react";
+import { FixGuide, getFixGuide } from "./fix-guide";
 
 const matchTypeLabels: Record<string, { label: string; color: string }> = {
   direct_copy: { label: "Direct Copy", color: "destructive" },
@@ -204,6 +205,10 @@ export function PlagiarismPanel() {
                   <span className="font-medium">Fix: </span>
                   {match.suggestion}
                 </div>
+                <FixGuide
+                  issue={match.matchType}
+                  {...getFixGuide(match.matchType)}
+                />
               </Card>
             );
           })}

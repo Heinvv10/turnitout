@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ShieldCheck, Loader2, AlertTriangle } from "lucide-react";
+import { FixGuide, getFixGuide } from "./fix-guide";
 
 export function AIRiskPanel() {
   const { currentPaper, analysisResults, isAnalyzing, setAnalyzing, setAIRiskResult } =
@@ -154,6 +155,12 @@ export function AIRiskPanel() {
                 <span className="font-medium">Suggestion: </span>
                 {para.suggestion}
               </div>
+            )}
+            {para.flags[0] && (
+              <FixGuide
+                issue={para.flags[0].type}
+                {...getFixGuide(para.flags[0].type, para.flags[0].detail)}
+              />
             )}
           </Card>
         ))}

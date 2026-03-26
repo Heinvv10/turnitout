@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { BookOpen, Loader2, AlertCircle, CheckCircle } from "lucide-react";
+import { FixGuide, getFixGuide } from "./fix-guide";
 
 export function CitationPanel() {
   const {
@@ -137,6 +138,10 @@ export function CitationPanel() {
                   {issue.suggestion}
                 </p>
               )}
+              <FixGuide
+                issue={issue.type}
+                {...getFixGuide(issue.type)}
+              />
             </Card>
           ))}
         </div>
