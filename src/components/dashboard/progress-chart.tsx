@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useDraftHistoryStore } from "@/store/draft-history-store";
 import { Card } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
@@ -13,8 +14,10 @@ const SCORE_KEYS = [
   { key: "similarity", label: "Similarity", color: "bg-orange-400", inverted: true },
 ] as const;
 
+const EMPTY_SNAPSHOTS: never[] = [];
+
 export function ProgressChart({ moduleCode }: { moduleCode: string }) {
-  const snapshots = useDraftHistoryStore((s) => s.getSnapshots(moduleCode));
+  const snapshots = useDraftHistoryStore((s) => s.snapshots[moduleCode] ?? EMPTY_SNAPSHOTS);
 
   if (snapshots.length < 1) return null;
 

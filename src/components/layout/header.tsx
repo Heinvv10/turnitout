@@ -52,9 +52,10 @@ function getNextDueDate(
   let closest: { dueDate: Date; assessmentName: string } | null = null;
 
   for (const assessment of assessments) {
-    if (!assessment.dueWeek) continue;
+    const week = Number(assessment.dueWeek);
+    if (!week || isNaN(week)) continue;
     const dueDate = new Date(semesterStart);
-    dueDate.setDate(dueDate.getDate() + (assessment.dueWeek - 1) * 7);
+    dueDate.setDate(dueDate.getDate() + (week - 1) * 7);
 
     if (!closest || dueDate.getTime() < closest.dueDate.getTime()) {
       // Prefer the next upcoming one, but if all are past, show the most recent
