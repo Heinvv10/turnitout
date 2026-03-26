@@ -82,7 +82,6 @@ export function TemplateExport() {
   if (!studentName) missingFields.push("Name");
   if (!studentNumber) missingFields.push("Student Number");
   if (!assignmentTitle) missingFields.push("Title");
-  if (!template) missingFields.push("Word Template");
   if (!sectionData.introduction && !sectionData.body)
     missingFields.push("Essay text");
 
@@ -100,11 +99,23 @@ export function TemplateExport() {
   };
 
   const handleExport = async () => {
-    if (!template) return;
     setExporting(true);
     try {
+      // Use uploaded template or fetch generic fallback
+      let templateBase64 = template?.base64;
+      if (!templateBase64) {
+        const res = await fetch("/generic-template.docx");
+        const buf = await res.arrayBuffer();
+        const bytes = new Uint8Array(buf);
+        let binary = "";
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        templateBase64 = btoa(binary);
+      }
+
       const blob = await populateTemplate(
-        template.base64,
+        templateBase64,
         {
           studentName,
           studentNumber,
@@ -152,16 +163,25 @@ export function TemplateExport() {
           </label>
         </div>
       ) : (
-        <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/25 p-4 hover:border-primary/50">
-          <Upload className="h-5 w-5 text-muted-foreground" />
-          <span className="text-xs">Upload Cornerstone Template (.docx)</span>
-          <input
-            type="file"
-            accept=".docx"
-            className="hidden"
-            onChange={handleTemplateUpload}
-          />
-        </label>
+        <div className="rounded-lg border border-dashed border-muted-foreground/25 p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium">Using generic template</p>
+              <p className="text-[10px] text-muted-foreground">
+                Upload your university template for exact formatting
+              </p>
+            </div>
+            <label className="cursor-pointer rounded-md bg-muted px-3 py-1.5 text-xs font-medium hover:bg-muted/80">
+              Upload .docx
+              <input
+                type="file"
+                accept=".docx"
+                className="hidden"
+                onChange={handleTemplateUpload}
+              />
+            </label>
+          </div>
+        </div>
       )}
 
       {/* Student Details */}
@@ -260,7 +280,7 @@ export function TemplateExport() {
       {/* Export */}
       <Button
         onClick={handleExport}
-        disabled={!template || !currentPaper?.plainText || exporting}
+        disabled={!currentPaper?.plainText || exporting}
         className="w-full bg-green-600 hover:bg-green-700"
       >
         {exporting ? (
