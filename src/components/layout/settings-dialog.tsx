@@ -99,30 +99,13 @@ export function SettingsDialog() {
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* API Key - most important, show first */}
-          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-            <Label htmlFor="s-apikey" className="flex items-center gap-1.5 text-sm font-medium">
-              <Key className="h-3.5 w-3.5" />
-              Anthropic API Key
-            </Label>
-            <p className="mb-2 text-xs text-muted-foreground">
-              Required for AI checks. Get yours at{" "}
-              <a
-                href="https://console.anthropic.com/settings/keys"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary underline"
-              >
-                console.anthropic.com
-              </a>
-            </p>
+          {/* API key managed by TurnItOut service */}
+          <div className="hidden">
             <Input
               id="s-apikey"
-              type="password"
+              type="hidden"
               value={localKey}
               onChange={(e) => setLocalKey(e.target.value)}
-              placeholder="sk-ant-..."
-              className="font-mono text-xs"
             />
           </div>
 

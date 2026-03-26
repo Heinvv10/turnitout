@@ -10,11 +10,12 @@ export async function callClaude(
   model?: string,
   maxTokens?: number,
 ): Promise<string> {
-  const key = apiKey || process.env.ANTHROPIC_API_KEY;
+  // Server-side env var takes priority (service-provided key)
+  const key = process.env.ANTHROPIC_API_KEY || apiKey;
 
-  if (!key || key === "your-api-key-here") {
+  if (!key) {
     throw new Error(
-      "No API key configured. Go to Settings (gear icon) and enter your Anthropic API key.",
+      "Service unavailable. Please contact support.",
     );
   }
 

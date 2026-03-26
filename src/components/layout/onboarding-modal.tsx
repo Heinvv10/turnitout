@@ -249,31 +249,7 @@ export function OnboardingModal() {
                 className="mt-1"
               />
             </div>
-            <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-              <Label htmlFor="ob-apikey" className="flex items-center gap-1.5 text-sm font-medium">
-                <Key className="h-3.5 w-3.5" />
-                Anthropic API Key
-              </Label>
-              <p className="mb-2 text-xs text-muted-foreground">
-                Required for AI checks. Get yours at{" "}
-                <a
-                  href="https://console.anthropic.com/settings/keys"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary underline"
-                >
-                  console.anthropic.com
-                </a>
-              </p>
-              <Input
-                id="ob-apikey"
-                type="password"
-                value={localApiKey}
-                onChange={(e) => setLocalApiKey(e.target.value)}
-                placeholder="sk-ant-..."
-                className="font-mono text-xs"
-              />
-            </div>
+            {/* API key provided by TurnItOut service */}
           </div>
         )}
 
