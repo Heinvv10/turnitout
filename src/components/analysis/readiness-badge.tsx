@@ -134,6 +134,11 @@ export function ReadinessBadge() {
               Grade: <strong>{grading.totalScore}%</strong>
             </span>
           )}
+          {analysisResults.grammar && (
+            <span>
+              Grammar: <strong>{analysisResults.grammar.score}%</strong>
+            </span>
+          )}
         </div>
       </div>
 

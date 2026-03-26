@@ -47,11 +47,12 @@ function HomeContent() {
     setCitationResult,
     setGradingResult,
     setPlagiarismResult,
+    setGrammarResult,
     setPaper,
     setSections,
     clearResults,
   } = usePaperStore();
-  const { selectedModule, setSelectedModule, moduleOutlines, apiKey, gradingScale, referencingStyle, saveModulePaper, getModulePaper } =
+  const { selectedModule, setSelectedModule, moduleOutlines, apiKey, gradingScale, referencingStyle, language, saveModulePaper, getModulePaper } =
     useSettingsStore();
   const { addEntry } = useHistoryStore();
   const searchParams = useSearchParams();
@@ -108,7 +109,7 @@ function HomeContent() {
   }, [selectedModule]);
 
   const anyLoading =
-    isAnalyzing.aiRisk || isAnalyzing.citations || isAnalyzing.grading || isAnalyzing.plagiarism;
+    isAnalyzing.aiRisk || isAnalyzing.citations || isAnalyzing.grading || isAnalyzing.plagiarism || isAnalyzing.grammar;
 
   const runAllChecks = async () => {
     if (!currentPaper?.plainText) return;
@@ -128,12 +129,14 @@ function HomeContent() {
       apiKey,
       gradingScale,
       referencingStyle,
+      language,
     };
 
     setAnalyzing("aiRisk", true);
     setAnalyzing("citations", true);
     setAnalyzing("grading", true);
     setAnalyzing("plagiarism", true);
+    setAnalyzing("grammar", true);
 
     const safeFetch = async (url: string, retries = 2): Promise<unknown> => {
       for (let i = 0; i <= retries; i++) {
@@ -180,6 +183,13 @@ function HomeContent() {
     if (plagRes.status === "fulfilled") setPlagiarismResult(plagRes.value as Parameters<typeof setPlagiarismResult>[0]);
     setAnalyzing("grading", false);
     setAnalyzing("plagiarism", false);
+
+    // Batch 3: Grammar
+    const [grammarRes] = await Promise.allSettled([
+      safeFetch("/api/check-grammar"),
+    ]);
+    if (grammarRes.status === "fulfilled") setGrammarResult(grammarRes.value as Parameters<typeof setGrammarResult>[0]);
+    setAnalyzing("grammar", false);
 
     // Save to history (localStorage)
     const updatedResults = usePaperStore.getState().analysisResults;
