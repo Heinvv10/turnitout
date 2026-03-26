@@ -16,6 +16,7 @@ import {
   XCircle,
   FileText,
 } from "lucide-react";
+import { ProgressChart } from "@/components/dashboard/progress-chart";
 import Link from "next/link";
 
 function TrafficIcon({ color }: { color: "green" | "yellow" | "red" }) {
@@ -27,7 +28,7 @@ function TrafficIcon({ color }: { color: "green" | "yellow" | "red" }) {
 }
 
 export default function DashboardPage() {
-  const { moduleOutlines, studentName } = useSettingsStore();
+  const { moduleOutlines, studentName, selectedModule } = useSettingsStore();
   const { entries, removeEntry, clearAll } = useHistoryStore();
 
   const semester1 = MODULES.filter((m) => m.semester === 1);
@@ -80,6 +81,11 @@ export default function DashboardPage() {
               />
             ))}
           </div>
+        </div>
+
+        {/* Draft Progress */}
+        <div className="mb-8">
+          <ProgressChart moduleCode={selectedModule} />
         </div>
 
         {/* History */}

@@ -10,6 +10,7 @@ import { AnalysisTabs } from "@/components/analysis/analysis-tabs";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { useHistoryStore } from "@/store/history-store";
+import { useDraftHistoryStore } from "@/store/draft-history-store";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -57,6 +58,7 @@ function HomeContent() {
   const { selectedModule, setSelectedModule, moduleOutlines, apiKey, gradingScale, referencingStyle, language, saveModulePaper, getModulePaper } =
     useSettingsStore();
   const { addEntry } = useHistoryStore();
+  const { addSnapshot } = useDraftHistoryStore();
   const searchParams = useSearchParams();
   const prevModuleRef = useRef(selectedModule);
 
@@ -250,6 +252,23 @@ function HomeContent() {
           }),
         }).catch((err) => console.error("DB history save failed:", err));
       }
+
+      // Save draft snapshot for progress tracking
+      addSnapshot(selectedModule, {
+        id: crypto.randomUUID(),
+        timestamp: new Date().toISOString(),
+        moduleCode: selectedModule,
+        wordCount: currentPaper.wordCount,
+        scores: {
+          readability: updatedResults.tone?.formalityScore ?? 0,
+          grammar: updatedResults.grammar?.score ?? 0,
+          citations: updatedResults.citations?.score ?? 0,
+          similarity: updatedResults.plagiarism?.overallSimilarity ?? 0,
+          aiRisk: updatedResults.aiRisk?.overallScore ?? 0,
+          grade: updatedResults.grading?.totalScore ?? 0,
+          overall: updatedResults.overall ?? 0,
+        },
+      });
 
       // Save paper + results for this module
       const latestPaper = usePaperStore.getState().currentPaper;

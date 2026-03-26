@@ -8,6 +8,7 @@ import type {
   GradingResult,
   GrammarResult,
   PlagiarismResult,
+  SourcesResult,
   SubmissionReadiness,
   ToneResult,
   TrafficLight,
@@ -41,6 +42,7 @@ interface PaperState {
   setGrammarResult: (result: GrammarResult) => void;
   setToneResult: (result: ToneResult) => void;
   setAdviceResult: (result: AdviceResult) => void;
+  setSourcesResult: (result: SourcesResult) => void;
   setAnalyzing: (
     key: "aiRisk" | "citations" | "grading" | "plagiarism" | "grammar",
     value: boolean,
@@ -78,6 +80,7 @@ const emptyResults: SubmissionReadiness = {
   grammar: null,
   tone: null,
   advice: null,
+  sources: null,
   overall: 0,
   trafficLight: "red",
 };
@@ -171,6 +174,10 @@ export const usePaperStore = create<PaperState>()(
 
   setAdviceResult: (result) => {
     set({ analysisResults: { ...get().analysisResults, advice: result } });
+  },
+
+  setSourcesResult: (result) => {
+    set({ analysisResults: { ...get().analysisResults, sources: result } });
   },
 
   setAnalyzing: (key, value) =>

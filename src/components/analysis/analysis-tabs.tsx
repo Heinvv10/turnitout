@@ -11,6 +11,7 @@ import { ReadabilityPanel } from "./readability-panel";
 import { TonePanel } from "./tone-panel";
 import { AdvicePanel } from "./advice-panel";
 import { GrammarPanel } from "./grammar-panel";
+import { SourcesPanel } from "./sources-panel";
 import {
   ShieldCheck,
   BookOpen,
@@ -20,6 +21,7 @@ import {
   BarChart3,
   MessageSquare,
   SpellCheck,
+  BookMarked,
 } from "lucide-react";
 
 function TrafficDot({ color }: { color: "green" | "yellow" | "red" | null }) {
@@ -93,6 +95,10 @@ export function AnalysisTabs() {
               Advice
               <TrafficDot color={adviceDot} />
             </TabsTrigger>
+            <TabsTrigger value="sources" className="gap-1 text-xs">
+              <BookMarked className="h-3 w-3" />
+              Sources
+            </TabsTrigger>
           </TabsList>
         </div>
       </div>
@@ -120,6 +126,9 @@ export function AnalysisTabs() {
         </TabsContent>
         <TabsContent value="advice" className="p-4">
           <AdvicePanel />
+        </TabsContent>
+        <TabsContent value="sources" className="p-4">
+          <SourcesPanel />
         </TabsContent>
       </div>
     </Tabs>

@@ -116,6 +116,24 @@ export interface AdviceResult {
   checklist: string[];
 }
 
+export interface SourceSuggestion {
+  title: string;
+  authors: string;
+  year: number;
+  journal: string;
+  citedBy: number;
+  doi: string;
+  url: string;
+  relevance: string;
+  abstract: string;
+  formattedCitation: { harvard: string; apa7: string };
+}
+
+export interface SourcesResult {
+  searchTerms: string[];
+  sources: SourceSuggestion[];
+}
+
 export interface SubmissionReadiness {
   aiRisk: AIRiskResult | null;
   citations: CitationResult | null;
@@ -124,6 +142,7 @@ export interface SubmissionReadiness {
   grammar: GrammarResult | null;
   tone: ToneResult | null;
   advice: AdviceResult | null;
+  sources: SourcesResult | null;
   overall: number;
   trafficLight: TrafficLight;
 }
