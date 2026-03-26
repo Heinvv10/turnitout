@@ -20,16 +20,16 @@ import {
 const plans = [
   {
     id: "free",
-    name: "Free",
+    name: "Free Trial",
     price: "R0",
     period: "",
-    description: "Try TurnItOut",
-    checks: "2 checks/month",
+    description: "Try it out",
+    checks: "2 checks total",
     features: [
-      "Readability analysis",
-      "Grammar check",
-      "Basic feedback",
-      "2 checks per month",
+      "2 free checks total",
+      "Full analysis suite included",
+      "See exactly what you get",
+      "Then upgrade to continue",
     ],
     icon: Zap,
     highlight: false,
@@ -353,8 +353,8 @@ export default function BillingPage() {
                 a: "Yes. TurnItOut is a writing improvement tool, like Grammarly. It helps you check your own work before submission - it never writes content for you.",
               },
               {
-                q: "What happens when my free checks run out?",
-                a: "You can still use the editor and readability analysis. To run AI-powered checks (grammar, citations, grading, etc.), upgrade to Student or Annual.",
+                q: "What happens when my 2 free checks run out?",
+                a: "You'll need to upgrade to Student or Annual to continue running checks. Your essays and previous results are saved — you won't lose anything.",
               },
               {
                 q: "Do you offer student discounts?",

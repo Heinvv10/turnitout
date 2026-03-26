@@ -22,14 +22,14 @@ const PAYFAST_VALIDATE_URL = PAYFAST_SANDBOX
 
 export const PLANS = {
   free: {
-    name: "Free",
+    name: "Free Trial",
     price: 0,
-    checksPerMonth: 2,
+    checksTotal: 2, // 2 checks TOTAL, not per month
     features: [
-      "2 checks per month",
-      "Readability analysis",
-      "Grammar check",
-      "Basic feedback",
+      "2 free checks total",
+      "Full analysis suite",
+      "See what TurnItOut can do",
+      "Then upgrade to continue",
     ],
   },
   student_monthly: {

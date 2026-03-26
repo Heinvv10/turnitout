@@ -6,10 +6,10 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 
 export const PLANS = {
   free: {
-    name: "Free",
+    name: "Free Trial",
     price: 0,
-    checksPerMonth: 5,
-    features: ["Basic readability", "Grammar check", "5 checks/month"],
+    checksTotal: 2, // 2 checks TOTAL then must upgrade
+    features: ["2 free checks total", "Full analysis suite", "Then upgrade to continue"],
   },
   student: {
     name: "Student",
