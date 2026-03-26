@@ -2,357 +2,372 @@
 
 import { useState } from "react";
 import { Header } from "@/components/layout/header";
-import { PLANS } from "@/lib/stripe";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { useSettingsStore } from "@/store/settings-store";
 import {
   Check,
-  Sparkles,
-  Crown,
   Zap,
+  Crown,
+  Users,
+  CreditCard,
+  Banknote,
   Loader2,
-  ExternalLink,
 } from "lucide-react";
 
-type PaidPlan = "student" | "annual";
+const plans = [
+  {
+    id: "free",
+    name: "Free",
+    price: "R0",
+    period: "",
+    description: "Try TurnItOut",
+    checks: "2 checks/month",
+    features: [
+      "Readability analysis",
+      "Grammar check",
+      "Basic feedback",
+      "2 checks per month",
+    ],
+    icon: Zap,
+    highlight: false,
+  },
+  {
+    id: "student_monthly",
+    name: "Student",
+    price: "R149",
+    period: "/month",
+    description: "Everything you need",
+    checks: "Unlimited checks",
+    features: [
+      "Unlimited checks",
+      "All 9 analysis tabs",
+      "AI Writing Coach",
+      "Source suggestions (250M+ papers)",
+      "Citation formatter",
+      "Word template export",
+      "PDF export",
+      "Outline generator",
+      "Guided fix suggestions",
+      "Draft progress tracking",
+    ],
+    icon: Crown,
+    highlight: true,
+    popular: true,
+  },
+  {
+    id: "student_annual",
+    name: "Annual",
+    price: "R1,199",
+    priceMonthly: "R100",
+    period: "/year",
+    description: "Best value — save R589",
+    checks: "Unlimited checks",
+    features: [
+      "Everything in Student",
+      "Save R589/year (R100/mo effective)",
+      "Priority support",
+      "Early access to new features",
+    ],
+    icon: Crown,
+    highlight: false,
+    savings: "Save 33%",
+  },
+  {
+    id: "study_group",
+    name: "Study Group",
+    price: "R99",
+    period: "/student/month",
+    description: "For 5+ students",
+    checks: "Unlimited per student",
+    features: [
+      "Everything in Student",
+      "R99/mo per student (min 5)",
+      "Shared module library",
+      "Group progress dashboard",
+    ],
+    icon: Users,
+    highlight: false,
+  },
+];
 
 export default function BillingPage() {
-  const [loading, setLoading] = useState<PaidPlan | null>(null);
-  const [currentPlan] = useState<string>("free");
+  const { studentName } = useSettingsStore();
+  const [loading, setLoading] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"payfast" | "stripe">(
+    "payfast",
+  );
 
-  async function handleUpgrade(plan: PaidPlan) {
-    setLoading(plan);
+  const handleCheckout = async (planId: string) => {
+    setLoading(planId);
     try {
-      const res = await fetch("/api/billing/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
+      if (paymentMethod === "payfast") {
+        const res = await fetch("/api/payfast/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            plan: planId,
+            userId: 1, // TODO: get from auth session
+            email: "",
+            name: studentName,
+          }),
+        });
+        const data = await res.json();
+        if (data.url && data.formData) {
+          // Create a form and submit to PayFast
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = data.url;
+          Object.entries(data.formData).forEach(([key, value]) => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = key;
+            input.value = value as string;
+            form.appendChild(input);
+          });
+          document.body.appendChild(form);
+          form.submit();
+          return;
+        }
       } else {
-        throw new Error(data.error || "Failed to create checkout session");
+        // Stripe checkout
+        const res = await fetch("/api/billing/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan: planId, userId: 1 }),
+        });
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+          return;
+        }
       }
-    } catch {
+    } catch (err) {
+      console.error("Checkout error:", err);
+    } finally {
       setLoading(null);
     }
-  }
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-
-      <div className="mx-auto w-full max-w-5xl flex-1 p-6">
-        {/* Hero */}
-        <div className="mb-10 text-center">
-          <h2 className="text-3xl font-bold tracking-tight">
-            Choose Your Plan
-          </h2>
-          <p className="mt-2 text-muted-foreground">
-            Get the most out of TurnItOut with unlimited checks and advanced
-            features
+      <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold">
+            Invest in Your Academic Success
+          </h1>
+          <p className="mt-2 text-lg text-muted-foreground">
+            One tool that replaces Grammarly + Scribbr + GPTZero + Quillbot
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Trusted by students at Cornerstone Institute, UCT, Stellenbosch and
+            more
           </p>
         </div>
 
-        {/* Plan Cards */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {/* Free Plan */}
-          <Card
-            className={`relative flex flex-col ${currentPlan === "free" ? "ring-2 ring-primary" : ""}`}
+        {/* Payment method selector */}
+        <div className="mb-6 flex items-center justify-center gap-2">
+          <span className="text-sm text-muted-foreground">Pay with:</span>
+          <Button
+            variant={paymentMethod === "payfast" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setPaymentMethod("payfast")}
+            className="gap-1.5"
           >
-            {currentPlan === "free" && (
-              <Badge className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary">
-                Current Plan
-              </Badge>
-            )}
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-muted-foreground" />
-                <CardTitle>{PLANS.free.name}</CardTitle>
-              </div>
-              <CardDescription>Get started with basic checks</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <div className="mb-4">
-                <span className="text-3xl font-bold">R0</span>
-                <span className="text-muted-foreground">/month</span>
-              </div>
-              <Separator className="mb-4" />
-              <ul className="space-y-2.5">
-                {PLANS.free.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-sm">
-                    <Check className="h-4 w-4 shrink-0 text-green-500" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button
-                variant="outline"
-                className="w-full"
-                disabled={currentPlan === "free"}
-              >
-                {currentPlan === "free" ? "Active" : "Downgrade"}
-              </Button>
-            </CardFooter>
-          </Card>
+            <Banknote className="h-3.5 w-3.5" />
+            PayFast (EFT, SnapScan, Card)
+          </Button>
+          <Button
+            variant={paymentMethod === "stripe" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setPaymentMethod("stripe")}
+            className="gap-1.5"
+          >
+            <CreditCard className="h-3.5 w-3.5" />
+            Stripe (International Card)
+          </Button>
+        </div>
 
-          {/* Student Plan */}
-          <Card
-            className={`relative flex flex-col border-primary/50 shadow-lg ${currentPlan === "student" ? "ring-2 ring-primary" : ""}`}
-          >
-            <Badge className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-              {currentPlan === "student" ? "Current Plan" : "Most Popular"}
-            </Badge>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-blue-500" />
-                <CardTitle>{PLANS.student.name}</CardTitle>
-              </div>
-              <CardDescription>
-                Everything you need to ace your papers
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <div className="mb-4">
-                <span className="text-3xl font-bold">
-                  R{PLANS.student.priceMonthly}
-                </span>
-                <span className="text-muted-foreground">/month</span>
-              </div>
-              <Separator className="mb-4" />
-              <ul className="space-y-2.5">
-                {PLANS.student.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-sm">
-                    <Check className="h-4 w-4 shrink-0 text-green-500" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700"
-                disabled={currentPlan === "student" || loading === "student"}
-                onClick={() => handleUpgrade("student")}
-              >
-                {loading === "student" ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                {currentPlan === "student" ? "Active" : "Upgrade"}
-              </Button>
-            </CardFooter>
-          </Card>
-
-          {/* Annual Plan */}
-          <Card
-            className={`relative flex flex-col ${currentPlan === "annual" ? "ring-2 ring-primary" : ""}`}
-          >
-            {currentPlan === "annual" && (
-              <Badge className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary">
-                Current Plan
-              </Badge>
-            )}
-            <Badge
-              variant="secondary"
-              className="absolute -top-2.5 right-4 bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+        {/* Plans */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {plans.map((plan) => (
+            <Card
+              key={plan.id}
+              className={`relative flex flex-col p-6 ${
+                plan.highlight
+                  ? "border-2 border-primary shadow-lg"
+                  : ""
+              }`}
             >
-              Save R349/yr
-            </Badge>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Crown className="h-5 w-5 text-amber-500" />
-                <CardTitle>{PLANS.annual.name}</CardTitle>
+              {plan.popular && (
+                <Badge className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-primary">
+                  Most Popular
+                </Badge>
+              )}
+              {plan.savings && (
+                <Badge
+                  variant="secondary"
+                  className="absolute -top-2.5 left-1/2 -translate-x-1/2"
+                >
+                  {plan.savings}
+                </Badge>
+              )}
+
+              <div className="mb-4">
+                <plan.icon
+                  className={`mb-2 h-8 w-8 ${
+                    plan.highlight ? "text-primary" : "text-muted-foreground"
+                  }`}
+                />
+                <h3 className="text-lg font-bold">{plan.name}</h3>
+                <p className="text-xs text-muted-foreground">
+                  {plan.description}
+                </p>
               </div>
-              <CardDescription>Best value for serious students</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <div className="mb-1">
-                <span className="text-3xl font-bold">
-                  R{PLANS.annual.priceYearly}
+
+              <div className="mb-4">
+                <span className="text-3xl font-bold">{plan.price}</span>
+                <span className="text-sm text-muted-foreground">
+                  {plan.period}
                 </span>
-                <span className="text-muted-foreground">/year</span>
+                {plan.priceMonthly && (
+                  <p className="text-xs text-green-600 dark:text-green-400">
+                    ({plan.priceMonthly}/mo effective)
+                  </p>
+                )}
               </div>
-              <p className="mb-4 text-xs text-muted-foreground">
-                Only R{Math.round(PLANS.annual.priceYearly / 12)}/month
-              </p>
-              <Separator className="mb-4" />
-              <ul className="space-y-2.5">
-                {PLANS.annual.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-sm">
-                    <Check className="h-4 w-4 shrink-0 text-green-500" />
+
+              <Badge variant="secondary" className="mb-4 w-fit">
+                {plan.checks}
+              </Badge>
+
+              <ul className="mb-6 flex-1 space-y-2">
+                {plan.features.map((feature, i) => (
+                  <li
+                    key={i}
+                    className="flex items-start gap-2 text-sm"
+                  >
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
                     {feature}
                   </li>
                 ))}
               </ul>
-            </CardContent>
-            <CardFooter>
-              <Button
-                variant="outline"
-                className="w-full"
-                disabled={currentPlan === "annual" || loading === "annual"}
-                onClick={() => handleUpgrade("annual")}
-              >
-                {loading === "annual" ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                {currentPlan === "annual" ? "Active" : "Upgrade"}
-              </Button>
-            </CardFooter>
-          </Card>
+
+              {plan.id === "free" ? (
+                <Button variant="outline" disabled className="w-full">
+                  Current Plan
+                </Button>
+              ) : plan.id === "study_group" ? (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() =>
+                    (window.location.href = "mailto:support@turnitout.co.za?subject=Study%20Group%20Plan")
+                  }
+                >
+                  Contact Us
+                </Button>
+              ) : (
+                <Button
+                  className={`w-full ${plan.highlight ? "" : "variant-outline"}`}
+                  variant={plan.highlight ? "default" : "outline"}
+                  onClick={() => handleCheckout(plan.id)}
+                  disabled={loading === plan.id}
+                >
+                  {loading === plan.id ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}
+                  {loading === plan.id ? "Processing..." : "Get Started"}
+                </Button>
+              )}
+            </Card>
+          ))}
         </div>
 
-        {/* Feature Comparison Table */}
-        <div className="mt-12">
-          <h3 className="mb-4 text-center text-lg font-semibold">
-            Feature Comparison
-          </h3>
-          <Card>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-muted/50">
-                      <th className="px-4 py-3 text-left font-medium">
-                        Feature
-                      </th>
-                      <th className="px-4 py-3 text-center font-medium">
-                        Free
-                      </th>
-                      <th className="px-4 py-3 text-center font-medium">
-                        Student
-                      </th>
-                      <th className="px-4 py-3 text-center font-medium">
-                        Annual
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      {
-                        feature: "Readability analysis",
-                        free: true,
-                        student: true,
-                        annual: true,
-                      },
-                      {
-                        feature: "Grammar check",
-                        free: true,
-                        student: true,
-                        annual: true,
-                      },
-                      {
-                        feature: "Monthly checks",
-                        free: "5",
-                        student: "Unlimited",
-                        annual: "Unlimited",
-                      },
-                      {
-                        feature: "AI risk analysis",
-                        free: false,
-                        student: true,
-                        annual: true,
-                      },
-                      {
-                        feature: "Citation compliance",
-                        free: false,
-                        student: true,
-                        annual: true,
-                      },
-                      {
-                        feature: "Source suggestions",
-                        free: false,
-                        student: true,
-                        annual: true,
-                      },
-                      {
-                        feature: "Writing coach",
-                        free: false,
-                        student: true,
-                        annual: true,
-                      },
-                      {
-                        feature: "Export .docx / .pdf",
-                        free: false,
-                        student: true,
-                        annual: true,
-                      },
-                      {
-                        feature: "Priority support",
-                        free: false,
-                        student: false,
-                        annual: true,
-                      },
-                    ].map((row) => (
-                      <tr key={row.feature} className="border-b last:border-0">
-                        <td className="px-4 py-2.5">{row.feature}</td>
-                        <td className="px-4 py-2.5 text-center">
-                          {typeof row.free === "boolean" ? (
-                            row.free ? (
-                              <Check className="mx-auto h-4 w-4 text-green-500" />
-                            ) : (
-                              <span className="text-muted-foreground">-</span>
-                            )
-                          ) : (
-                            <span>{row.free}</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-2.5 text-center">
-                          {typeof row.student === "boolean" ? (
-                            row.student ? (
-                              <Check className="mx-auto h-4 w-4 text-green-500" />
-                            ) : (
-                              <span className="text-muted-foreground">-</span>
-                            )
-                          ) : (
-                            <span className="font-medium">{row.student}</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-2.5 text-center">
-                          {typeof row.annual === "boolean" ? (
-                            row.annual ? (
-                              <Check className="mx-auto h-4 w-4 text-green-500" />
-                            ) : (
-                              <span className="text-muted-foreground">-</span>
-                            )
-                          ) : (
-                            <span className="font-medium">{row.annual}</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Separator className="my-8" />
 
-        {/* Manage Subscription */}
-        {currentPlan !== "free" && (
-          <div className="mt-8 text-center">
-            <a
-                href="https://billing.stripe.com/p/login/placeholder"
-                className="text-sm text-muted-foreground hover:underline"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-                Manage Subscription
-              </a>
+        {/* Comparison with competitors */}
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="mb-4 text-xl font-bold">
+            Why Students Switch to TurnItOut
+          </h2>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <Card className="p-4 text-left">
+              <p className="font-medium text-red-500 line-through">
+                Grammarly Pro
+              </p>
+              <p className="text-muted-foreground">R200-510/mo</p>
+              <p className="text-xs text-muted-foreground">
+                Grammar + basic plagiarism only
+              </p>
+            </Card>
+            <Card className="p-4 text-left">
+              <p className="font-medium text-green-600">TurnItOut Student</p>
+              <p className="text-muted-foreground">R149/mo</p>
+              <p className="text-xs text-muted-foreground">
+                Grammar + 8 more checks + coach + rubric grading
+              </p>
+            </Card>
+            <Card className="p-4 text-left">
+              <p className="font-medium text-red-500 line-through">
+                Scribbr
+              </p>
+              <p className="text-muted-foreground">R340 per paper</p>
+              <p className="text-xs text-muted-foreground">
+                Single plagiarism check per payment
+              </p>
+            </Card>
+            <Card className="p-4 text-left">
+              <p className="font-medium text-green-600">TurnItOut Student</p>
+              <p className="text-muted-foreground">R149/mo unlimited</p>
+              <p className="text-xs text-muted-foreground">
+                Unlimited checks all month, every subject
+              </p>
+            </Card>
           </div>
-        )}
+        </div>
+
+        <Separator className="my-8" />
+
+        {/* FAQ */}
+        <div className="mx-auto max-w-2xl">
+          <h2 className="mb-4 text-center text-xl font-bold">
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-4">
+            {[
+              {
+                q: "Can I cancel anytime?",
+                a: "Yes, cancel your subscription at any time. You'll keep access until the end of your billing period.",
+              },
+              {
+                q: "What payment methods do you accept?",
+                a: "We accept EFT (instant bank transfer), SnapScan, credit/debit cards via PayFast, and international cards via Stripe.",
+              },
+              {
+                q: "Is this allowed by my university?",
+                a: "Yes. TurnItOut is a writing improvement tool, like Grammarly. It helps you check your own work before submission - it never writes content for you.",
+              },
+              {
+                q: "What happens when my free checks run out?",
+                a: "You can still use the editor and readability analysis. To run AI-powered checks (grammar, citations, grading, etc.), upgrade to Student or Annual.",
+              },
+              {
+                q: "Do you offer student discounts?",
+                a: "Our pricing IS the student price. We're already 50-70% cheaper than competitors while offering more features.",
+              },
+            ].map(({ q, a }, i) => (
+              <Card key={i} className="p-4">
+                <p className="font-medium">{q}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{a}</p>
+              </Card>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

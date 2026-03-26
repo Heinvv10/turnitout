@@ -13,7 +13,7 @@ export const PLANS = {
   },
   student: {
     name: "Student",
-    priceMonthly: 79, // ZAR
+    priceMonthly: 149, // ZAR
     priceId: process.env.STRIPE_STUDENT_MONTHLY_PRICE_ID || "",
     checksPerMonth: -1, // unlimited
     features: [
@@ -26,7 +26,7 @@ export const PLANS = {
   },
   annual: {
     name: "Annual",
-    priceYearly: 599, // ZAR
+    priceYearly: 1199, // ZAR
     priceId: process.env.STRIPE_ANNUAL_PRICE_ID || "",
     checksPerMonth: -1,
     features: [
