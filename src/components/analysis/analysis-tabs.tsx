@@ -6,7 +6,7 @@ import { AIRiskPanel } from "./ai-risk-panel";
 import { CitationPanel } from "./citation-panel";
 import { GraderPanel } from "./grader-panel";
 import { ReadinessBadge } from "./readiness-badge";
-import { PlagiarismPanel } from "./plagiarism-panel";
+import { OriginalityPanel } from "./originality-panel";
 import { ReadabilityPanel } from "./readability-panel";
 import { TonePanel } from "./tone-panel";
 import { AdvicePanel } from "./advice-panel";
@@ -16,7 +16,7 @@ import {
   ShieldCheck,
   BookOpen,
   GraduationCap,
-  Search,
+  Fingerprint,
   Lightbulb,
   BarChart3,
   MessageSquare,
@@ -75,9 +75,9 @@ export function AnalysisTabs() {
               Citations
               <TrafficDot color={analysisResults.citations?.trafficLight || null} />
             </TabsTrigger>
-            <TabsTrigger value="plagiarism" className="gap-1 text-xs">
-              <Search className="h-3 w-3" />
-              Similarity
+            <TabsTrigger value="originality" className="gap-1 text-xs">
+              <Fingerprint className="h-3 w-3" />
+              Originality
               <TrafficDot color={analysisResults.plagiarism?.trafficLight || null} />
             </TabsTrigger>
             <TabsTrigger value="ai-risk" className="gap-1 text-xs">
@@ -115,8 +115,8 @@ export function AnalysisTabs() {
         <TabsContent value="citations" className="p-4">
           <CitationPanel />
         </TabsContent>
-        <TabsContent value="plagiarism" className="p-4">
-          <PlagiarismPanel />
+        <TabsContent value="originality" className="p-4">
+          <OriginalityPanel />
         </TabsContent>
         <TabsContent value="ai-risk" className="p-4">
           <AIRiskPanel />

@@ -121,7 +121,7 @@ export function ReadinessBadge() {
           )}
           {plagiarism && (
             <span>
-              Similarity: <strong>{plagiarism.overallSimilarity}%</strong>
+              Originality: <strong>{100 - plagiarism.overallSimilarity}%</strong>
             </span>
           )}
           {citations && (
