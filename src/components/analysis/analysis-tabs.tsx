@@ -36,7 +36,14 @@ function TrafficDot({ color }: { color: "green" | "yellow" | "red" | null }) {
 }
 
 export function AnalysisTabs() {
-  const { analysisResults } = usePaperStore();
+  const { analysisResults, currentPaper } = usePaperStore();
+
+  // Readability dot: green if text exists (it auto-calculates)
+  const readabilityDot: "green" | null = currentPaper?.plainText ? "green" : null;
+  // Tone dot from store
+  const toneDot = analysisResults.tone?.trafficLight || null;
+  // Advice dot
+  const adviceDot: "green" | null = analysisResults.advice ? "green" : null;
 
   return (
     <Tabs defaultValue="readability" className="flex h-full flex-col">
@@ -49,6 +56,7 @@ export function AnalysisTabs() {
             <TabsTrigger value="readability" className="gap-1 text-xs">
               <BarChart3 className="h-3 w-3" />
               Readability
+              <TrafficDot color={readabilityDot} />
             </TabsTrigger>
             <TabsTrigger value="grammar" className="gap-1 text-xs">
               <SpellCheck className="h-3 w-3" />
@@ -58,6 +66,7 @@ export function AnalysisTabs() {
             <TabsTrigger value="tone" className="gap-1 text-xs">
               <MessageSquare className="h-3 w-3" />
               Tone
+              <TrafficDot color={toneDot} />
             </TabsTrigger>
             <TabsTrigger value="citations" className="gap-1 text-xs">
               <BookOpen className="h-3 w-3" />
@@ -82,6 +91,7 @@ export function AnalysisTabs() {
             <TabsTrigger value="advice" className="gap-1 text-xs">
               <Lightbulb className="h-3 w-3" />
               Advice
+              <TrafficDot color={adviceDot} />
             </TabsTrigger>
           </TabsList>
         </div>
