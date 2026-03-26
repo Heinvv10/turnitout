@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { MODULE_RUBRICS } from "@/lib/module-rubrics";
@@ -38,6 +38,19 @@ export function AdvicePanel() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
+
+  // Listen for auto-advice from "Run All Checks"
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail && !detail.error) {
+        setAdvice(detail);
+        setCheckedItems(new Set());
+      }
+    };
+    window.addEventListener("turnitout-advice", handler);
+    return () => window.removeEventListener("turnitout-advice", handler);
+  }, []);
 
   const hasResults =
     analysisResults.aiRisk ||

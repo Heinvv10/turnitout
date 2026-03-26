@@ -164,13 +164,14 @@ function HomeContent() {
       throw new Error("Failed after retries");
     };
 
-    // Fire all 5 checks simultaneously with staggered starts (500ms apart to avoid rate spikes)
+    // Fire all 6 checks simultaneously with staggered starts (500ms apart to avoid rate spikes)
     const checkPromises = [
       safeFetch("/api/analyze-ai-risk", 0).then(v => { setAIRiskResult(v as Parameters<typeof setAIRiskResult>[0]); setAnalyzing("aiRisk", false); }),
       safeFetch("/api/check-citations", 500).then(v => { setCitationResult(v as Parameters<typeof setCitationResult>[0]); setAnalyzing("citations", false); }),
       safeFetch("/api/grade-paper", 1000).then(v => { setGradingResult(v as Parameters<typeof setGradingResult>[0]); setAnalyzing("grading", false); }),
       safeFetch("/api/check-plagiarism", 1500).then(v => { setPlagiarismResult(v as Parameters<typeof setPlagiarismResult>[0]); setAnalyzing("plagiarism", false); }),
       safeFetch("/api/check-grammar", 2000).then(v => { setGrammarResult(v as Parameters<typeof setGrammarResult>[0]); setAnalyzing("grammar", false); }),
+      safeFetch("/api/check-tone", 2500).catch(() => {}), // Tone - fire and forget, result handled separately
     ];
 
     // Each check updates the UI as soon as it completes (no waiting for others)
@@ -182,6 +183,37 @@ function HomeContent() {
     setAnalyzing("grading", false);
     setAnalyzing("plagiarism", false);
     setAnalyzing("grammar", false);
+
+    // Auto-trigger advice after all checks complete
+    const latestResults = usePaperStore.getState().analysisResults;
+    if (currentPaper?.plainText && (latestResults.aiRisk || latestResults.grading)) {
+      fetch("/api/get-advice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: currentPaper.plainText.slice(0, 3000),
+          moduleCode: selectedModule,
+          assessmentName: "",
+          results: {
+            aiRisk: latestResults.aiRisk ? { overallScore: latestResults.aiRisk.overallScore, summary: latestResults.aiRisk.summary, topIssues: latestResults.aiRisk.topIssues } : null,
+            citations: latestResults.citations ? { score: latestResults.citations.score, issues: latestResults.citations.issues } : null,
+            grading: latestResults.grading ? { totalScore: latestResults.grading.totalScore, saGrade: latestResults.grading.saGrade, rubricScores: latestResults.grading.rubricScores, overallFeedback: latestResults.grading.overallFeedback } : null,
+            plagiarism: latestResults.plagiarism ? { overallSimilarity: latestResults.plagiarism.overallSimilarity, summary: latestResults.plagiarism.summary, matches: latestResults.plagiarism.matches } : null,
+          },
+          verifiedData: {
+            wordCount: currentPaper.wordCount,
+            referenceCount: currentPaper.referenceCount,
+          },
+          apiKey,
+        }),
+      }).then(r => r.json()).then(data => {
+        if (!data.error) {
+          // Store advice in a way the AdvicePanel can pick it up
+          // We'll dispatch a custom event
+          window.dispatchEvent(new CustomEvent("turnitout-advice", { detail: data }));
+        }
+      }).catch(() => {});
+    }
 
     // Save to history (localStorage)
     const updatedResults = usePaperStore.getState().analysisResults;
