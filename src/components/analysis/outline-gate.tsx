@@ -14,7 +14,9 @@ import {
   AlertTriangle,
   CheckCircle,
   BookOpen,
+  Library,
 } from "lucide-react";
+import Link from "next/link";
 
 export function OutlineGate() {
   const { selectedModule, moduleOutlines, setModuleOutline, apiKey } =
@@ -164,6 +166,13 @@ export function OutlineGate() {
                 .pdf, .docx, or .txt
               </span>
             </div>
+            <Link
+              href="/library"
+              className="mt-2 inline-flex items-center gap-1.5 text-xs text-amber-700 hover:underline dark:text-amber-400"
+            >
+              <Library className="h-3 w-3" />
+              Or browse outlines shared by other students
+            </Link>
             {uploadError && (
               <div className="mt-2 flex items-center gap-1.5 text-xs text-red-600">
                 <AlertTriangle className="h-3 w-3" />

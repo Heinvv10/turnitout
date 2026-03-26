@@ -110,4 +110,38 @@ export const db = {
   upsertSettings: (studentId: number, settings: Record<string, unknown>) =>
     dbCall("upsertSettings", { studentId, settings }),
   getSettings: (studentId: number) => dbCall("getSettings", { studentId }),
+
+  // Institutions
+  upsertInstitution: (name: string, country: string) =>
+    dbCall("upsertInstitution", { name, country }),
+  searchInstitutions: (query: string) =>
+    dbCall("searchInstitutions", { query }),
+
+  // Shared Outlines
+  shareOutline: (
+    userId: number | null,
+    institutionId: number,
+    moduleCode: string,
+    moduleName: string,
+    outlineData: unknown,
+    lecturer?: string,
+    turnitinThreshold?: number,
+  ) =>
+    dbCall("shareOutline", {
+      userId,
+      institutionId,
+      moduleCode,
+      moduleName,
+      outlineData,
+      lecturer,
+      turnitinThreshold,
+    }),
+  searchSharedOutlines: (institutionName?: string, moduleCode?: string) =>
+    dbCall("searchSharedOutlines", { institutionName, moduleCode }),
+  getSharedOutlinesByInstitution: (institutionId: number) =>
+    dbCall("getSharedOutlinesByInstitution", { institutionId }),
+  incrementOutlineDownload: (outlineId: number) =>
+    dbCall("incrementOutlineDownload", { outlineId }),
+  getSharedOutlineById: (outlineId: number) =>
+    dbCall("getSharedOutlineById", { outlineId }),
 };

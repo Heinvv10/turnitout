@@ -194,3 +194,180 @@ export async function getSettings(studentId: number) {
   const rows = await sql`SELECT * FROM student_settings WHERE student_id = ${studentId}`;
   return rows[0] || null;
 }
+
+// ── Institutions ──
+
+export async function upsertInstitution(name: string, country: string) {
+  const sql = getDb();
+  const rows = await sql`
+    INSERT INTO institutions (name, country)
+    VALUES (${name}, ${country})
+    ON CONFLICT (name)
+    DO UPDATE SET country = EXCLUDED.country
+    RETURNING *
+  `;
+  return rows[0];
+}
+
+export async function searchInstitutions(query: string) {
+  const sql = getDb();
+  return await sql`
+    SELECT * FROM institutions
+    WHERE name ILIKE ${"%" + query + "%"}
+    ORDER BY name
+    LIMIT 50
+  `;
+}
+
+// ── Shared Outlines ──
+
+export async function shareOutline(
+  userId: number | null,
+  institutionId: number,
+  moduleCode: string,
+  moduleName: string,
+  outlineData: unknown,
+  lecturer?: string,
+  turnitinThreshold?: number,
+) {
+  const sql = getDb();
+  const rows = await sql`
+    INSERT INTO shared_outlines (uploaded_by, institution_id, module_code, module_name, lecturer, turnitin_threshold, outline_data)
+    VALUES (${userId}, ${institutionId}, ${moduleCode}, ${moduleName}, ${lecturer || null}, ${turnitinThreshold || 25}, ${JSON.stringify(outlineData)})
+    ON CONFLICT (institution_id, module_code)
+    DO UPDATE SET
+      module_name = EXCLUDED.module_name,
+      lecturer = COALESCE(EXCLUDED.lecturer, shared_outlines.lecturer),
+      turnitin_threshold = COALESCE(EXCLUDED.turnitin_threshold, shared_outlines.turnitin_threshold),
+      outline_data = EXCLUDED.outline_data
+    RETURNING *
+  `;
+  return rows[0];
+}
+
+export async function searchSharedOutlines(
+  institutionName?: string,
+  moduleCode?: string,
+) {
+  const sql = getDb();
+
+  if (institutionName && moduleCode) {
+    return await sql`
+      SELECT so.*, i.name as institution_name, i.country
+      FROM shared_outlines so
+      JOIN institutions i ON so.institution_id = i.id
+      WHERE i.name ILIKE ${"%" + institutionName + "%"}
+        AND so.module_code ILIKE ${"%" + moduleCode + "%"}
+        AND so.approved = true
+      ORDER BY so.download_count DESC
+      LIMIT 50
+    `;
+  }
+
+  if (institutionName) {
+    return await sql`
+      SELECT so.*, i.name as institution_name, i.country
+      FROM shared_outlines so
+      JOIN institutions i ON so.institution_id = i.id
+      WHERE i.name ILIKE ${"%" + institutionName + "%"}
+        AND so.approved = true
+      ORDER BY so.download_count DESC
+      LIMIT 50
+    `;
+  }
+
+  if (moduleCode) {
+    return await sql`
+      SELECT so.*, i.name as institution_name, i.country
+      FROM shared_outlines so
+      JOIN institutions i ON so.institution_id = i.id
+      WHERE so.module_code ILIKE ${"%" + moduleCode + "%"}
+        AND so.approved = true
+      ORDER BY so.download_count DESC
+      LIMIT 50
+    `;
+  }
+
+  return await sql`
+    SELECT so.*, i.name as institution_name, i.country
+    FROM shared_outlines so
+    JOIN institutions i ON so.institution_id = i.id
+    WHERE so.approved = true
+    ORDER BY so.download_count DESC
+    LIMIT 50
+  `;
+}
+
+export async function getSharedOutlinesByInstitution(institutionId: number) {
+  const sql = getDb();
+  return await sql`
+    SELECT so.*, i.name as institution_name, i.country
+    FROM shared_outlines so
+    JOIN institutions i ON so.institution_id = i.id
+    WHERE so.institution_id = ${institutionId}
+      AND so.approved = true
+    ORDER BY so.module_code
+  `;
+}
+
+export async function incrementOutlineDownload(outlineId: number) {
+  const sql = getDb();
+  await sql`
+    UPDATE shared_outlines
+    SET download_count = download_count + 1
+    WHERE id = ${outlineId}
+  `;
+}
+
+export async function getSharedOutlineById(outlineId: number) {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT so.*, i.name as institution_name, i.country
+    FROM shared_outlines so
+    JOIN institutions i ON so.institution_id = i.id
+    WHERE so.id = ${outlineId}
+  `;
+  return rows[0] || null;
+}
+
+// ── Auth Usage Tracking ──
+
+export async function incrementCheckCount(userId: number) {
+  const sql = getDb();
+  await sql`
+    UPDATE auth_users
+    SET checks_used_this_month = checks_used_this_month + 1,
+        updated_at = NOW()
+    WHERE id = ${userId}
+  `;
+}
+
+export async function getCheckCount(userId: number) {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT checks_used_this_month, subscription_tier, checks_reset_at
+    FROM auth_users WHERE id = ${userId}
+  `;
+  return rows[0] || null;
+}
+
+export async function resetMonthlyChecks(userId: number) {
+  const sql = getDb();
+  await sql`
+    UPDATE auth_users
+    SET checks_used_this_month = 0,
+        checks_reset_at = NOW(),
+        updated_at = NOW()
+    WHERE id = ${userId}
+  `;
+}
+
+export async function getAuthUser(userId: number) {
+  const sql = getDb();
+  const rows = await sql`
+    SELECT id, email, name, student_number, university, country,
+           subscription_tier, checks_used_this_month, checks_reset_at
+    FROM auth_users WHERE id = ${userId}
+  `;
+  return rows[0] || null;
+}

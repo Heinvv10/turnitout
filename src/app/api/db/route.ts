@@ -15,6 +15,13 @@ import {
   getHistory,
   upsertSettings,
   getSettings,
+  upsertInstitution,
+  searchInstitutions,
+  shareOutline,
+  searchSharedOutlines,
+  getSharedOutlinesByInstitution,
+  incrementOutlineDownload,
+  getSharedOutlineById,
 } from "@/lib/db";
 
 export async function POST(request: Request) {
@@ -125,6 +132,46 @@ export async function POST(request: Request) {
       case "getSettings":
         return NextResponse.json(
           await getSettings(params.studentId),
+        );
+
+      // Institutions
+      case "upsertInstitution":
+        return NextResponse.json(
+          await upsertInstitution(params.name, params.country),
+        );
+      case "searchInstitutions":
+        return NextResponse.json(
+          await searchInstitutions(params.query),
+        );
+
+      // Shared Outlines
+      case "shareOutline":
+        return NextResponse.json(
+          await shareOutline(
+            params.userId,
+            params.institutionId,
+            params.moduleCode,
+            params.moduleName,
+            params.outlineData,
+            params.lecturer,
+            params.turnitinThreshold,
+          ),
+        );
+      case "searchSharedOutlines":
+        return NextResponse.json(
+          await searchSharedOutlines(params.institutionName, params.moduleCode),
+        );
+      case "getSharedOutlinesByInstitution":
+        return NextResponse.json(
+          await getSharedOutlinesByInstitution(params.institutionId),
+        );
+      case "incrementOutlineDownload":
+        return NextResponse.json(
+          await incrementOutlineDownload(params.outlineId),
+        );
+      case "getSharedOutlineById":
+        return NextResponse.json(
+          await getSharedOutlineById(params.outlineId),
         );
 
       default:

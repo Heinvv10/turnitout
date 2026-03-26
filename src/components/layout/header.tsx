@@ -11,9 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Shield, Moon, Sun, LayoutDashboard, CalendarDays } from "lucide-react";
+import { Shield, Moon, Sun, LayoutDashboard, CalendarDays, Library } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { UserMenu } from "@/components/auth/user-menu";
 import {
   Tooltip,
   TooltipTrigger,
@@ -157,6 +158,15 @@ export function Header() {
                 Editor
               </Button>
             </Link>
+            <Link href="/library">
+              <Button
+                variant={pathname === "/library" ? "secondary" : "ghost"}
+                size="sm"
+              >
+                <Library className="mr-1.5 h-3.5 w-3.5" />
+                Library
+              </Button>
+            </Link>
             <Link href="/dashboard">
               <Button
                 variant={pathname === "/dashboard" ? "secondary" : "ghost"}
@@ -213,6 +223,8 @@ export function Header() {
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             <span className="sr-only">Toggle theme</span>
           </Button>
+
+          <UserMenu />
         </div>
       </div>
     </header>
