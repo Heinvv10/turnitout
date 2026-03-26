@@ -148,6 +148,70 @@ export function OriginalityPanel() {
 
       <p className="text-sm text-muted-foreground">{result.summary}</p>
 
+      {/* Plagiarism Warning */}
+      {(result.uncitedMatches || 0) > 0 && (
+        <Card className="border-red-300 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/30">
+          <div className="flex items-start gap-2">
+            <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+            <div>
+              <p className="text-sm font-bold text-red-700 dark:text-red-400">
+                Plagiarism Warning
+              </p>
+              <p className="mt-0.5 text-xs text-red-600 dark:text-red-400">
+                {result.uncitedMatches} passage{(result.uncitedMatches || 0) > 1 ? "s" : ""} appear
+                to be from external sources without proper citation. This could
+                be flagged as plagiarism by Turnitin and may result in mark
+                deductions or disciplinary action.
+              </p>
+              <div className="mt-2 rounded bg-red-100 p-2 text-xs text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                <p className="font-medium">What to do:</p>
+                <ul className="mt-1 list-disc pl-4 space-y-0.5">
+                  <li>Add proper citations for all borrowed ideas</li>
+                  <li>Put direct quotes in quotation marks with page numbers</li>
+                  <li>Rewrite paraphrased sections in your own words</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {(result.uncitedMatches || 0) === 0 && result.overallSimilarity < 25 && (
+        <Card className="border-green-300 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/30">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-green-600" />
+            <div>
+              <p className="text-sm font-bold text-green-700 dark:text-green-400">
+                No Plagiarism Detected
+              </p>
+              <p className="text-xs text-green-600 dark:text-green-400">
+                Your work appears original and properly cited. You are within
+                Cornerstone&apos;s {25}% similarity threshold.
+              </p>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {result.overallSimilarity >= 25 && (result.uncitedMatches || 0) === 0 && (
+        <Card className="border-yellow-300 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-950/30">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600" />
+            <div>
+              <p className="text-sm font-bold text-yellow-700 dark:text-yellow-400">
+                High Similarity — Review Needed
+              </p>
+              <p className="text-xs text-yellow-600 dark:text-yellow-400">
+                Your similarity score ({result.overallSimilarity}%) exceeds the
+                25% threshold. Even though citations appear present, Turnitin
+                will flag this. Reduce direct quotes and paraphrase more in your
+                own words.
+              </p>
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
         <Card className="p-2 text-center">
