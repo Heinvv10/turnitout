@@ -138,7 +138,8 @@ function HomeContent() {
     setAnalyzing("plagiarism", true);
     setAnalyzing("grammar", true);
 
-    const safeFetch = async (url: string, retries = 2): Promise<unknown> => {
+    const safeFetch = async (url: string, delay = 0, retries = 2): Promise<unknown> => {
+      if (delay > 0) await new Promise(r => setTimeout(r, delay));
       for (let i = 0; i <= retries; i++) {
         try {
           const r = await fetch(url, {
@@ -163,32 +164,23 @@ function HomeContent() {
       throw new Error("Failed after retries");
     };
 
-    // Run in two batches to avoid rate limits
-    const [aiRes, citRes] = await Promise.allSettled([
-      safeFetch("/api/analyze-ai-risk"),
-      safeFetch("/api/check-citations"),
-    ]);
+    // Fire all 5 checks simultaneously with staggered starts (500ms apart to avoid rate spikes)
+    const checkPromises = [
+      safeFetch("/api/analyze-ai-risk", 0).then(v => { setAIRiskResult(v as Parameters<typeof setAIRiskResult>[0]); setAnalyzing("aiRisk", false); }),
+      safeFetch("/api/check-citations", 500).then(v => { setCitationResult(v as Parameters<typeof setCitationResult>[0]); setAnalyzing("citations", false); }),
+      safeFetch("/api/grade-paper", 1000).then(v => { setGradingResult(v as Parameters<typeof setGradingResult>[0]); setAnalyzing("grading", false); }),
+      safeFetch("/api/check-plagiarism", 1500).then(v => { setPlagiarismResult(v as Parameters<typeof setPlagiarismResult>[0]); setAnalyzing("plagiarism", false); }),
+      safeFetch("/api/check-grammar", 2000).then(v => { setGrammarResult(v as Parameters<typeof setGrammarResult>[0]); setAnalyzing("grammar", false); }),
+    ];
 
-    if (aiRes.status === "fulfilled") setAIRiskResult(aiRes.value as Parameters<typeof setAIRiskResult>[0]);
-    if (citRes.status === "fulfilled") setCitationResult(citRes.value as Parameters<typeof setCitationResult>[0]);
+    // Each check updates the UI as soon as it completes (no waiting for others)
+    await Promise.allSettled(checkPromises.map(p => p.catch(() => {})));
+
+    // Ensure all analyzing states are cleared
     setAnalyzing("aiRisk", false);
     setAnalyzing("citations", false);
-
-    const [gradeRes, plagRes] = await Promise.allSettled([
-      safeFetch("/api/grade-paper"),
-      safeFetch("/api/check-plagiarism"),
-    ]);
-
-    if (gradeRes.status === "fulfilled") setGradingResult(gradeRes.value as Parameters<typeof setGradingResult>[0]);
-    if (plagRes.status === "fulfilled") setPlagiarismResult(plagRes.value as Parameters<typeof setPlagiarismResult>[0]);
     setAnalyzing("grading", false);
     setAnalyzing("plagiarism", false);
-
-    // Batch 3: Grammar
-    const [grammarRes] = await Promise.allSettled([
-      safeFetch("/api/check-grammar"),
-    ]);
-    if (grammarRes.status === "fulfilled") setGrammarResult(grammarRes.value as Parameters<typeof setGrammarResult>[0]);
     setAnalyzing("grammar", false);
 
     // Save to history (localStorage)

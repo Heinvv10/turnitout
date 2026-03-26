@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import type { Paper } from "@/types/paper";
 import type {
   AIRiskResult,
@@ -75,7 +76,9 @@ const emptyResults: SubmissionReadiness = {
   trafficLight: "red",
 };
 
-export const usePaperStore = create<PaperState>((set, get) => ({
+export const usePaperStore = create<PaperState>()(
+  persist(
+    (set, get) => ({
   currentPaper: null,
   analysisResults: { ...emptyResults },
   isAnalyzing: { aiRisk: false, citations: false, grading: false, plagiarism: false, grammar: false },
@@ -163,4 +166,14 @@ export const usePaperStore = create<PaperState>((set, get) => ({
     set({ analysisResults: { ...emptyResults }, resultsStale: false }),
 
   markStale: () => set({ resultsStale: true }),
-}));
+}),
+    {
+      name: "turnitout-paper",
+      partialize: (state) => ({
+        currentPaper: state.currentPaper,
+        analysisResults: state.analysisResults,
+        sections: state.sections,
+      }),
+    },
+  ),
+);
