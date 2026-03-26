@@ -3,11 +3,13 @@ import { persist } from "zustand/middleware";
 import type { Paper } from "@/types/paper";
 import type {
   AIRiskResult,
+  AdviceResult,
   CitationResult,
   GradingResult,
   GrammarResult,
   PlagiarismResult,
   SubmissionReadiness,
+  ToneResult,
   TrafficLight,
 } from "@/types/analysis";
 
@@ -37,6 +39,8 @@ interface PaperState {
   setGradingResult: (result: GradingResult) => void;
   setPlagiarismResult: (result: PlagiarismResult) => void;
   setGrammarResult: (result: GrammarResult) => void;
+  setToneResult: (result: ToneResult) => void;
+  setAdviceResult: (result: AdviceResult) => void;
   setAnalyzing: (
     key: "aiRisk" | "citations" | "grading" | "plagiarism" | "grammar",
     value: boolean,
@@ -72,6 +76,8 @@ const emptyResults: SubmissionReadiness = {
   grading: null,
   plagiarism: null,
   grammar: null,
+  tone: null,
+  advice: null,
   overall: 0,
   trafficLight: "red",
 };
@@ -157,6 +163,14 @@ export const usePaperStore = create<PaperState>()(
     const results = { ...get().analysisResults, grammar: result };
     const { overall, trafficLight } = computeOverall(results);
     set({ analysisResults: { ...results, overall, trafficLight } });
+  },
+
+  setToneResult: (result) => {
+    set({ analysisResults: { ...get().analysisResults, tone: result } });
+  },
+
+  setAdviceResult: (result) => {
+    set({ analysisResults: { ...get().analysisResults, advice: result } });
   },
 
   setAnalyzing: (key, value) =>

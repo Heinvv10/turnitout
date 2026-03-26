@@ -101,12 +101,29 @@ export interface GrammarResult {
   summary: string;
 }
 
+export interface ToneResult {
+  formalityScore: number;
+  trafficLight: TrafficLight;
+  issues: { type: string; text: string; suggestion: string }[];
+  summary: string;
+}
+
+export interface AdviceResult {
+  overallMessage: string;
+  critical: { area: string; detail: string; action: string }[];
+  recommended: { area: string; detail: string; action: string }[];
+  polish: { area: string; detail: string; action: string }[];
+  checklist: string[];
+}
+
 export interface SubmissionReadiness {
   aiRisk: AIRiskResult | null;
   citations: CitationResult | null;
   grading: GradingResult | null;
   plagiarism: PlagiarismResult | null;
   grammar: GrammarResult | null;
-  overall: number; // Weighted composite 0-100
+  tone: ToneResult | null;
+  advice: AdviceResult | null;
+  overall: number;
   trafficLight: TrafficLight;
 }

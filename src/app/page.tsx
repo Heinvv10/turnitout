@@ -48,6 +48,8 @@ function HomeContent() {
     setGradingResult,
     setPlagiarismResult,
     setGrammarResult,
+    setToneResult,
+    setAdviceResult,
     setPaper,
     setSections,
     clearResults,
@@ -171,7 +173,7 @@ function HomeContent() {
       safeFetch("/api/grade-paper", 1000).then(v => { setGradingResult(v as Parameters<typeof setGradingResult>[0]); setAnalyzing("grading", false); }),
       safeFetch("/api/check-plagiarism", 1500).then(v => { setPlagiarismResult(v as Parameters<typeof setPlagiarismResult>[0]); setAnalyzing("plagiarism", false); }),
       safeFetch("/api/check-grammar", 2000).then(v => { setGrammarResult(v as Parameters<typeof setGrammarResult>[0]); setAnalyzing("grammar", false); }),
-      safeFetch("/api/check-tone", 2500).catch(() => {}), // Tone - fire and forget, result handled separately
+      safeFetch("/api/check-tone", 2500).then(v => { setToneResult(v as Parameters<typeof setToneResult>[0]); }),
     ];
 
     // Each check updates the UI as soon as it completes (no waiting for others)
@@ -208,9 +210,7 @@ function HomeContent() {
         }),
       }).then(r => r.json()).then(data => {
         if (!data.error) {
-          // Store advice in a way the AdvicePanel can pick it up
-          // We'll dispatch a custom event
-          window.dispatchEvent(new CustomEvent("turnitout-advice", { detail: data }));
+          setAdviceResult(data);
         }
       }).catch(() => {});
     }

@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { MODULE_RUBRICS } from "@/lib/module-rubrics";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Lightbulb,
   Loader2,
@@ -17,40 +16,15 @@ import {
   Square,
 } from "lucide-react";
 
-interface AdviceItem {
-  area: string;
-  detail: string;
-  action: string;
-}
-
-interface AdviceResult {
-  overallMessage: string;
-  critical: AdviceItem[];
-  recommended: AdviceItem[];
-  polish: AdviceItem[];
-  checklist: string[];
-}
-
 export function AdvicePanel() {
-  const { currentPaper, analysisResults, sections } = usePaperStore();
+  const { currentPaper, analysisResults } = usePaperStore();
   const { selectedModule, apiKey, moduleOutlines } = useSettingsStore();
-  const [advice, setAdvice] = useState<AdviceResult | null>(null);
+  const { setAdviceResult } = usePaperStore();
+
+  const advice = analysisResults.advice;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
-
-  // Listen for auto-advice from "Run All Checks"
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      if (detail && !detail.error) {
-        setAdvice(detail);
-        setCheckedItems(new Set());
-      }
-    };
-    window.addEventListener("turnitout-advice", handler);
-    return () => window.removeEventListener("turnitout-advice", handler);
-  }, []);
 
   const hasResults =
     analysisResults.aiRisk ||
@@ -76,41 +50,23 @@ export function AdvicePanel() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          text: currentPaper.plainText,
+          text: currentPaper.plainText.slice(0, 3000),
           moduleCode: selectedModule,
-          assessmentName: "Reflective Essay",
+          assessmentName: "",
           results: {
             aiRisk: analysisResults.aiRisk
-              ? {
-                  overallScore: analysisResults.aiRisk.overallScore,
-                  summary: analysisResults.aiRisk.summary,
-                  topIssues: analysisResults.aiRisk.topIssues,
-                }
+              ? { overallScore: analysisResults.aiRisk.overallScore, summary: analysisResults.aiRisk.summary, topIssues: analysisResults.aiRisk.topIssues }
               : null,
             citations: analysisResults.citations
-              ? {
-                  score: analysisResults.citations.score,
-                  issues: analysisResults.citations.issues,
-                }
+              ? { score: analysisResults.citations.score, issues: analysisResults.citations.issues }
               : null,
             grading: analysisResults.grading
-              ? {
-                  totalScore: analysisResults.grading.totalScore,
-                  saGrade: analysisResults.grading.saGrade,
-                  rubricScores: analysisResults.grading.rubricScores,
-                  overallFeedback: analysisResults.grading.overallFeedback,
-                }
+              ? { totalScore: analysisResults.grading.totalScore, saGrade: analysisResults.grading.saGrade, rubricScores: analysisResults.grading.rubricScores, overallFeedback: analysisResults.grading.overallFeedback }
               : null,
             plagiarism: analysisResults.plagiarism
-              ? {
-                  overallSimilarity:
-                    analysisResults.plagiarism.overallSimilarity,
-                  summary: analysisResults.plagiarism.summary,
-                  matches: analysisResults.plagiarism.matches,
-                }
+              ? { overallSimilarity: analysisResults.plagiarism.overallSimilarity, summary: analysisResults.plagiarism.summary, matches: analysisResults.plagiarism.matches }
               : null,
           },
-          apiKey,
           verifiedData: {
             wordCount: currentPaper.wordCount,
             referenceCount: currentPaper.referenceCount,
@@ -123,28 +79,22 @@ export function AdvicePanel() {
               const outline = moduleOutlines[selectedModule] || MODULE_RUBRICS[selectedModule];
               return outline?.turnitinThreshold || 25;
             })(),
-            sections: sections ? {
-              introduction: sections.introduction.split(/\s+/).filter(Boolean).length,
-              body: sections.body.split(/\s+/).filter(Boolean).length,
-              conclusion: sections.conclusion.split(/\s+/).filter(Boolean).length,
-            } : undefined,
           },
+          apiKey,
         }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
-      setAdvice(data);
+      setAdviceResult(data);
       setCheckedItems(new Set());
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to get advice";
-      console.error("Advice failed:", msg);
       setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
-  // No results yet
   if (!hasResults && !advice && !loading) {
     return (
       <div className="flex flex-col items-center gap-4 py-8 text-center">
@@ -152,20 +102,14 @@ export function AdvicePanel() {
         <div>
           <p className="font-medium">Improvement Advice</p>
           <p className="text-sm text-muted-foreground">
-            Run the checks first (AI Risk, Similarity, Citations, Grade), then
-            get personalised advice on how to improve your paper before
-            submission.
+            Run the checks first, then get personalised advice.
           </p>
         </div>
-        <Button disabled>
-          <Lightbulb className="mr-2 h-4 w-4" />
-          Run checks first
-        </Button>
+        <Button disabled>Run checks first</Button>
       </div>
     );
   }
 
-  // Has results but no advice yet
   if (!advice && !loading) {
     return (
       <div className="flex flex-col items-center gap-4 py-8 text-center">
@@ -173,21 +117,14 @@ export function AdvicePanel() {
         <div>
           <p className="font-medium">Ready for Advice</p>
           <p className="text-sm text-muted-foreground">
-            Your checks are complete. Get personalised improvement advice based
-            on all your results.
+            Your checks are complete. Get personalised improvement advice.
           </p>
         </div>
         <Button onClick={getAdvice} disabled={loading}>
-          {loading ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Lightbulb className="mr-2 h-4 w-4" />
-          )}
-          {loading ? "Getting advice..." : "Get Improvement Advice"}
+          {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Lightbulb className="mr-2 h-4 w-4" />}
+          Get Improvement Advice
         </Button>
-        {error && (
-          <p className="text-xs text-red-500 max-w-xs">{error}</p>
-        )}
+        {error && <p className="text-xs text-red-500 max-w-xs">{error}</p>}
       </div>
     );
   }
@@ -196,9 +133,7 @@ export function AdvicePanel() {
     return (
       <div className="flex flex-col items-center gap-3 py-12">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">
-          Analysing your results and preparing advice...
-        </p>
+        <p className="text-sm text-muted-foreground">Preparing advice...</p>
       </div>
     );
   }
@@ -207,12 +142,10 @@ export function AdvicePanel() {
 
   return (
     <div className="space-y-4">
-      {/* Overall message */}
       <Card className="bg-primary/5 border-primary/20 p-4">
         <p className="text-sm">{advice.overallMessage}</p>
       </Card>
 
-      {/* Critical fixes */}
       {advice.critical && advice.critical.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
@@ -222,26 +155,17 @@ export function AdvicePanel() {
             </p>
           </div>
           {advice.critical.map((item, i) => (
-            <Card
-              key={i}
-              className="border-red-200 bg-red-50/50 p-3 dark:border-red-900 dark:bg-red-950/20"
-            >
+            <Card key={i} className="border-red-200 bg-red-50/50 p-3 dark:border-red-900 dark:bg-red-950/20">
               <p className="mb-1 text-sm font-medium">{item.area}</p>
-              <p className="mb-2 text-xs text-muted-foreground">
-                {item.detail}
-              </p>
+              <p className="mb-2 text-xs text-muted-foreground">{item.detail}</p>
               <div className="rounded bg-white/80 p-2 text-xs dark:bg-black/20">
-                <span className="font-medium text-red-700 dark:text-red-400">
-                  Action:{" "}
-                </span>
-                {item.action}
+                <span className="font-medium text-red-700 dark:text-red-400">Action: </span>{item.action}
               </div>
             </Card>
           ))}
         </div>
       )}
 
-      {/* Recommended improvements */}
       {advice.recommended && advice.recommended.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
@@ -251,26 +175,17 @@ export function AdvicePanel() {
             </p>
           </div>
           {advice.recommended.map((item, i) => (
-            <Card
-              key={i}
-              className="border-yellow-200 bg-yellow-50/50 p-3 dark:border-yellow-900 dark:bg-yellow-950/20"
-            >
+            <Card key={i} className="border-yellow-200 bg-yellow-50/50 p-3 dark:border-yellow-900 dark:bg-yellow-950/20">
               <p className="mb-1 text-sm font-medium">{item.area}</p>
-              <p className="mb-2 text-xs text-muted-foreground">
-                {item.detail}
-              </p>
+              <p className="mb-2 text-xs text-muted-foreground">{item.detail}</p>
               <div className="rounded bg-white/80 p-2 text-xs dark:bg-black/20">
-                <span className="font-medium text-yellow-700 dark:text-yellow-400">
-                  Action:{" "}
-                </span>
-                {item.action}
+                <span className="font-medium text-yellow-700 dark:text-yellow-400">Action: </span>{item.action}
               </div>
             </Card>
           ))}
         </div>
       )}
 
-      {/* Polish */}
       {advice.polish && advice.polish.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
@@ -283,40 +198,20 @@ export function AdvicePanel() {
             <Card key={i} className="p-3">
               <p className="mb-1 text-sm font-medium">{item.area}</p>
               <p className="text-xs text-muted-foreground">{item.detail}</p>
-              <p className="mt-1 text-xs">
-                <span className="font-medium">Tip: </span>
-                {item.action}
-              </p>
+              <p className="mt-1 text-xs"><span className="font-medium">Tip: </span>{item.action}</p>
             </Card>
           ))}
         </div>
       )}
 
-      {/* Pre-submission checklist */}
       {advice.checklist && advice.checklist.length > 0 && (
         <div className="space-y-2">
           <p className="text-sm font-semibold">Pre-Submission Checklist</p>
           <Card className="p-3">
             {advice.checklist.map((item, i) => (
-              <button
-                key={i}
-                onClick={() => toggleCheck(i)}
-                className="flex w-full items-start gap-2 rounded p-1.5 text-left text-xs hover:bg-muted/50"
-              >
-                {checkedItems.has(i) ? (
-                  <CheckSquare className="mt-0.5 h-3.5 w-3.5 shrink-0 text-green-500" />
-                ) : (
-                  <Square className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                )}
-                <span
-                  className={
-                    checkedItems.has(i)
-                      ? "line-through text-muted-foreground"
-                      : ""
-                  }
-                >
-                  {item}
-                </span>
+              <button key={i} onClick={() => toggleCheck(i)} className="flex w-full items-start gap-2 rounded p-1.5 text-left text-xs hover:bg-muted/50">
+                {checkedItems.has(i) ? <CheckSquare className="mt-0.5 h-3.5 w-3.5 shrink-0 text-green-500" /> : <Square className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />}
+                <span className={checkedItems.has(i) ? "line-through text-muted-foreground" : ""}>{item}</span>
               </button>
             ))}
             <div className="mt-2 text-center text-[10px] text-muted-foreground">
