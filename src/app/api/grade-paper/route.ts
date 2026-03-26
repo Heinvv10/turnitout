@@ -9,7 +9,7 @@ import type { GradingResult } from "@/types/analysis";
 
 export async function POST(request: Request) {
   try {
-    const { text, moduleCode, assignmentTitle, assessmentName, uploadedOutline, apiKey } =
+    const { text, moduleCode, assignmentTitle, assessmentName, uploadedOutline, apiKey, gradingScale, referencingStyle } =
       await request.json();
 
     if (!text || text.trim().length < 50) {
@@ -23,6 +23,8 @@ export async function POST(request: Request) {
       moduleCode || "",
       assessmentName,
       uploadedOutline || null,
+      gradingScale,
+      referencingStyle,
     );
 
     const response = await callClaude(

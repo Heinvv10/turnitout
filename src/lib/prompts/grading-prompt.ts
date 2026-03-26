@@ -1,9 +1,14 @@
-import { MODULES, getSAGrade } from "@/lib/constants";
+import { MODULES } from "@/lib/constants";
 import {
   getModuleRubric,
   type RubricCriterion,
   type ModuleRubric,
 } from "@/lib/module-rubrics";
+import {
+  GRADING_SCALES,
+  getGradeLabel,
+  getReferencingStyle,
+} from "@/lib/i18n-config";
 
 /**
  * Build the grading system prompt. Can accept an uploaded outline
@@ -13,28 +18,35 @@ export function buildGradingSystemPrompt(
   moduleCode: string,
   assessmentName?: string,
   uploadedOutline?: ModuleRubric | null,
+  gradingScale?: string,
+  referencingStyle?: string,
 ): string {
+  const scaleId = gradingScale || "south_africa";
+  const refStyleId = referencingStyle || "harvard";
+
   // Priority: uploaded outline > hardcoded rubric > generic
   if (uploadedOutline) {
     const criteria = assessmentName
       ? uploadedOutline.rubrics?.[assessmentName]
       : Object.values(uploadedOutline.rubrics || {})[0];
     if (criteria) {
-      return buildSpecificPrompt(uploadedOutline, criteria, assessmentName);
+      return buildSpecificPrompt(uploadedOutline, criteria, assessmentName, scaleId, refStyleId);
     }
   }
 
   const { rubric, criteria } = getModuleRubric(moduleCode, assessmentName);
   if (rubric && criteria) {
-    return buildSpecificPrompt(rubric, criteria, assessmentName);
+    return buildSpecificPrompt(rubric, criteria, assessmentName, scaleId, refStyleId);
   }
-  return GENERIC_GRADING_PROMPT;
+  return buildGenericGradingPrompt(scaleId, refStyleId);
 }
 
 function buildSpecificPrompt(
   rubric: ModuleRubric,
   criteria: RubricCriterion[],
   assessmentName?: string,
+  scaleId: string = "south_africa",
+  refStyleId: string = "harvard",
 ): string {
   const assessment = assessmentName
     ? rubric.assessments.find((a) => a.name === assessmentName)
@@ -77,19 +89,16 @@ ${rubricTable}
 
 **Total: /${criteria.reduce((sum, c) => sum + c.maxMark, 0)}**
 
-## South African Grading Scale
-- 75-100%: A - Distinction (Excellent)
-- 70-74%: B - Upper Second (Good)
-- 60-69%: C - Lower Second (Satisfactory)
-- 50-59%: D - Third Class (Basic pass)
-- 0-49%: F - Fail (Needs development)
+## Grading Scale
+${buildGradingScaleText(scaleId)}
 
 ## Important Grading Notes
-- This is a FIRST-YEAR student (NQF Level 5). Grade at first-year level.
+- This is a FIRST-YEAR student. Grade at first-year level.
 - Be constructive and encouraging - this is formative feedback to help improve before submission.
 - The essay is a REFLECTIVE piece - personal experience and self-awareness matter as much as theory.
 - Check if they meet the word count requirement (${assessment?.wordCount || "as specified"}).
 - Check if the required structure is followed.
+- Referencing style: ${getReferencingStyle(refStyleId).label} (${getReferencingStyle(refStyleId).description})
 - Flag any potential AI-generated content patterns (overly generic, lacks personal voice).
 
 Return valid JSON (no markdown, no commentary):
@@ -104,7 +113,7 @@ Return valid JSON (no markdown, no commentary):
     }
   ],
   "totalScore": <number 0-100>,
-  "saGrade": "<e.g. 65% - C (Satisfactory)>",
+  "saGrade": "<e.g. ${getGradeLabel(65, scaleId)}>",
   "overallFeedback": "<paragraph of constructive overall feedback>",
   "strengths": ["<strength 1>", "<strength 2>"],
   "trafficLight": "<green|yellow|red>"
@@ -113,22 +122,29 @@ Return valid JSON (no markdown, no commentary):
 Traffic light: green = 60%+, yellow = 50-59%, red = <50%.`;
 }
 
-const GENERIC_GRADING_PROMPT = `You are an experienced South African university lecturer grading a first-year BA Psychology paper at Cornerstone Institute. You provide constructive, formative feedback to help the student improve before final submission.
+function buildGradingScaleText(scaleId: string): string {
+  const scaleConfig = GRADING_SCALES[scaleId as keyof typeof GRADING_SCALES];
+  if (!scaleConfig) return "Use standard percentage grading.";
+  return scaleConfig.scale
+    .map((g) => `- ${g.min}%+: ${g.label} (${g.description})`)
+    .join("\n");
+}
+
+function buildGenericGradingPrompt(scaleId: string, refStyleId: string): string {
+  const refStyle = getReferencingStyle(refStyleId);
+
+  return `You are an experienced university lecturer grading a first-year paper. You provide constructive, formative feedback to help the student improve before final submission.
 
 Grade against these rubric categories:
 
-1. **Understanding of Concepts (0-25)**: Does the student demonstrate a genuine grasp of key theories, concepts, and psychological principles?
+1. **Understanding of Concepts (0-25)**: Does the student demonstrate a genuine grasp of key theories, concepts, and principles?
 2. **Critical Analysis (0-25)**: Does the student evaluate, compare, and synthesise rather than merely describe?
 3. **Argument Structure & Flow (0-20)**: Is there a clear thesis/argument? Are paragraphs logically organised?
-4. **Source Quality & Citation (0-15)**: Are sources peer-reviewed and relevant? Is Harvard referencing format correct?
+4. **Source Quality & Citation (0-15)**: Are sources peer-reviewed and relevant? Is ${refStyle.label} referencing format correct?
 5. **Academic Tone & Writing Quality (0-15)**: Is the register formal and academic? Is grammar correct?
 
-GRADING SCALE (South African):
-- 75-100%: Distinction
-- 70-74%: Upper Second
-- 60-69%: Lower Second
-- 50-59%: Third Class (pass)
-- 0-49%: Fail
+GRADING SCALE:
+${buildGradingScaleText(scaleId)}
 
 This is a FIRST-YEAR student. Grade at first-year level. Be encouraging but honest.
 
@@ -144,13 +160,14 @@ Return valid JSON (no markdown, no commentary):
     }
   ],
   "totalScore": <number 0-100>,
-  "saGrade": "<e.g. 65% - Lower Second (Satisfactory)>",
+  "saGrade": "<e.g. ${getGradeLabel(65, scaleId)}>",
   "overallFeedback": "<paragraph of constructive feedback>",
   "strengths": ["<strength 1>", "<strength 2>"],
   "trafficLight": "<green|yellow|red>"
 }
 
 Traffic light: green = 60%+, yellow = 50-59%, red = <50%.`;
+}
 
 export function buildGradingUserPrompt(
   text: string,

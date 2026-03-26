@@ -17,6 +17,12 @@ interface SettingsState {
   apiKey: string;
   currentPaperId: number | null;
   modulePapers: Record<string, { paper: Paper; sections: SectionSplit | null; results: SubmissionReadiness }>;
+  country: string;
+  university: string;
+  gradingScale: string;
+  referencingStyle: string;
+  language: string;
+  onboardingComplete: boolean;
 
   setStudentName: (name: string) => void;
   setStudentNumber: (number: string) => void;
@@ -30,6 +36,12 @@ interface SettingsState {
   setCurrentPaperId: (id: number | null) => void;
   saveModulePaper: (moduleCode: string, paper: Paper, sections: SectionSplit | null, results: SubmissionReadiness) => void;
   getModulePaper: (moduleCode: string) => { paper: Paper; sections: SectionSplit | null; results: SubmissionReadiness } | null;
+  setCountry: (country: string) => void;
+  setUniversity: (university: string) => void;
+  setGradingScale: (scale: string) => void;
+  setReferencingStyle: (style: string) => void;
+  setLanguage: (lang: string) => void;
+  setOnboardingComplete: (complete: boolean) => void;
   syncToDb: () => Promise<void>;
 }
 
@@ -46,6 +58,12 @@ export const useSettingsStore = create<SettingsState>()(
       apiKey: "",
       currentPaperId: null,
       modulePapers: {},
+      country: "ZA",
+      university: "Cornerstone Institute",
+      gradingScale: "south_africa",
+      referencingStyle: "harvard",
+      language: "en-ZA",
+      onboardingComplete: false,
 
       setStudentName: (name) => set({ studentName: name }),
       setStudentNumber: (number) => set({ studentNumber: number }),
@@ -65,6 +83,12 @@ export const useSettingsStore = create<SettingsState>()(
       },
       setApiKey: (key) => set({ apiKey: key }),
       setCurrentPaperId: (id) => set({ currentPaperId: id }),
+      setCountry: (country) => set({ country }),
+      setUniversity: (university) => set({ university }),
+      setGradingScale: (scale) => set({ gradingScale: scale }),
+      setReferencingStyle: (style) => set({ referencingStyle: style }),
+      setLanguage: (lang) => set({ language: lang }),
+      setOnboardingComplete: (complete) => set({ onboardingComplete: complete }),
       saveModulePaper: (moduleCode, paper, sections, results) =>
         set({
           modulePapers: {

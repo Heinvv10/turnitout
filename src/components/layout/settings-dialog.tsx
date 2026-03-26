@@ -3,6 +3,11 @@
 import { useState } from "react";
 import { useSettingsStore } from "@/store/settings-store";
 import { MODULES } from "@/lib/constants";
+import {
+  COUNTRIES,
+  GRADING_SCALES,
+  REFERENCING_STYLES,
+} from "@/lib/i18n-config";
 import { db } from "@/lib/db-client";
 import {
   Dialog,
@@ -15,6 +20,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Settings, Save, Key } from "lucide-react";
 
 export function SettingsDialog() {
@@ -23,10 +35,19 @@ export function SettingsDialog() {
     studentNumber,
     lecturers,
     apiKey,
+    country,
+    university,
+    gradingScale,
+    referencingStyle,
     setStudentName,
     setStudentNumber,
     setLecturer,
     setApiKey,
+    setCountry,
+    setUniversity,
+    setGradingScale,
+    setReferencingStyle,
+    setLanguage,
   } = useSettingsStore();
 
   const [open, setOpen] = useState(false);
@@ -34,11 +55,30 @@ export function SettingsDialog() {
   const [number, setNumber] = useState(studentNumber);
   const [localKey, setLocalKey] = useState(apiKey);
   const [localLecturers, setLocalLecturers] = useState(lecturers);
+  const [localCountry, setLocalCountry] = useState(country);
+  const [localUniversity, setLocalUniversity] = useState(university);
+  const [localScale, setLocalScale] = useState(gradingScale);
+  const [localRefStyle, setLocalRefStyle] = useState(referencingStyle);
+
+  const handleCountryChange = (code: string) => {
+    setLocalCountry(code);
+    const c = COUNTRIES.find((c) => c.code === code);
+    if (c) {
+      setLocalScale(c.defaultScale);
+      setLocalRefStyle(c.defaultRef);
+    }
+  };
 
   const handleSave = async () => {
     setStudentName(name);
     setStudentNumber(number);
     setApiKey(localKey);
+    setCountry(localCountry);
+    setUniversity(localUniversity);
+    setGradingScale(localScale);
+    setReferencingStyle(localRefStyle);
+    const countryConfig = COUNTRIES.find((c) => c.code === localCountry);
+    setLanguage(countryConfig?.defaultLang || "en-GB");
     Object.entries(localLecturers).forEach(([code, lecturer]) => {
       setLecturer(code, lecturer);
     });
@@ -84,6 +124,67 @@ export function SettingsDialog() {
               placeholder="sk-ant-..."
               className="font-mono text-xs"
             />
+          </div>
+
+          <Separator />
+
+          {/* Country & University */}
+          <div>
+            <Label>Country</Label>
+            <Select value={localCountry} onValueChange={(v) => v && handleCountryChange(v)}>
+              <SelectTrigger className="mt-1 w-full">
+                <SelectValue placeholder="Select country" />
+              </SelectTrigger>
+              <SelectContent>
+                {COUNTRIES.map((c) => (
+                  <SelectItem key={c.code} value={c.code}>
+                    {c.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="s-university">University / Institution</Label>
+            <Input
+              id="s-university"
+              value={localUniversity}
+              onChange={(e) => setLocalUniversity(e.target.value)}
+              placeholder="e.g. University of Cape Town"
+              className="mt-1"
+            />
+          </div>
+
+          {/* Grading & Referencing */}
+          <div>
+            <Label>Grading Scale</Label>
+            <Select value={localScale} onValueChange={(v) => v && setLocalScale(v)}>
+              <SelectTrigger className="mt-1 w-full">
+                <SelectValue placeholder="Select grading scale" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(GRADING_SCALES).map(([key, val]) => (
+                  <SelectItem key={key} value={key}>
+                    {val.label} (pass: {val.pass}%)
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Referencing Style</Label>
+            <Select value={localRefStyle} onValueChange={(v) => v && setLocalRefStyle(v)}>
+              <SelectTrigger className="mt-1 w-full">
+                <SelectValue placeholder="Select referencing style" />
+              </SelectTrigger>
+              <SelectContent>
+                {REFERENCING_STYLES.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.label} - {s.description}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <Separator />

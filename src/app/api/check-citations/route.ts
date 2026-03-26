@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { callClaude } from "@/lib/claude";
 import {
-  CITATION_SYSTEM_PROMPT,
+  buildCitationSystemPrompt,
   buildCitationUserPrompt,
 } from "@/lib/prompts/citation-prompt";
 import { parseClaudeJSON } from "@/lib/parse-json";
@@ -9,7 +9,7 @@ import type { CitationResult } from "@/types/analysis";
 
 export async function POST(request: Request) {
   try {
-    const { text, apiKey } = await request.json();
+    const { text, apiKey, referencingStyle } = await request.json();
 
     if (!text || text.trim().length < 50) {
       return NextResponse.json(
@@ -19,8 +19,8 @@ export async function POST(request: Request) {
     }
 
     const response = await callClaude(
-      CITATION_SYSTEM_PROMPT,
-      buildCitationUserPrompt(text),
+      buildCitationSystemPrompt(referencingStyle || "harvard"),
+      buildCitationUserPrompt(text, referencingStyle),
       apiKey,
     );
 

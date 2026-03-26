@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/layout/header";
+import { OnboardingModal } from "@/components/layout/onboarding-modal";
 import { OutlineGate } from "@/components/analysis/outline-gate";
 import { PaperEditor } from "@/components/editor/paper-editor";
 import { AnalysisTabs } from "@/components/analysis/analysis-tabs";
@@ -50,7 +51,7 @@ function HomeContent() {
     setSections,
     clearResults,
   } = usePaperStore();
-  const { selectedModule, setSelectedModule, moduleOutlines, apiKey, saveModulePaper, getModulePaper } =
+  const { selectedModule, setSelectedModule, moduleOutlines, apiKey, gradingScale, referencingStyle, saveModulePaper, getModulePaper } =
     useSettingsStore();
   const { addEntry } = useHistoryStore();
   const searchParams = useSearchParams();
@@ -125,6 +126,8 @@ function HomeContent() {
       assignmentTitle: currentPaper.title,
       uploadedOutline,
       apiKey,
+      gradingScale,
+      referencingStyle,
     };
 
     setAnalyzing("aiRisk", true);
@@ -225,6 +228,7 @@ function HomeContent() {
 
   return (
     <div className="flex h-screen flex-col">
+      <OnboardingModal />
       <Header />
       <OutlineGate />
 
