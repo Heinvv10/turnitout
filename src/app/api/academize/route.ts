@@ -77,6 +77,7 @@ export async function POST(request: Request) {
       SYSTEM_PROMPT,
       `Convert the following text to academic register:\n\n${text}`,
       apiKey,
+      "claude-haiku-4-5-20251001",
     );
 
     const result = parseClaudeJSON<AcademizeResult>(response);

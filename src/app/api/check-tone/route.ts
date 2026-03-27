@@ -71,6 +71,7 @@ export async function POST(request: Request) {
       systemPrompt,
       `Analyse the following essay for academic tone and formality:\n\n${text}`,
       apiKey,
+      "claude-haiku-4-5-20251001",
     );
 
     const result = parseClaudeJSON<ToneResult>(response);
