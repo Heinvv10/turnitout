@@ -41,12 +41,12 @@ const PRICING_TIERS = [
   {
     name: "Starter",
     students: "Up to 500 students",
-    price: "R59",
+    price: "R99",
     unit: "/student/year",
     features: [
-      "20 AI checks per student per year",
+      "25 AI checks per student per year",
       "All local checks (unlimited)",
-      "Academic tone & grammar coaching",
+      "Grammar, citations, plagiarism, AI risk, grading",
       "Student dashboard & history",
       "Email support",
     ],
@@ -54,11 +54,11 @@ const PRICING_TIERS = [
   {
     name: "Growth",
     students: "500 - 2,000 students",
-    price: "R49",
+    price: "R79",
     unit: "/student/year",
     highlight: true,
     features: [
-      "25 AI checks per student per year",
+      "30 AI checks per student per year",
       "Everything in Starter",
       "Institutional analytics dashboard",
       "Priority support + onboarding workshop",
@@ -68,10 +68,10 @@ const PRICING_TIERS = [
   {
     name: "Enterprise",
     students: "2,000+ students",
-    price: "From R39",
+    price: "From R59",
     unit: "/student/year",
     features: [
-      "30+ AI checks per student per year",
+      "40+ AI checks per student per year",
       "Everything in Growth",
       "LMS integration (Moodle, Funda)",
       "SSO + dedicated account manager",

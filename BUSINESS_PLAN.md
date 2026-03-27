@@ -97,23 +97,48 @@ Every student gets these at R0 — they cost us nothing to run:
 
 ---
 
+#### Value Comparison: What students pay elsewhere
+
+| Feature | Competitor | Their Price | TurnItOut |
+|---------|-----------|-------------|-----------|
+| Grammar + tone | Grammarly Pro | R204/mo | Included |
+| Paraphrasing | QuillBot Premium | R142/mo | Included |
+| Plagiarism (per doc) | Scribbr | R340-R850/doc | Included |
+| AI detection | Copyleaks | R240/mo | Included |
+| Citation generator | QuillBot Premium | R142/mo (bundled) | Included |
+| Grade prediction | No competitor | — | Included |
+| ESL/Afrikaans support | No competitor | — | Included |
+| Academic phrasebank | Ref-N-Write | R510 once-off | Included |
+| Self-plagiarism check | Scribbr | R340/doc | Included |
+| **Cost to replicate** | | **R586+/mo** | **From R69/mo** |
+
+TurnItOut replaces 5+ paid tools at a fraction of the cost. Even at R99/mo we'd be 83% cheaper than the competitor stack — and none of them offer ESL patterns, Afrikaans support, provenance logs, or SA-specific Harvard referencing.
+
 #### B2C Plans (Individual Students)
 
 | Tier | Price | AI Checks Included | Extra Checks | Key Extras |
 |------|-------|---------------------|--------------|------------|
-| **Free** | R0 | **1 full AI check/month** | R5/each | All local features above |
-| **Lite** | R29/month | **5 AI checks/month** | R4/each | + Academizer, citation generator |
-| **Pro** | R49/month | **12 AI checks/month** | R3/each | + Writing coach, paraphraser, source suggestions |
-| **Semester Pass** | R199/semester (5 months) | **30 AI checks total** | R4/each | All Pro features. ~R6.60/check. Best value. |
-| **Single Check** | R5 once-off | 1 AI check | — | No subscription. Buy when needed. |
+| **Free** | R0 | **2 full AI checks total** (trial) | R15/each | All local features (unlimited) |
+| **Starter** | R69/month | **5 AI checks/month** | R10/each | + Academizer, citation generator |
+| **Pro** | R99/month | **15 AI checks/month** | R8/each | + Writing coach, paraphraser, source suggestions |
+| **Semester Pass** | R449/semester (5 months) | **40 AI checks total** | R8/each | All Pro features. ~R11/check. Best value for serious students. |
+| **Single Check** | R15 once-off | 1 AI check | — | No subscription. Assignment-night panic buy. |
 
 **What counts as 1 "AI check":**
 A full "Run All Checks" = 1 check (grammar + citations + plagiarism + AI risk + grading + tone + advice). "Quick Check" (grammar + citations only) = 0.5 checks. Academize and Paraphrase each = 0.25 checks.
 
 **Per-essay budgeting guide for students:**
-- 1 assignment = typically 2-3 checks (draft + revision + final) = R10-R15 on pay-as-you-go
-- Semester of 5 assignments = ~12-15 checks = R60-R75 on pay-as-you-go, or R49/mo × 4 months = R196 on Pro
-- Semester Pass at R199 for 30 checks is the sweet spot for active students
+- 1 assignment = typically 2-3 checks (draft + revision + final) = R30-R45 on pay-as-you-go
+- Semester of 6 assignments = ~15-18 checks = Starter plan covers it at R69/mo
+- Semester Pass at R449 for 40 checks is the best deal for consistent users
+- Even at R99/mo, TurnItOut is 83% cheaper than Grammarly Pro alone
+
+**Why this pricing works:**
+- R69/mo is less than half of Grammarly Pro (R204/mo) — easy to justify
+- R99/mo replaces R586+/mo worth of tools — massive perceived value
+- R15/single check = assignment-night impulse buy (less than a McDonald's meal)
+- Free tier gives 2 checks total (not monthly) — enough to experience value, not enough to freeload
+- Semester Pass rewards commitment at semester start when students have money
 
 ---
 
@@ -121,15 +146,16 @@ A full "Run All Checks" = 1 check (grammar + citations + plagiarism + AI risk + 
 
 | Tier | Price | Checks/Student/Year | What's Included |
 |------|-------|---------------------|-----------------|
-| **Starter** (up to 500 students) | R59/student/year | 20 AI checks | All features, admin dashboard, usage analytics |
-| **Growth** (500-2,000 students) | R49/student/year | 25 AI checks | + Priority support, custom rubrics, LMS integration |
-| **Enterprise** (2,000+ students) | Custom (from R39) | 30+ AI checks | + SSO, API access, account manager, on-site training |
+| **Starter** (up to 500 students) | R99/student/year | 25 AI checks | All features, admin dashboard, usage analytics |
+| **Growth** (500-2,000 students) | R79/student/year | 30 AI checks | + Priority support, custom rubrics, LMS integration |
+| **Enterprise** (2,000+ students) | Custom (from R59) | 40+ AI checks | + SSO, API access, account manager, on-site training |
 
-**Institutional margin calculation:**
-- R49/student/year with 25 checks = R2 × 25 = R50 API cost → **break-even**
-- Fix: Use Haiku for grammar/tone/citations (R0.30 vs R2), reserve Opus for grading/plagiarism
-- **Optimized API cost per check: ~R0.80** (Haiku for 4 light checks + Opus for 2 heavy)
-- R49/student with 25 checks at R0.80 = R20 API cost → **R29 margin (59%)**
+**Institutional margin calculation (post-Haiku optimization):**
+- API cost per check (optimized): ~R1.48
+- R79/student/year with 30 checks = R1.48 × 30 = R44.40 API cost → **R34.60 margin (44%)**
+- R99/student/year with 25 checks = R1.48 × 25 = R37 API cost → **R62 margin (63%)**
+- Still undercuts Turnitin at R50-R110/student/year, and offers far more features
+- Cornerstone deal: R79 × 2,000 students = **R158k/year**
 
 ---
 
@@ -209,25 +235,25 @@ A full "Run All Checks" = 1 check (grammar + citations + plagiarism + AI risk + 
 | Free users (Year 1) | 500 | 2,000 | 5,000 |
 | Conversion to paid | 3% | 5% | 8% |
 | Paying users | 15 | 100 | 400 |
-| Avg revenue/user/year | R149 | R168 | R180 |
-| **B2C Revenue Year 1** | **R2,235** | **R16,800** | **R72,000** |
+| Avg revenue/user/year | R449 (semester pass) | R594 (R99 × 6mo) | R828 (R69 × 12mo) |
+| **B2C Revenue Year 1** | **R6,735** | **R59,400** | **R331,200** |
 
 ### B2B Revenue Model (the real play)
 | Metric | Conservative | Moderate | Aggressive |
 |--------|-------------|----------|------------|
 | Institutions | 1 (Cornerstone) | 3 | 8 |
 | Students covered | 500 | 3,000 | 12,000 |
-| Avg price/student/year | R39 | R32 | R29 |
-| **B2B Revenue Year 1** | **R19,500** | **R96,000** | **R348,000** |
+| Avg price/student/year | R99 | R79 | R69 |
+| **B2B Revenue Year 1** | **R49,500** | **R237,000** | **R828,000** |
 
 ### Combined Revenue
 | Scenario | Year 1 | Year 2 | Year 3 |
 |----------|--------|--------|--------|
-| **Conservative** | R22k | R80k | R200k |
-| **Moderate** | R113k | R400k | R1M |
-| **Aggressive** | R420k | R1.5M | R3.5M |
+| **Conservative** | R56k | R180k | R400k |
+| **Moderate** | R296k | R900k | R2M |
+| **Aggressive** | R1.16M | R3.5M | R7M+ |
 
-**Key insight:** B2C is for adoption and word-of-mouth. B2B institutional licensing is where revenue comes from. One institutional deal at R29/student × 2,000 students = R58k — more than all individual subscriptions combined in the conservative scenario.
+**Key insight:** B2C drives adoption. B2B drives revenue. One Cornerstone deal at R79/student × 2,000 = R158k/year. The higher B2C pricing also means individual subscribers are genuinely profitable — R99/mo with 15 checks = R1.48 × 15 = R22.20 API cost vs R99 revenue = **78% margin**.
 
 ---
 
