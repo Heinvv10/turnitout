@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSettingsStore } from "@/store/settings-store";
 import { MODULES, SEMESTER_DATES } from "@/lib/constants";
 import { MODULE_RUBRICS } from "@/lib/module-rubrics";
@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Shield, Moon, Sun, LayoutDashboard, CalendarDays, Library } from "lucide-react";
+import { Shield, Moon, Sun, LayoutDashboard, CalendarDays, Library, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UserMenu } from "@/components/auth/user-menu";
@@ -21,6 +21,13 @@ import {
   TooltipContent,
   TooltipProvider,
 } from "@/components/ui/tooltip";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose,
+} from "@/components/ui/sheet";
 import { useTheme } from "./theme-provider";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -136,9 +143,10 @@ export function Header() {
   const { selectedModule, setSelectedModule } = useSettingsStore();
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="border-b bg-card px-4 py-3 dark:border-b-primary/10">
+    <header className="sticky top-0 z-30 border-b bg-card px-4 py-3 dark:border-b-primary/10 header-frosted">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-3">
@@ -150,6 +158,15 @@ export function Header() {
               </p>
             </div>
           </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="sm:hidden"
+            onClick={() => setMobileMenuOpen(true)}
+          >
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Open menu</span>
+          </Button>
           <nav className="hidden sm:flex items-center gap-1 ml-4">
             <Link href="/">
               <Button
@@ -180,9 +197,9 @@ export function Header() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Select value={selectedModule} onValueChange={(v) => v && setSelectedModule(v)}>
-            <SelectTrigger className="w-[120px] sm:w-[180px] md:w-[260px]">
+            <SelectTrigger className="hidden sm:flex w-[180px] md:w-[260px]">
               <SelectValue placeholder="Select module" />
             </SelectTrigger>
             <SelectContent>
@@ -211,7 +228,9 @@ export function Header() {
             </SelectContent>
           </Select>
 
-          <AssignmentCountdown moduleCode={selectedModule} />
+          <div className="hidden sm:block">
+            <AssignmentCountdown moduleCode={selectedModule} />
+          </div>
 
           <SettingsDialog />
 
@@ -228,6 +247,86 @@ export function Header() {
           <UserMenu />
         </div>
       </div>
+
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetContent side="bottom" showCloseButton={false}>
+          <SheetHeader>
+            <SheetTitle>Navigation</SheetTitle>
+          </SheetHeader>
+          <nav className="flex flex-col gap-1 px-4 pb-4">
+            <SheetClose
+              render={
+                <Link href="/">
+                  <Button
+                    variant={pathname === "/" ? "secondary" : "ghost"}
+                    className="w-full justify-start"
+                  >
+                    Editor
+                  </Button>
+                </Link>
+              }
+            />
+            <SheetClose
+              render={
+                <Link href="/library">
+                  <Button
+                    variant={pathname === "/library" ? "secondary" : "ghost"}
+                    className="w-full justify-start"
+                  >
+                    <Library className="mr-1.5 h-3.5 w-3.5" />
+                    Library
+                  </Button>
+                </Link>
+              }
+            />
+            <SheetClose
+              render={
+                <Link href="/dashboard">
+                  <Button
+                    variant={pathname === "/dashboard" ? "secondary" : "ghost"}
+                    className="w-full justify-start"
+                  >
+                    <LayoutDashboard className="mr-1.5 h-3.5 w-3.5" />
+                    Dashboard
+                  </Button>
+                </Link>
+              }
+            />
+          </nav>
+          <div className="border-t px-4 py-3">
+            <p className="mb-2 text-xs font-semibold text-muted-foreground">Module</p>
+            <Select value={selectedModule} onValueChange={(v) => { if (v) { setSelectedModule(v); setMobileMenuOpen(false); } }}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select module" />
+              </SelectTrigger>
+              <SelectContent>
+                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                  Semester 1
+                </div>
+                {MODULES.filter((m) => m.semester === 1).map((m) => (
+                  <SelectItem key={m.code} value={m.code}>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {m.code}
+                    </span>{" "}
+                    {m.name}
+                  </SelectItem>
+                ))}
+                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                  Semester 2
+                </div>
+                {MODULES.filter((m) => m.semester === 2).map((m) => (
+                  <SelectItem key={m.code} value={m.code}>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {m.code}
+                    </span>{" "}
+                    {m.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </SheetContent>
+      </Sheet>
     </header>
   );
 }

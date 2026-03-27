@@ -205,6 +205,27 @@
 }
 
 /* ═══════════════════════════════════════
+   DARK MODE POLISH
+   ═══════════════════════════════════════ */
+
+/* Frosted glass header in dark mode */
+.dark .header-frosted {
+  background: oklch(0.18 0.02 280 / 0.8);
+  backdrop-filter: blur(12px) saturate(1.5);
+  -webkit-backdrop-filter: blur(12px) saturate(1.5);
+  border-bottom: 1px solid oklch(0.35 0.04 280 / 0.5);
+}
+
+/* Subtle glow border on cards in dark mode */
+.dark .card-glow {
+  box-shadow: 0 0 0 1px oklch(0.40 0.06 280 / 0.3), 0 1px 3px oklch(0 0 0 / 0.3);
+  transition: box-shadow 0.2s ease;
+}
+.dark .card-glow:hover {
+  box-shadow: 0 0 0 1px oklch(0.50 0.10 280 / 0.4), 0 4px 12px oklch(0 0 0 / 0.4);
+}
+
+/* ═══════════════════════════════════════
    TIPTAP EDITOR
    ═══════════════════════════════════════ */
 

@@ -139,7 +139,7 @@ export function AnalysisTabs() {
   return (
     <div className="flex h-full flex-col">
       {/* Sticky header with readiness badge + accordion nav */}
-      <div className="sticky top-0 z-10 bg-card border-b">
+      <div className="sticky top-0 z-10 bg-card border-b card-glow">
         <div className="px-4 py-3">
           <ReadinessBadge />
         </div>
@@ -205,7 +205,11 @@ export function AnalysisTabs() {
 
       {/* Panel content */}
       <div className="flex-1 overflow-y-auto p-4">
-        {PanelComponent ? <PanelComponent /> : null}
+        {PanelComponent ? (
+          <div key={activePanel} className="animate-fade-in-up">
+            <PanelComponent />
+          </div>
+        ) : null}
       </div>
     </div>
   );

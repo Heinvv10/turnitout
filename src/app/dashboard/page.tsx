@@ -186,7 +186,7 @@ function ModuleCard({
 }) {
   return (
     <Link href={`/?module=${code}`}>
-      <Card className="cursor-pointer p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+      <Card className="cursor-pointer p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 card-glow">
         <div className="mb-2 flex items-center justify-between">
           <span className="font-mono text-xs text-primary/60">
             {code}
