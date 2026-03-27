@@ -2,10 +2,13 @@
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Header } from "@/components/layout/header";
 import { OnboardingModal } from "@/components/layout/onboarding-modal";
 import { OfflineBanner } from "@/components/layout/offline-banner";
 import { OutlineGate } from "@/components/analysis/outline-gate";
+import { FreeTierBanner } from "@/components/auth/free-tier-banner";
+import { AuthGate } from "@/components/auth/auth-gate";
 import { PaperEditor } from "@/components/editor/paper-editor";
 import { AnalysisTabs } from "@/components/analysis/analysis-tabs";
 import { OfflineToast } from "@/components/ui/offline-toast";
@@ -206,6 +209,11 @@ function HomeContent() {
   const anyLoading =
     isAnalyzing.aiRisk || isAnalyzing.citations || isAnalyzing.grading || isAnalyzing.plagiarism || isAnalyzing.grammar;
 
+  const { data: session } = useSession();
+  const isAuthenticated = Boolean(session?.user);
+  const [authGateOpen, setAuthGateOpen] = useState(false);
+  const [authGateFeature, setAuthGateFeature] = useState("");
+
   const [isQuickChecking, setIsQuickChecking] = useState(false);
 
   const buildRequestBody = () => {
@@ -405,6 +413,12 @@ function HomeContent() {
       <OnboardingModal />
       <Header />
       <OfflineBanner isOnline={isOnline} />
+      {!isAuthenticated && <FreeTierBanner />}
+      <AuthGate
+        open={authGateOpen}
+        onOpenChange={setAuthGateOpen}
+        feature={authGateFeature}
+      />
       <OutlineGate />
 
       <div className="flex items-center justify-between border-b px-4 py-2">
@@ -418,7 +432,14 @@ function HomeContent() {
           <AcademizeButton />
           <Button
             variant="outline"
-            onClick={runQuickCheck}
+            onClick={() => {
+              if (!isAuthenticated) {
+                setAuthGateFeature("Quick Check");
+                setAuthGateOpen(true);
+                return;
+              }
+              runQuickCheck();
+            }}
             disabled={!currentPaper?.plainText || anyLoading || isQuickChecking}
             size="sm"
           >
@@ -430,7 +451,14 @@ function HomeContent() {
             {isQuickChecking ? "Checking..." : "Quick Check"}
           </Button>
           <Button
-            onClick={runAllChecks}
+            onClick={() => {
+              if (!isAuthenticated) {
+                setAuthGateFeature("Run All Checks");
+                setAuthGateOpen(true);
+                return;
+              }
+              runAllChecks();
+            }}
             disabled={!currentPaper?.plainText || anyLoading || isQuickChecking}
             size="sm"
           >

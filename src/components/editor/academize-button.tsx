@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { AuthGate } from "@/components/auth/auth-gate";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import {
@@ -32,6 +34,9 @@ interface AcademizeResult {
 }
 
 export function AcademizeButton() {
+  const { data: session } = useSession();
+  const isAuthenticated = Boolean(session?.user);
+
   const currentPaper = usePaperStore((s) => s.currentPaper);
   const updateContent = usePaperStore((s) => s.updateContent);
   const apiKey = useSettingsStore((s) => s.apiKey);
@@ -42,6 +47,7 @@ export function AcademizeButton() {
   const [copied, setCopied] = useState(false);
   const [applied, setApplied] = useState(false);
   const [open, setOpen] = useState(false);
+  const [authGateOpen, setAuthGateOpen] = useState(false);
 
   const lowDataMode = useSettingsStore((s) => s.lowDataMode);
   const hasText = Boolean(currentPaper?.plainText);
@@ -119,11 +125,14 @@ export function AcademizeButton() {
   };
 
   return (
+    <>
+    <AuthGate open={authGateOpen} onOpenChange={setAuthGateOpen} feature="Academize" />
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger
         disabled={!hasText || lowDataMode}
         className="inline-flex items-center justify-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
         title={lowDataMode ? "Disabled in Low Data Mode" : undefined}
+        onClick={(e) => { if (!isAuthenticated) { e.preventDefault(); setAuthGateOpen(true); } }}
       >
         <GraduationCap className="h-4 w-4" />
         Academize
@@ -276,5 +285,6 @@ export function AcademizeButton() {
         )}
       </DialogContent>
     </Dialog>
+    </>
   );
 }

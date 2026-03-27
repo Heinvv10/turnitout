@@ -17,10 +17,11 @@ import { LogIn, UserPlus, Loader2 } from "lucide-react";
 interface LoginModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultTab?: "login" | "register";
 }
 
-export function LoginModal({ open, onOpenChange }: LoginModalProps) {
-  const [tab, setTab] = useState<string>("login");
+export function LoginModal({ open, onOpenChange, defaultTab = "login" }: LoginModalProps) {
+  const [tab, setTab] = useState<string>(defaultTab);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
