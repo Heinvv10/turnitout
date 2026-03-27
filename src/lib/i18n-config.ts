@@ -65,13 +65,13 @@ export const GRADING_SCALES = {
 };
 
 export const REFERENCING_STYLES = [
-  { id: "harvard", label: "Harvard", description: "Author-date system (Author Year)" },
-  { id: "apa7", label: "APA 7th Edition", description: "Author-date system (Author, Year)" },
-  { id: "mla9", label: "MLA 9th Edition", description: "Author-page system (Author Page)" },
-  { id: "chicago", label: "Chicago/Turabian", description: "Notes-bibliography or Author-date" },
-  { id: "vancouver", label: "Vancouver", description: "Numbered citations [1]" },
-  { id: "ieee", label: "IEEE", description: "Numbered citations [1]" },
-  { id: "oscola", label: "OSCOLA", description: "Law referencing (footnotes)" },
+  { id: "harvard", label: "Harvard", description: "Author-date: (Wright 2013). Most common in SA humanities.", hint: "If you're at a SA university doing Arts, Theology, or Education — this is almost certainly yours." },
+  { id: "apa7", label: "APA 7th Edition", description: "Author-date: (Wright, 2013). Standard for Psychology.", hint: "Uses a comma before the year and & between authors. Common in Psychology and Social Sciences." },
+  { id: "mla9", label: "MLA 9th Edition", description: "Author-page: (Wright 45). Used in Literature and Languages.", hint: "Uses page numbers instead of years in-text. Mostly Literature and Language departments." },
+  { id: "chicago", label: "Chicago/Turabian", description: "Footnotes or author-date. Common in History.", hint: "Uses footnotes at the bottom of each page. Common in History and some Theology courses." },
+  { id: "vancouver", label: "Vancouver", description: "Numbered: [1]. Used in Health Sciences and Medicine.", hint: "If you're studying Nursing, Medicine, or Health Sciences, this is likely yours." },
+  { id: "ieee", label: "IEEE", description: "Numbered: [1]. Used in Engineering and Computer Science.", hint: "Standard for Engineering, IT, and Computer Science papers." },
+  { id: "oscola", label: "OSCOLA", description: "Law referencing with footnotes.", hint: "Only used in Law faculties. If you're not studying Law, this isn't yours." },
 ];
 
 export const COUNTRIES = [

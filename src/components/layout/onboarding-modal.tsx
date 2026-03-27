@@ -204,23 +204,48 @@ export function OnboardingModal() {
 
             <div>
               <Label>Referencing Style</Label>
-              <Select value={localRefStyle} onValueChange={(v) => v && setLocalRefStyle(v)}>
-                <SelectTrigger className="mt-1 w-full">
-                  <SelectValue placeholder="Select referencing style" />
-                </SelectTrigger>
-                <SelectContent>
-                  {REFERENCING_STYLES.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>
-                      {s.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="mt-2 space-y-1.5">
+                {REFERENCING_STYLES.map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => setLocalRefStyle(s.id)}
+                    className={`flex w-full items-start gap-3 rounded-lg border p-3 text-left transition-colors ${
+                      localRefStyle === s.id
+                        ? "border-primary bg-primary/5 ring-1 ring-primary"
+                        : "border-border hover:bg-accent/50"
+                    }`}
+                  >
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{s.label}</p>
+                      <p className="text-xs text-muted-foreground">{s.description}</p>
+                    </div>
+                    {localRefStyle === s.id && (
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    )}
+                  </button>
+                ))}
+              </div>
               {localRefStyle && (
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {REFERENCING_STYLES.find((s) => s.id === localRefStyle)?.description}
-                </p>
+                <div className="mt-3 rounded-md border border-primary/20 bg-primary/5 p-3">
+                  <p className="text-xs font-medium text-primary">
+                    💡 {REFERENCING_STYLES.find((s) => s.id === localRefStyle)?.hint}
+                  </p>
+                </div>
               )}
+              <details className="mt-3">
+                <summary className="cursor-pointer text-xs font-medium text-primary hover:underline">
+                  Not sure which style to use?
+                </summary>
+                <div className="mt-2 rounded-md border bg-muted/50 p-3 text-xs text-muted-foreground space-y-1.5">
+                  <p><strong>Check these places:</strong></p>
+                  <p>1. Your <strong>module outline</strong> or assignment brief — it usually says "use Harvard referencing" or similar</p>
+                  <p>2. Your institution's <strong>academic writing guide</strong> (often on the student portal)</p>
+                  <p>3. Ask your <strong>lecturer or tutor</strong> — they won't mind!</p>
+                  <p>4. Look at your <strong>previous assignment feedback</strong> — if you were marked down for referencing, the comment usually names the expected style</p>
+                  <p className="pt-1 font-medium">Still unsure? <strong>Harvard</strong> is the most common in SA universities. You can always change this later in Settings.</p>
+                </div>
+              </details>
             </div>
           </div>
         )}
