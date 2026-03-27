@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { callClaude } from "@/lib/claude";
+import { aiRateLimiter } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/get-ip";
 
 const COACH_SYSTEM_PROMPT = `You are a Socratic academic writing coach. Your role is to help students improve their essays by asking thought-provoking questions — NEVER by writing content for them.
 
@@ -23,6 +25,15 @@ interface ChatMessage {
 }
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const rateCheck = aiRateLimiter.check(ip);
+  if (!rateCheck.allowed) {
+    return Response.json(
+      { error: "Too many requests. Please wait a moment." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil((rateCheck.resetAt - Date.now()) / 1000)) } },
+    );
+  }
+
   try {
     const { message, essayContext, moduleCode, analysisScores, chatHistory, apiKey } =
       await request.json();

@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import bcrypt from "bcryptjs";
+import { authRateLimiter } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/get-ip";
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request);
+  const rateCheck = authRateLimiter.check(ip);
+  if (!rateCheck.allowed) {
+    return Response.json(
+      { error: "Too many requests. Please wait a moment." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil((rateCheck.resetAt - Date.now()) / 1000)) } },
+    );
+  }
+
   try {
     const body = await request.json();
     const { email, password, name, studentNumber, university, country } = body;

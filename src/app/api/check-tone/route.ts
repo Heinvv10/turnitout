@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { callClaude } from "@/lib/claude";
 import { parseClaudeJSON } from "@/lib/parse-json";
+import { aiRateLimiter } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/get-ip";
 
 interface ToneIssue {
   type: "informal" | "contraction" | "slang" | "first_person" | "hedging" | "emotional" | "bias";
@@ -55,6 +57,15 @@ Guidelines:
 }
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const rateCheck = aiRateLimiter.check(ip);
+  if (!rateCheck.allowed) {
+    return Response.json(
+      { error: "Too many requests. Please wait a moment." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil((rateCheck.resetAt - Date.now()) / 1000)) } },
+    );
+  }
+
   try {
     const { text, apiKey, referencingStyle } = await request.json();
 
