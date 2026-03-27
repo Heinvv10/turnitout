@@ -6,6 +6,7 @@ import { AIRiskPanel } from "./ai-risk-panel";
 import { CitationPanel } from "./citation-panel";
 import { GraderPanel } from "./grader-panel";
 import { ReadinessBadge } from "./readiness-badge";
+import { SubmissionChecklist } from "./submission-checklist";
 import { OriginalityPanel } from "./originality-panel";
 import { ReadabilityPanel } from "./readability-panel";
 import { TonePanel } from "./tone-panel";
@@ -140,8 +141,9 @@ export function AnalysisTabs() {
     <div className="flex h-full flex-col">
       {/* Sticky header with readiness badge + accordion nav */}
       <div className="sticky top-0 z-10 bg-card border-b card-glow">
-        <div className="px-4 py-3">
+        <div className="px-4 py-3 space-y-3">
           <ReadinessBadge />
+          <SubmissionChecklist />
         </div>
 
         <div className="space-y-1 px-3 pb-3">

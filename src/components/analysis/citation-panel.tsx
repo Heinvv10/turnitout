@@ -18,6 +18,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { FixGuide, getFixGuide } from "./fix-guide";
+import { CitationCrossCheckPanel } from "./citation-cross-check-panel";
 
 interface FormattedCitation {
   original: string;
@@ -224,6 +225,11 @@ export function CitationPanel() {
           ))}
         </div>
       )}
+
+      {/* Citation Cross-Check */}
+      <div className="border-t pt-4">
+        <CitationCrossCheckPanel />
+      </div>
 
       {/* Format References Section */}
       <div className="border-t pt-4">

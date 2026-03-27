@@ -10,7 +10,9 @@ import {
   XCircle,
   FileText,
   Hash,
+  Share2,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function ReadinessBadge() {
   const { currentPaper, analysisResults, resultsStale } = usePaperStore();
@@ -145,6 +147,43 @@ export function ReadinessBadge() {
             </span>
           )}
         </div>
+
+        {/* WhatsApp share */}
+        {overall != null && (
+          <div className="mt-2 flex justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 gap-1.5 text-xs text-muted-foreground"
+              onClick={() => {
+                const emoji =
+                  trafficLight === "green"
+                    ? "\u{1F7E2}"
+                    : trafficLight === "yellow"
+                      ? "\u{1F7E1}"
+                      : "\u{1F534}";
+                const lines = [
+                  "TurnItOut Pre-Submission Check",
+                  `Essay: ${currentPaper?.title || "Untitled"}`,
+                  `Readiness: ${overall}% ${emoji}`,
+                ];
+                const stats: string[] = [];
+                if (grading) stats.push(`Grade: ${grading.totalScore}%`);
+                if (citations) stats.push(`Citations: ${citations.score}%`);
+                if (analysisResults.grammar)
+                  stats.push(`Grammar: ${analysisResults.grammar.score}%`);
+                if (stats.length > 0) lines.push(stats.join(" | "));
+                lines.push("");
+                lines.push("Check your essay before you submit: turnitout.co.za");
+                const msg = encodeURIComponent(lines.join("\n"));
+                window.open(`https://wa.me/?text=${msg}`, "_blank");
+              }}
+            >
+              <Share2 className="h-3.5 w-3.5" />
+              Share via WhatsApp
+            </Button>
+          </div>
+        )}
       </div>
 
       {wordCountStatus && currentWords > 0 && (

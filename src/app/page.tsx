@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { OnboardingModal } from "@/components/layout/onboarding-modal";
@@ -28,7 +28,9 @@ import { TemplateExport } from "@/components/template/template-export";
 import { DocumentPreview } from "@/components/template/document-preview";
 import { Tabs as ExportTabs, TabsContent as ETC, TabsList as ETL, TabsTrigger as ETT } from "@/components/ui/tabs";
 import { ChatPanel } from "@/components/coach/chat-panel";
-import { Loader2, PlayCircle, PanelRightOpen, Download, Eye, Settings2 } from "lucide-react";
+import { TTSButton } from "@/components/editor/tts-button";
+import { safeFetch } from "@/lib/safe-fetch";
+import { Loader2, PlayCircle, PanelRightOpen, Download, Eye, Settings2, Zap } from "lucide-react";
 
 export default function Home() {
   return (
@@ -116,26 +118,48 @@ function HomeContent() {
   const anyLoading =
     isAnalyzing.aiRisk || isAnalyzing.citations || isAnalyzing.grading || isAnalyzing.plagiarism || isAnalyzing.grammar;
 
-  const runAllChecks = async () => {
-    if (!currentPaper?.plainText) return;
+  const [isQuickChecking, setIsQuickChecking] = useState(false);
 
+  const buildRequestBody = () => {
     const uploadedOutline = moduleOutlines[selectedModule] || undefined;
-
-    // Combine body + references for full text analysis, but keep them separate for context
-    const fullText = currentPaper.references
+    const fullText = currentPaper?.references
       ? `${currentPaper.plainText}\n\nReference List\n${currentPaper.references}`
-      : currentPaper.plainText;
-
-    const body = {
+      : currentPaper?.plainText ?? "";
+    return {
       text: fullText,
       moduleCode: selectedModule,
-      assignmentTitle: currentPaper.title,
+      assignmentTitle: currentPaper?.title ?? "",
       uploadedOutline,
       apiKey,
       gradingScale,
       referencingStyle,
       language,
     };
+  };
+
+  const runQuickCheck = async () => {
+    if (!currentPaper?.plainText) return;
+    setIsQuickChecking(true);
+    const body = buildRequestBody();
+
+    setAnalyzing("grammar", true);
+    setAnalyzing("citations", true);
+
+    const quickPromises = [
+      safeFetch("/api/check-grammar", body).then(v => { setGrammarResult(v as Parameters<typeof setGrammarResult>[0]); setAnalyzing("grammar", false); }),
+      safeFetch("/api/check-citations", body).then(v => { setCitationResult(v as Parameters<typeof setCitationResult>[0]); setAnalyzing("citations", false); }),
+    ];
+
+    await Promise.allSettled(quickPromises.map(p => p.catch(() => {})));
+
+    setAnalyzing("grammar", false);
+    setAnalyzing("citations", false);
+    setIsQuickChecking(false);
+  };
+
+  const runAllChecks = async () => {
+    if (!currentPaper?.plainText) return;
+    const body = buildRequestBody();
 
     setAnalyzing("aiRisk", true);
     setAnalyzing("citations", true);
@@ -143,40 +167,14 @@ function HomeContent() {
     setAnalyzing("plagiarism", true);
     setAnalyzing("grammar", true);
 
-    const safeFetch = async (url: string, delay = 0, retries = 2): Promise<unknown> => {
-      if (delay > 0) await new Promise(r => setTimeout(r, delay));
-      for (let i = 0; i <= retries; i++) {
-        try {
-          const r = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-          });
-          const data = await r.json();
-          if (data.error?.includes("overloaded") || data.error?.includes("529")) {
-            if (i < retries) { await new Promise(r => setTimeout(r, (i + 1) * 3000)); continue; }
-          }
-          if (data.error) throw new Error(data.error);
-          return data;
-        } catch (err) {
-          if (i < retries && err instanceof Error && (err.message.includes("overloaded") || err.message.includes("529"))) {
-            await new Promise(r => setTimeout(r, (i + 1) * 3000));
-            continue;
-          }
-          throw err;
-        }
-      }
-      throw new Error("Failed after retries");
-    };
-
     // Fire all 6 checks simultaneously with staggered starts (500ms apart to avoid rate spikes)
     const checkPromises = [
-      safeFetch("/api/analyze-ai-risk", 0).then(v => { setAIRiskResult(v as Parameters<typeof setAIRiskResult>[0]); setAnalyzing("aiRisk", false); }),
-      safeFetch("/api/check-citations", 500).then(v => { setCitationResult(v as Parameters<typeof setCitationResult>[0]); setAnalyzing("citations", false); }),
-      safeFetch("/api/grade-paper", 1000).then(v => { setGradingResult(v as Parameters<typeof setGradingResult>[0]); setAnalyzing("grading", false); }),
-      safeFetch("/api/check-plagiarism", 1500).then(v => { setPlagiarismResult(v as Parameters<typeof setPlagiarismResult>[0]); setAnalyzing("plagiarism", false); }),
-      safeFetch("/api/check-grammar", 2000).then(v => { setGrammarResult(v as Parameters<typeof setGrammarResult>[0]); setAnalyzing("grammar", false); }),
-      safeFetch("/api/check-tone", 2500).then(v => { setToneResult(v as Parameters<typeof setToneResult>[0]); }),
+      safeFetch("/api/analyze-ai-risk", body, { delay: 0 }).then(v => { setAIRiskResult(v as Parameters<typeof setAIRiskResult>[0]); setAnalyzing("aiRisk", false); }),
+      safeFetch("/api/check-citations", body, { delay: 500 }).then(v => { setCitationResult(v as Parameters<typeof setCitationResult>[0]); setAnalyzing("citations", false); }),
+      safeFetch("/api/grade-paper", body, { delay: 1000 }).then(v => { setGradingResult(v as Parameters<typeof setGradingResult>[0]); setAnalyzing("grading", false); }),
+      safeFetch("/api/check-plagiarism", body, { delay: 1500 }).then(v => { setPlagiarismResult(v as Parameters<typeof setPlagiarismResult>[0]); setAnalyzing("plagiarism", false); }),
+      safeFetch("/api/check-grammar", body, { delay: 2000 }).then(v => { setGrammarResult(v as Parameters<typeof setGrammarResult>[0]); setAnalyzing("grammar", false); }),
+      safeFetch("/api/check-tone", body, { delay: 2500 }).then(v => { setToneResult(v as Parameters<typeof setToneResult>[0]); }),
     ];
 
     // Each check updates the UI as soon as it completes (no waiting for others)
@@ -293,9 +291,23 @@ function HomeContent() {
             : "Start writing to begin"}
         </p>
         <div className="flex items-center gap-2">
+          <TTSButton />
+          <Button
+            variant="outline"
+            onClick={runQuickCheck}
+            disabled={!currentPaper?.plainText || anyLoading || isQuickChecking}
+            size="sm"
+          >
+            {isQuickChecking ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Zap className="mr-2 h-4 w-4" />
+            )}
+            {isQuickChecking ? "Checking..." : "Quick Check"}
+          </Button>
           <Button
             onClick={runAllChecks}
-            disabled={!currentPaper?.plainText || anyLoading}
+            disabled={!currentPaper?.plainText || anyLoading || isQuickChecking}
             size="sm"
           >
             {anyLoading ? (
