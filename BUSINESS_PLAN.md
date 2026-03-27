@@ -122,7 +122,7 @@ TurnItOut replaces 5+ paid tools at 66% less than the competitor stack — and n
 | **Term Pass** | R499/term (~10 weeks) | Term | R200/mo | **40 AI checks** | Predictable cost |
 | **Semester Pass** | R899/semester (~5 months) | Semester | R180/mo | **80 AI checks** | Save 10% vs monthly |
 | **Annual Pass** | R1,699/year | Year | R142/mo | **150 AI checks** | Save 29% vs monthly |
-| **Single Check** | R25 once-off | — | — | 1 AI check | No commitment |
+| **Pay-as-you-go** | R25/check | — | — | 1 AI check per purchase | No commitment |
 
 **What counts as 1 "AI check":**
 A full "Run All Checks" = 1 check (grammar + citations + plagiarism + AI risk + grading + tone + advice). "Quick Check" (grammar + citations only) = 0.5 checks. Academize and Paraphrase each = 0.25 checks.
@@ -151,14 +151,14 @@ Readability, vocabulary analysis, ESL/Afrikaans patterns, citation cross-check, 
 | Term (40) | R499 | 40 | R59.20 | **R439.80 (88%)** |
 | Semester (80) | R899 | 80 | R118.40 | **R780.60 (87%)** |
 | Annual (150) | R1,699 | 150 | R222.00 | **R1,477 (87%)** |
-| Single (1) | R25 | 1 | R1.48 | **R23.52 (94%)** |
+| Pay-as-you-go (1) | R25 | 1 | R1.48 | **R23.52 (94%)** |
 
 **Average revenue per check across tiers:**
 - Monthly: R13.27/check
 - Term: R12.48/check
 - Semester: R11.24/check
 - Annual: R11.33/check
-- Single: R25/check
+- Pay-as-you-go: R25/check
 - **All tiers profitable at 86-94% margin.** Even if students max out every check, we're healthy.
 
 ---
@@ -220,7 +220,7 @@ Institutional pricing = significant discount vs individual (R1,600/year → from
 |----------|-----|
 | Free tier: 2 checks total (trial) | Enough to experience full value. Not enough to freeload. Local features provide ongoing daily value. |
 | R199/mo Pro | 66% cheaper than Grammarly Pro alone (R204/mo), while replacing R586+/mo of tools. Easy comparison. |
-| R25/single check | Less than a McDonald's meal. Assignment-night impulse buy. 94% margin. |
+| R25 pay-as-you-go | Less than a McDonald's meal. Assignment-night impulse buy. 94% margin. Like buying airtime — SA students get it. |
 | Semester/Annual discounts | R899/semester < one module repeat (R5,000+). Parents think in semesters. Annual at R1,699 saves 29% vs monthly. |
 | B2B at R299-R399/student/year | 75-81% off individual pricing. Each prevented disciplinary hearing saves R2,000-R5,000. Undercuts Turnitin while offering far more. |
 | ZAR-only pricing | Competitive advantage vs Grammarly/QuillBot (USD-only). No exchange rate surprises. |
