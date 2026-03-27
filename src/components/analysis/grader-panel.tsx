@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { MODULES } from "@/lib/constants";
@@ -29,15 +30,23 @@ import {
 } from "lucide-react";
 
 export function GraderPanel() {
-  const {
-    currentPaper,
-    analysisResults,
-    isAnalyzing,
-    setAnalyzing,
-    setGradingResult,
-  } = usePaperStore();
-  const { selectedModule, moduleOutlines, setModuleOutline, apiKey } =
-    useSettingsStore();
+  const { currentPaper, analysisResults, isAnalyzing } = usePaperStore(
+    useShallow((s) => ({
+      currentPaper: s.currentPaper,
+      analysisResults: s.analysisResults,
+      isAnalyzing: s.isAnalyzing,
+    })),
+  );
+  const setAnalyzing = usePaperStore((s) => s.setAnalyzing);
+  const setGradingResult = usePaperStore((s) => s.setGradingResult);
+  const { selectedModule, moduleOutlines, apiKey } = useSettingsStore(
+    useShallow((s) => ({
+      selectedModule: s.selectedModule,
+      moduleOutlines: s.moduleOutlines,
+      apiKey: s.apiKey,
+    })),
+  );
+  const setModuleOutline = useSettingsStore((s) => s.setModuleOutline);
   const result = analysisResults.grading;
   const loading = isAnalyzing.grading;
 

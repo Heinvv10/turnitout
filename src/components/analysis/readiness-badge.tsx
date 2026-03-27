@@ -15,8 +15,11 @@ import {
 import { Button } from "@/components/ui/button";
 
 export function ReadinessBadge() {
-  const { currentPaper, analysisResults, resultsStale } = usePaperStore();
-  const { selectedModule, moduleOutlines } = useSettingsStore();
+  const currentPaper = usePaperStore((s) => s.currentPaper);
+  const analysisResults = usePaperStore((s) => s.analysisResults);
+  const resultsStale = usePaperStore((s) => s.resultsStale);
+  const selectedModule = useSettingsStore((s) => s.selectedModule);
+  const moduleOutlines = useSettingsStore((s) => s.moduleOutlines);
   const { overall, trafficLight, aiRisk, citations, grading, plagiarism } =
     analysisResults;
 

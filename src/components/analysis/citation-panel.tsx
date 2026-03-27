@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { Button } from "@/components/ui/button";
@@ -34,15 +35,18 @@ interface FormatResult {
 }
 
 export function CitationPanel() {
-  const {
-    currentPaper,
-    analysisResults,
-    isAnalyzing,
-    setAnalyzing,
-    setCitationResult,
-    updateReferences,
-  } = usePaperStore();
-  const { apiKey, referencingStyle } = useSettingsStore();
+  const { currentPaper, analysisResults, isAnalyzing } = usePaperStore(
+    useShallow((s) => ({
+      currentPaper: s.currentPaper,
+      analysisResults: s.analysisResults,
+      isAnalyzing: s.isAnalyzing,
+    })),
+  );
+  const setAnalyzing = usePaperStore((s) => s.setAnalyzing);
+  const setCitationResult = usePaperStore((s) => s.setCitationResult);
+  const updateReferences = usePaperStore((s) => s.updateReferences);
+  const apiKey = useSettingsStore((s) => s.apiKey);
+  const referencingStyle = useSettingsStore((s) => s.referencingStyle);
   const result = analysisResults.citations;
   const loading = isAnalyzing.citations;
 

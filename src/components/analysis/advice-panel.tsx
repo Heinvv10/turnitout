@@ -17,9 +17,12 @@ import {
 } from "lucide-react";
 
 export function AdvicePanel() {
-  const { currentPaper, analysisResults } = usePaperStore();
-  const { selectedModule, apiKey, moduleOutlines } = useSettingsStore();
-  const { setAdviceResult } = usePaperStore();
+  const currentPaper = usePaperStore((s) => s.currentPaper);
+  const analysisResults = usePaperStore((s) => s.analysisResults);
+  const setAdviceResult = usePaperStore((s) => s.setAdviceResult);
+  const selectedModule = useSettingsStore((s) => s.selectedModule);
+  const apiKey = useSettingsStore((s) => s.apiKey);
+  const moduleOutlines = useSettingsStore((s) => s.moduleOutlines);
 
   const advice = analysisResults.advice;
   const [loading, setLoading] = useState(false);

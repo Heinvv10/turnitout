@@ -158,8 +158,10 @@ function buildChecklist(
 }
 
 export function SubmissionChecklist() {
-  const { currentPaper, analysisResults } = usePaperStore();
-  const { selectedModule, moduleOutlines } = useSettingsStore();
+  const currentPaper = usePaperStore((s) => s.currentPaper);
+  const analysisResults = usePaperStore((s) => s.analysisResults);
+  const selectedModule = useSettingsStore((s) => s.selectedModule);
+  const moduleOutlines = useSettingsStore((s) => s.moduleOutlines);
 
   const items = useMemo(
     () => buildChecklist(
@@ -168,7 +170,7 @@ export function SubmissionChecklist() {
       selectedModule,
       moduleOutlines as Record<string, { assessments?: { type: string; wordCount: string }[] }>,
     ),
-    [currentPaper, analysisResults, selectedModule, moduleOutlines],
+    [currentPaper?.plainText, currentPaper?.wordCount, analysisResults, selectedModule, moduleOutlines],
   );
 
   const availableItems = items.filter((i) => i.available);

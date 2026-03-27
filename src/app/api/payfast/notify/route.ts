@@ -55,9 +55,6 @@ export async function POST(request: Request) {
         WHERE id = ${userId}
       `;
 
-      console.log(
-        `PayFast: User ${userId} subscribed to ${tier} (payment: ${paymentId})`,
-      );
     } else if (paymentStatus === "CANCELLED" && userId > 0) {
       // Downgrade to free
       await sql`
@@ -68,7 +65,6 @@ export async function POST(request: Request) {
         WHERE id = ${userId}
       `;
 
-      console.log(`PayFast: User ${userId} subscription cancelled`);
     }
 
     // PayFast expects a 200 response

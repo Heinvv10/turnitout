@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { Button } from "@/components/ui/button";
@@ -49,9 +50,17 @@ function typeBadgeVariant(type: GrammarIssue["type"]) {
 }
 
 export function GrammarPanel() {
-  const { currentPaper, analysisResults, isAnalyzing, setAnalyzing, setGrammarResult } =
-    usePaperStore();
-  const { apiKey, language } = useSettingsStore();
+  const { currentPaper, analysisResults, isAnalyzing } = usePaperStore(
+    useShallow((s) => ({
+      currentPaper: s.currentPaper,
+      analysisResults: s.analysisResults,
+      isAnalyzing: s.isAnalyzing,
+    })),
+  );
+  const setAnalyzing = usePaperStore((s) => s.setAnalyzing);
+  const setGrammarResult = usePaperStore((s) => s.setGrammarResult);
+  const apiKey = useSettingsStore((s) => s.apiKey);
+  const language = useSettingsStore((s) => s.language);
   const result = analysisResults.grammar;
   const loading = isAnalyzing.grammar;
 

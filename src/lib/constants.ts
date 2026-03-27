@@ -101,12 +101,16 @@ export const RUBRIC_CATEGORIES = [
   },
 ] as const;
 
-export const SEMESTER_DATES = {
+export const SEMESTER_DATES: Record<number, { semester1Start: string; semester2Start: string }> = {
   2026: {
     semester1Start: "2026-02-09", // Week 1 starts
     semester2Start: "2026-07-20", // Approximate
   },
-} as const;
+  2027: {
+    semester1Start: "2027-02-08",
+    semester2Start: "2027-07-19",
+  },
+};
 
 export function getSAGrade(score: number): string {
   for (const grade of SA_GRADE_SCALE) {

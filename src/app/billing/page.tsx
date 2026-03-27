@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { Header } from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -95,6 +96,7 @@ const plans = [
 
 export default function BillingPage() {
   const { studentName } = useSettingsStore();
+  const { data: session } = useSession();
   const [loading, setLoading] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"payfast" | "stripe">(
     "payfast",
@@ -109,8 +111,8 @@ export default function BillingPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             plan: planId,
-            userId: 1, // TODO: get from auth session
-            email: "",
+            userId: session?.user?.id,
+            email: session?.user?.email ?? "",
             name: studentName,
           }),
         });
@@ -136,7 +138,7 @@ export default function BillingPage() {
         const res = await fetch("/api/billing/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ plan: planId, userId: 1 }),
+          body: JSON.stringify({ plan: planId, userId: session?.user?.id }),
         });
         const data = await res.json();
         if (data.url) {

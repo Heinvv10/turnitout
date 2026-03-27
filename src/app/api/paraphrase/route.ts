@@ -39,6 +39,10 @@ export async function POST(request: Request) {
       );
     }
 
+    if (text.length > 50000) {
+      return Response.json({ error: "Text too long (max 50,000 characters)" }, { status: 400 });
+    }
+
     const response = await callClaude(
       SYSTEM_PROMPT,
       buildUserPrompt(text.trim(), context?.trim()),

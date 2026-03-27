@@ -13,6 +13,7 @@ import { LockedPanel } from "@/components/auth/locked-panel";
 import { PaperEditor } from "@/components/editor/paper-editor";
 import { AnalysisTabs } from "@/components/analysis/analysis-tabs";
 import { OfflineToast } from "@/components/ui/offline-toast";
+import { useShallow } from "zustand/react/shallow";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { useHistoryStore } from "@/store/history-store";
@@ -60,28 +61,44 @@ export default function Home() {
 }
 
 function HomeContent() {
-  const {
-    currentPaper,
-    analysisResults,
-    isAnalyzing,
-    sections,
-    setAnalyzing,
-    setAIRiskResult,
-    setCitationResult,
-    setGradingResult,
-    setPlagiarismResult,
-    setGrammarResult,
-    setToneResult,
-    setAdviceResult,
-    setPaper,
-    setSections,
-    clearResults,
-  } = usePaperStore();
-  const { selectedModule, setSelectedModule, moduleOutlines, apiKey, gradingScale, referencingStyle, language, saveModulePaper, getModulePaper, lowDataMode } =
-    useSettingsStore();
-  const { addEntry } = useHistoryStore();
-  const { addSnapshot } = useDraftHistoryStore();
-  const { enqueue, getQueue, clearQueue } = useOfflineQueueStore();
+  const { currentPaper, analysisResults, isAnalyzing, sections } = usePaperStore(
+    useShallow((s) => ({
+      currentPaper: s.currentPaper,
+      analysisResults: s.analysisResults,
+      isAnalyzing: s.isAnalyzing,
+      sections: s.sections,
+    })),
+  );
+  const setAnalyzing = usePaperStore((s) => s.setAnalyzing);
+  const setAIRiskResult = usePaperStore((s) => s.setAIRiskResult);
+  const setCitationResult = usePaperStore((s) => s.setCitationResult);
+  const setGradingResult = usePaperStore((s) => s.setGradingResult);
+  const setPlagiarismResult = usePaperStore((s) => s.setPlagiarismResult);
+  const setGrammarResult = usePaperStore((s) => s.setGrammarResult);
+  const setToneResult = usePaperStore((s) => s.setToneResult);
+  const setAdviceResult = usePaperStore((s) => s.setAdviceResult);
+  const setPaper = usePaperStore((s) => s.setPaper);
+  const setSections = usePaperStore((s) => s.setSections);
+  const clearResults = usePaperStore((s) => s.clearResults);
+  const { selectedModule, moduleOutlines, apiKey, gradingScale, referencingStyle, language, lowDataMode } = useSettingsStore(
+    useShallow((s) => ({
+      selectedModule: s.selectedModule,
+      moduleOutlines: s.moduleOutlines,
+      apiKey: s.apiKey,
+      gradingScale: s.gradingScale,
+      referencingStyle: s.referencingStyle,
+      language: s.language,
+      lowDataMode: s.lowDataMode,
+    })),
+  );
+  const setSelectedModule = useSettingsStore((s) => s.setSelectedModule);
+  const saveModulePaper = useSettingsStore((s) => s.saveModulePaper);
+  const getModulePaper = useSettingsStore((s) => s.getModulePaper);
+  const addEntry = useHistoryStore((s) => s.addEntry);
+  const addSnapshot = useDraftHistoryStore((s) => s.addSnapshot);
+  const enqueue = useOfflineQueueStore((s) => s.enqueue);
+  const getQueue = useOfflineQueueStore((s) => s.getQueue);
+  const clearQueue = useOfflineQueueStore((s) => s.clearQueue);
   const { isOnline } = useOnlineStatus();
   const searchParams = useSearchParams();
   const prevModuleRef = useRef(selectedModule);

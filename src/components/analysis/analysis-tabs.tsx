@@ -108,7 +108,8 @@ const PANELS: Record<string, React.ComponentType> = {
 };
 
 export function AnalysisTabs() {
-  const { analysisResults, currentPaper } = usePaperStore();
+  const analysisResults = usePaperStore((s) => s.analysisResults);
+  const currentPaper = usePaperStore((s) => s.currentPaper);
   const language = useSettingsStore((s) => s.language);
 
   const showAfrikaans = useMemo(() => {

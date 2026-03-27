@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 import {
   upsertStudent,
   getStudent,
@@ -25,6 +26,14 @@ import {
 } from "@/lib/db";
 
 export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json(
+      { error: "Authentication required" },
+      { status: 401 },
+    );
+  }
+
   try {
     const { action, ...params } = await request.json();
 

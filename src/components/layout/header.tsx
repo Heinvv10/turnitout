@@ -50,7 +50,9 @@ function getNextDueDate(
   if (!mod) return null;
 
   const semesterKey = mod.semester === 1 ? "semester1Start" : "semester2Start";
-  const startDateStr = SEMESTER_DATES[2026]?.[semesterKey];
+  const currentYear = new Date().getFullYear();
+  const dates = SEMESTER_DATES[currentYear] ?? SEMESTER_DATES[Math.max(...Object.keys(SEMESTER_DATES).map(Number))];
+  const startDateStr = dates?.[semesterKey];
   if (!startDateStr) return null;
 
   const semesterStart = new Date(startDateStr);
@@ -77,7 +79,7 @@ function getNextDueDate(
 }
 
 function AssignmentCountdown({ moduleCode }: { moduleCode: string }) {
-  const { moduleOutlines } = useSettingsStore();
+  const moduleOutlines = useSettingsStore((s) => s.moduleOutlines);
 
   const dueInfo = useMemo(
     () => getNextDueDate(moduleCode, moduleOutlines),
@@ -141,7 +143,8 @@ function AssignmentCountdown({ moduleCode }: { moduleCode: string }) {
 }
 
 export function Header() {
-  const { selectedModule, setSelectedModule } = useSettingsStore();
+  const selectedModule = useSettingsStore((s) => s.selectedModule);
+  const setSelectedModule = useSettingsStore((s) => s.setSelectedModule);
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

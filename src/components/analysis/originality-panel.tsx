@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { Button } from "@/components/ui/button";
@@ -28,14 +29,16 @@ const matchTypeLabels: Record<string, { label: string; color: string; icon: stri
 };
 
 export function OriginalityPanel() {
-  const {
-    currentPaper,
-    analysisResults,
-    isAnalyzing,
-    setAnalyzing,
-    setPlagiarismResult,
-  } = usePaperStore();
-  const { apiKey } = useSettingsStore();
+  const { currentPaper, analysisResults, isAnalyzing } = usePaperStore(
+    useShallow((s) => ({
+      currentPaper: s.currentPaper,
+      analysisResults: s.analysisResults,
+      isAnalyzing: s.isAnalyzing,
+    })),
+  );
+  const setAnalyzing = usePaperStore((s) => s.setAnalyzing);
+  const setPlagiarismResult = usePaperStore((s) => s.setPlagiarismResult);
+  const apiKey = useSettingsStore((s) => s.apiKey);
   const result = analysisResults.plagiarism;
   const loading = isAnalyzing.plagiarism;
   const [viewerMatch, setViewerMatch] = useState<number | null>(null);

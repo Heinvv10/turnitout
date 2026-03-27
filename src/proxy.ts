@@ -1,48 +1,47 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-// Auth is optional for now - the app works without login.
-// This proxy is set up to support future auth enforcement.
-
-// Public routes that never require auth
-const publicPaths = [
-  "/",
-  "/preview",
+// Public API routes that never require authentication
+const PUBLIC_API_PATHS = [
   "/api/auth",
+  "/api/payfast/notify",
+  "/api/billing/webhook",
+  "/api/institutional-inquiry",
 ];
 
-function isPublicPath(pathname: string): boolean {
-  return publicPaths.some(
+function isPublicApiPath(pathname: string): boolean {
+  return PUBLIC_API_PATHS.some(
     (path) => pathname === path || pathname.startsWith(path + "/"),
   );
 }
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Always allow public routes
-  if (isPublicPath(pathname)) {
+  // Only enforce auth on /api/ routes
+  if (!pathname.startsWith("/api/")) {
     return NextResponse.next();
   }
 
-  // For now, allow all routes (auth is optional during development).
-  // To enforce auth later, uncomment the block below:
-  //
-  // const token = request.cookies.get("authjs.session-token")?.value
-  //   || request.cookies.get("__Secure-authjs.session-token")?.value;
-  //
-  // if (!token) {
-  //   const loginUrl = new URL("/", request.url);
-  //   loginUrl.searchParams.set("signin", "true");
-  //   return NextResponse.redirect(loginUrl);
-  // }
+  // Allow public API routes without auth
+  if (isPublicApiPath(pathname)) {
+    return NextResponse.next();
+  }
+
+  // Check for valid session token
+  const token = await getToken({ req: request });
+
+  if (!token) {
+    return Response.json(
+      { error: "Authentication required" },
+      { status: 401 },
+    );
+  }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    // Match all routes except static files and Next.js internals
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/api/:path*"],
 };

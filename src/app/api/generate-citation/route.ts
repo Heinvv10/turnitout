@@ -32,11 +32,44 @@ function detectInputType(input: string): InputType {
   return "title";
 }
 
+function isPrivateUrl(urlString: string): boolean {
+  try {
+    const parsed = new URL(urlString);
+    const hostname = parsed.hostname;
+
+    // Only allow HTTPS
+    if (parsed.protocol !== "https:") return true;
+
+    // Block private/internal IPs
+    const privatePatterns = [
+      /^127\./,
+      /^10\./,
+      /^172\.(1[6-9]|2\d|3[01])\./,
+      /^192\.168\./,
+      /^169\.254\./,
+      /^0\./,
+      /^localhost$/i,
+      /^\[::1\]$/,
+      /^\[fc/i,
+      /^\[fd/i,
+      /^\[fe80:/i,
+    ];
+
+    return privatePatterns.some((pattern) => pattern.test(hostname));
+  } catch {
+    return true;
+  }
+}
+
 async function fetchUrlMetadata(
   url: string,
 ): Promise<Record<string, string>> {
+  if (isPrivateUrl(url)) {
+    return { url, error: "URL not allowed" };
+  }
+
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000);
+  const timeout = setTimeout(() => controller.abort(), 5000);
 
   try {
     const res = await fetch(url, {
@@ -180,6 +213,12 @@ export async function POST(request: Request) {
     let context = "";
 
     if (type === "url") {
+      if (isPrivateUrl(input.trim())) {
+        return NextResponse.json(
+          { error: "Only public HTTPS URLs are allowed" },
+          { status: 400 },
+        );
+      }
       const meta = await fetchUrlMetadata(input.trim());
       context = JSON.stringify(meta, null, 2);
     } else if (type === "doi") {

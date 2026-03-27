@@ -1,5 +1,6 @@
 "use client";
 
+import { useShallow } from "zustand/react/shallow";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { Button } from "@/components/ui/button";
@@ -10,9 +11,16 @@ import { ShieldCheck, Loader2, AlertTriangle } from "lucide-react";
 import { FixGuide, getFixGuide } from "./fix-guide";
 
 export function AIRiskPanel() {
-  const { currentPaper, analysisResults, isAnalyzing, setAnalyzing, setAIRiskResult } =
-    usePaperStore();
-  const { apiKey } = useSettingsStore();
+  const { currentPaper, analysisResults, isAnalyzing } = usePaperStore(
+    useShallow((s) => ({
+      currentPaper: s.currentPaper,
+      analysisResults: s.analysisResults,
+      isAnalyzing: s.isAnalyzing,
+    })),
+  );
+  const setAnalyzing = usePaperStore((s) => s.setAnalyzing);
+  const setAIRiskResult = usePaperStore((s) => s.setAIRiskResult);
+  const apiKey = useSettingsStore((s) => s.apiKey);
   const result = analysisResults.aiRisk;
   const loading = isAnalyzing.aiRisk;
 

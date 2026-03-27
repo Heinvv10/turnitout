@@ -24,9 +24,10 @@ const issueTypeLabels: Record<string, { label: string; color: string }> = {
 };
 
 export function TonePanel() {
-  const { currentPaper, analysisResults } = usePaperStore();
-  const { apiKey } = useSettingsStore();
-  const { setToneResult } = usePaperStore();
+  const currentPaper = usePaperStore((s) => s.currentPaper);
+  const analysisResults = usePaperStore((s) => s.analysisResults);
+  const setToneResult = usePaperStore((s) => s.setToneResult);
+  const apiKey = useSettingsStore((s) => s.apiKey);
   const result = analysisResults.tone;
 
   const loading = false; // managed locally for manual re-check
@@ -43,7 +44,14 @@ export function TonePanel() {
       });
       const data = await res.json();
       if (!data.error) setToneResult(data);
-    } catch {}
+    } catch (_err) {
+      setToneResult({
+        formalityScore: 0,
+        trafficLight: "red" as const,
+        summary: "Failed to check tone. Please try again.",
+        issues: [],
+      });
+    }
   };
 
   if (!result) {

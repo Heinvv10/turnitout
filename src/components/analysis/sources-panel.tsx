@@ -145,9 +145,11 @@ function SourceCard({
 }
 
 export function SourcesPanel() {
-  const { currentPaper, analysisResults, setSourcesResult } =
-    usePaperStore();
-  const { apiKey, referencingStyle } = useSettingsStore();
+  const currentPaper = usePaperStore((s) => s.currentPaper);
+  const analysisResults = usePaperStore((s) => s.analysisResults);
+  const setSourcesResult = usePaperStore((s) => s.setSourcesResult);
+  const apiKey = useSettingsStore((s) => s.apiKey);
+  const referencingStyle = useSettingsStore((s) => s.referencingStyle);
 
   const sources = analysisResults.sources;
   const [loading, setLoading] = useState(false);

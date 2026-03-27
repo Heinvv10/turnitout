@@ -66,6 +66,10 @@ export async function POST(request: Request) {
       );
     }
 
+    if (text.length > 50000) {
+      return Response.json({ error: "Text too long (max 50,000 characters)" }, { status: 400 });
+    }
+
     if (text.length > 15000) {
       return NextResponse.json(
         { error: "Text is too long. Please select a shorter section (max ~3000 words)." },
