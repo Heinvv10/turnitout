@@ -9,6 +9,7 @@ import { OfflineBanner } from "@/components/layout/offline-banner";
 import { OutlineGate } from "@/components/analysis/outline-gate";
 import { FreeTierBanner } from "@/components/auth/free-tier-banner";
 import { AuthGate } from "@/components/auth/auth-gate";
+import { LockedPanel } from "@/components/auth/locked-panel";
 import { PaperEditor } from "@/components/editor/paper-editor";
 import { AnalysisTabs } from "@/components/analysis/analysis-tabs";
 import { OfflineToast } from "@/components/ui/offline-toast";
@@ -510,7 +511,7 @@ function HomeContent() {
 
         {/* Analysis Panel - Desktop */}
         <div className="hidden flex-1 overflow-y-auto bg-card lg:block">
-          <AnalysisTabs />
+          {isAuthenticated ? <AnalysisTabs /> : <LockedPanel />}
         </div>
 
         {/* Analysis Panel - Mobile (Sheet) */}
@@ -520,7 +521,7 @@ function HomeContent() {
               <PanelRightOpen className="h-5 w-5" />
             </SheetTrigger>
             <SheetContent side="bottom" className="h-[80vh] overflow-y-auto p-0">
-              <AnalysisTabs />
+              {isAuthenticated ? <AnalysisTabs /> : <LockedPanel />}
             </SheetContent>
           </Sheet>
         </div>
