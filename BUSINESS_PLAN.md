@@ -21,56 +21,53 @@ No tool in the market combines pre-submission checking with remediation assistan
 ### Phase 1: Quick Wins (Week 1-2)
 High-impact, low-effort features using existing infrastructure.
 
-- [ ] **Text-to-Speech Proofreading** — "Read aloud" button using browser SpeechSynthesis API. Zero cost. ESL students catch errors by hearing their text read back.
-- [ ] **WhatsApp Score Share** — "Share my readiness score" button generating a `wa.me` link with pre-filled text summary. Viral growth channel in SA.
-- [ ] **Citation Cross-Checker** — Scan in-text citations (Author, Year) against reference list. Flag orphan citations and ghost references. Regex + NLP in existing API route.
-- [ ] **Quick Check Mode** — Single-button "quick scan" that runs readability + grammar + citation check in under 30 seconds. For last-minute submissions.
-- [ ] **Submission Readiness Checklist** — Final pre-submit dashboard: word count, readability, originality, citations matched, tone academic, formatting correct. Aggregate existing checks.
+- [x] **Text-to-Speech Proofreading** — "Read aloud" button using browser SpeechSynthesis API. Zero cost. ESL students catch errors by hearing their text read back.
+- [x] **WhatsApp Score Share** — "Share my readiness score" button generating a `wa.me` link with pre-filled text summary. Viral growth channel in SA.
+- [x] **Citation Cross-Checker** — Scan in-text citations (Author, Year) against reference list. Flag orphan citations and ghost references. Regex + NLP in existing API route.
+- [x] **Quick Check Mode** — Single-button "quick scan" that runs readability + grammar + citation check in under 30 seconds. For last-minute submissions.
+- [x] **Submission Readiness Checklist** — Final pre-submit dashboard: word count, readability, originality, citations matched, tone academic, formatting correct. Aggregate existing checks.
 
 ### Phase 2: Core Differentiators (Week 3-5)
 Features that create competitive moat.
 
-- [ ] **Academic Phrasebank** — Searchable library of 2,000+ phrases organized by essay section (introduction, literature review, methodology, discussion, conclusion). Psychology-specific phrases included. JSON dataset + UI panel alongside editor.
-- [ ] **Paraphrasing Assistant** — When originality check flags similar passages, offer inline "Rephrase this" with 3 alternative phrasings. Powered by Claude API (already integrated).
-- [ ] **Academizer / Tone Converter** — Button to convert informal sentences to academic register. Critical for ESL students. Claude API with specialized prompt.
-- [ ] **Citation Generator** — Auto-generate Harvard/APA references from pasted URL, DOI, or book title. Use CrossRef + OpenLibrary APIs. SA Harvard conventions (not generic).
-- [ ] **Vocabulary Level Indicator** — Show academic vocabulary level (basic/intermediate/advanced). Suggest upgrades for overused simple words ("good" -> "advantageous"). Extends existing word cloud feature.
+- [x] **Academic Phrasebank** — Searchable library of 2,000+ phrases organized by essay section (introduction, literature review, methodology, discussion, conclusion). Psychology-specific phrases included. JSON dataset + UI panel alongside editor.
+- [x] **Paraphrasing Assistant** — When originality check flags similar passages, offer inline "Rephrase this" with 3 alternative phrasings. Powered by Claude API (already integrated).
+- [x] **Academizer / Tone Converter** — Button to convert informal sentences to academic register. Critical for ESL students. Claude API with specialized prompt.
+- [x] **Citation Generator** — Auto-generate Harvard/APA references from pasted URL, DOI, or book title. Use CrossRef + OpenLibrary APIs. SA Harvard conventions (not generic).
+- [x] **Vocabulary Level Indicator** — Show academic vocabulary level (basic/intermediate/advanced). Suggest upgrades for overused simple words ("good" -> "advantageous"). Extends existing word cloud feature.
 
 ### Phase 3: Retention & Engagement (Week 6-8)
 Features that keep students coming back.
 
-- [ ] **Writing Process Provenance Log** — Track writing timeline (typed, pasted, deleted, revised). Creates verifiable authorship trail. Student can share with lecturer to prove they wrote it. Addresses the shift away from AI detection.
-- [ ] **Self-Plagiarism Checker** — Upload previous assignments, check new work against them. Many first-years unknowingly recycle paragraphs.
-- [ ] **Side-by-Side Originality Viewer** — Split view showing student text alongside matched source with highlighted phrases. Educational, not punitive.
-- [ ] **ESL-Aware Grammar Mode** — Detect and explain common L1 transfer errors (article omission, preposition errors, tense inconsistency). Coaching tone: explain *why* not just *what*.
-- [ ] **Module-Specific Rubric Templates** — Pre-built rubrics for common BA Psychology Year 1 modules. Makes grade prediction more accurate.
+- [x] **Writing Process Provenance Log** — Track writing timeline (typed, pasted, deleted, revised). Creates verifiable authorship trail. Student can share with lecturer to prove they wrote it. Addresses the shift away from AI detection.
+- [x] **Self-Plagiarism Checker** — Upload previous assignments, check new work against them. Many first-years unknowingly recycle paragraphs.
+- [x] **Side-by-Side Originality Viewer** — Split view showing student text alongside matched source with highlighted phrases. Educational, not punitive.
+- [x] **ESL-Aware Grammar Mode** — Detect and explain common L1 transfer errors (article omission, preposition errors, tense inconsistency). Coaching tone: explain *why* not just *what*.
+- [x] **Module-Specific Rubric Templates** — Pre-built rubrics for common BA Psychology Year 1 modules. Makes grade prediction more accurate.
 
 ### Phase 4: Growth & Scale (Week 9-12)
 SA-market-specific growth features.
 
-- [ ] **Afrikaans Writing Support** — Basic grammar and tone checking in Afrikaans. No competitor offers this. Claude has reasonable Afrikaans capability.
-- [ ] **Peer Review Mode** — Shareable read-only link with structured review prompts. Every shared link introduces a new potential user. Viral growth.
-- [ ] **Low-Data Mode** — Minimal payload toggle. Disable images, reduce API calls, aggressive caching. Critical for data-cost-sensitive students.
-- [ ] **Offline Essay Capture** — Allow document upload + basic local checks (word count, readability) without internet. Queue API checks for when connectivity returns.
-- [ ] **Institutional Licensing Portal** — Dashboard for Cornerstone admin to manage student accounts, view aggregate usage, track academic integrity trends.
+- [x] **Afrikaans Writing Support** — Basic grammar and tone checking in Afrikaans. No competitor offers this. Claude has reasonable Afrikaans capability.
+- [x] **Peer Review Mode** — Shareable read-only link with structured review prompts. Every shared link introduces a new potential user. Viral growth.
+- [x] **Low-Data Mode** — Minimal payload toggle. Disable images, reduce API calls, aggressive caching. Critical for data-cost-sensitive students.
+- [x] **Offline Essay Capture** — Allow document upload + basic local checks (word count, readability) without internet. Queue API checks for when connectivity returns.
+- [x] **Institutional Licensing Portal** — Dashboard for Cornerstone admin to manage student accounts, view aggregate usage, track academic integrity trends.
 
 ---
 
 ## Pricing Strategy
 
-### Current Model
-2 free checks total, then must pay. No monthly reset.
-
-### Proposed Model — Revised (based on SA market research + API cost reality)
+### Pricing Model
 
 **Context:**
-- NSFAS living allowance: R1,650/mo. After food, almost nothing left.
-- Spotify Student SA: R47.99/mo — the affordability ceiling.
-- Grammarly: ~R204/mo — unaffordable for 90%+ of SA students.
-- **Our API cost: ~R2 per full "Run All Checks"** (Claude token usage).
+- Grammarly Pro: R204/mo (R2,448/year). QuillBot Premium: R142/mo (R1,704/year).
+- Scribbr plagiarism: R340-R850 per document. Copyleaks: R240/mo.
+- To replicate TurnItOut's features from competitors: **R586+/mo**.
+- **Our API cost: ~R1.48 per full "Run All Checks"** (optimized: Haiku for 5 light checks + Sonnet for 4 heavy checks).
 - 41% of features are FREE (local computation, zero API cost).
 
-**Core pricing principle:** Charge per AI check, not per month. Students pay for what they use. Local features are always free.
+**Core pricing principle:** Price for value, not cost. TurnItOut replaces 5+ paid tools. Longer commitments = bigger discounts. Local features always free.
 
 ---
 
@@ -110,9 +107,9 @@ Every student gets these at R0 — they cost us nothing to run:
 | ESL/Afrikaans support | No competitor | — | Included |
 | Academic phrasebank | Ref-N-Write | R510 once-off | Included |
 | Self-plagiarism check | Scribbr | R340/doc | Included |
-| **Cost to replicate** | | **R586+/mo** | **From R69/mo** |
+| **Cost to replicate** | | **R586+/mo** | **From R199/mo** |
 
-TurnItOut replaces 5+ paid tools at a fraction of the cost. Even at R99/mo we'd be 83% cheaper than the competitor stack — and none of them offer ESL patterns, Afrikaans support, provenance logs, or SA-specific Harvard referencing.
+TurnItOut replaces 5+ paid tools at 66% less than the competitor stack — and none of them offer ESL patterns, Afrikaans support, provenance logs, or SA-specific Harvard referencing.
 
 #### B2C Plans (Individual Students)
 
@@ -206,12 +203,14 @@ Institutional pricing = significant discount vs individual (R1,600/year → from
 | **Full check (current)** | **Mixed** | **~R2.55** | — |
 | **Full check (optimized)** | **Haiku + Sonnet** | — | **~R1.48** |
 
-**Cost optimization roadmap:**
-- [ ] Migrate grammar, citations, tone to Haiku (saves 60% on these)
+**Cost optimizations completed:**
+- [x] Grammar, citations, tone, academize, paraphrase migrated to Haiku (42% cost reduction per check)
+- [x] Format-citation, generate-citation, outline, split-sections already on Haiku
+
+**Future optimizations:**
 - [ ] Cache repeat grammar patterns (save ~20% on grammar calls)
 - [ ] Batch plagiarism + AI risk into single prompt (save 1 API call)
 - [ ] Use streaming for grading to reduce perceived latency
-- [ ] Set hard monthly caps per tier — no overages without purchase
 
 ---
 
@@ -219,13 +218,13 @@ Institutional pricing = significant discount vs individual (R1,600/year → from
 
 | Decision | Why |
 |----------|-----|
-| Free tier with 1 AI check/month | Enough to try the full experience once. Local features provide daily value. Converts curiosity → habit. |
-| Per-check model, not unlimited | At R2/check API cost, unlimited at R19 = guaranteed loss. Students understand "you get X checks." |
-| R5/single check | R5 is less than a Coke at a campus café. Low enough for impulse buy. Covers R2 API + R3 margin. |
-| Semester Pass at R199 | Matches academic calendar. Students budget per semester, not per month. 30 checks for 5 assignments = generous. |
-| B2B at R49-R59/student/year | Still undercuts Turnitin (R50-R110). Profitable only with Haiku optimization. |
-| No USD pricing | ZAR-denominated = advantage over Grammarly/QuillBot. No FX surprises. |
-| Quick Check = 0.5 credits | Encourages use of the cheaper option (grammar + citations only), saves API costs. |
+| Free tier: 2 checks total (trial) | Enough to experience full value. Not enough to freeload. Local features provide ongoing daily value. |
+| R199/mo Pro | 66% cheaper than Grammarly Pro alone (R204/mo), while replacing R586+/mo of tools. Easy comparison. |
+| R25/single check | Less than a McDonald's meal. Assignment-night impulse buy. 94% margin. |
+| Semester/Annual discounts | R900/semester < one module repeat (R5,000+). Parents think in semesters. Annual at R1,600 saves 33% vs monthly. |
+| B2B at R299-R399/student/year | 75-81% off individual pricing. Each prevented disciplinary hearing saves R2,000-R5,000. Undercuts Turnitin while offering far more. |
+| ZAR-only pricing | Competitive advantage vs Grammarly/QuillBot (USD-only). No exchange rate surprises. |
+| Quick Check = 0.5 credits | Saves API costs. Students use lighter checks for drafts, save full checks for final submissions. |
 
 ---
 
@@ -292,12 +291,13 @@ Institutional pricing = significant discount vs individual (R1,600/year → from
 
 ## Technical Priorities
 
-- [ ] **Performance**: Keep LCP under 1s, bundle size minimal
-- [ ] **Mobile-first**: All features must work on 390px viewport
-- [ ] **Data efficiency**: Lazy loading, service worker caching, low-data mode
+- [x] **Performance**: LCP 816ms, Lighthouse 96/100/100 (a11y/best practices/SEO)
+- [x] **Mobile-first**: Hamburger menu, responsive layout, mobile bottom sheets
+- [x] **Data efficiency**: Low-data mode toggle, offline queue, local-first features
 - [ ] **Zero-rating application**: Prepare technical documentation for MTN/Vodacom
 - [ ] **PWA**: Add service worker + manifest for installable web app
-- [ ] **Test coverage**: Maintain 169+ tests, add integration tests for API routes
+- [x] **Test coverage**: 391 tests across 6 test files, all passing
+- [x] **API cost optimization**: 11 routes on Haiku, 5 on Sonnet. R2.55 → R1.48/check (42% saving)
 
 ---
 
@@ -307,7 +307,7 @@ Institutional pricing = significant discount vs individual (R1,600/year → from
 |--------|--------|
 | Monthly Active Users | 100 (Month 3), 500 (Month 6), 2,000 (Month 12) |
 | Checks per user per month | 4+ |
-| Free-to-paid conversion | 15%+ |
+| Free-to-paid conversion | 5%+ |
 | 30-day retention | 60%+ |
 | NPS score | 50+ |
 | Institutional deals closed | 1 (Month 6), 3 (Month 12) |
@@ -318,12 +318,14 @@ Institutional pricing = significant discount vs individual (R1,600/year → from
 ## Competitive Advantages
 
 1. **Only pre-submission tool built for SA market** — ZAR pricing, Harvard SA conventions, ESL-aware
-2. **Detection + remediation** — doesn't just flag problems, helps students fix them
-3. **Mobile-first** — 98.7% of SA students access internet via mobile
+2. **Detection + remediation** — doesn't just flag problems, helps students fix them (academizer, paraphraser, phrasebank)
+3. **Mobile-first** — hamburger menu, offline mode, low-data toggle for 98.7% mobile users
 4. **Not an AI detector** — positioned as writing improvement, aligned with UCT's shift away from AI detection
-5. **WhatsApp-native sharing** — built for how SA students actually collaborate
-6. **Affordable** — R29/month or R5/check, no NSFAS required
-7. **Cornerstone-specific** — deep integration with module outlines, rubrics, and referencing styles
+5. **WhatsApp-native sharing** — readiness scores, peer review links built for how SA students collaborate
+6. **Replaces R586+/mo of tools for R199/mo** — Grammarly + QuillBot + Scribbr + Copyleaks in one ZAR-priced app
+7. **Cornerstone-specific** — 7 module rubrics, module outlines, SA Harvard + APA referencing
+8. **Afrikaans + ESL support** — 39 language patterns for SA students, no competitor offers this
+9. **Writing provenance** — authorship trail addresses the shift away from AI detection tools
 
 ---
 
