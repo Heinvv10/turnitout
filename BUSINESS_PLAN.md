@@ -116,46 +116,67 @@ TurnItOut replaces 5+ paid tools at a fraction of the cost. Even at R99/mo we'd 
 
 #### B2C Plans (Individual Students)
 
-| Tier | Price | AI Checks Included | Extra Checks | Key Extras |
-|------|-------|---------------------|--------------|------------|
-| **Free** | R0 | **2 full AI checks total** (trial) | R15/each | All local features (unlimited) |
-| **Starter** | R69/month | **5 AI checks/month** | R10/each | + Academizer, citation generator |
-| **Pro** | R99/month | **15 AI checks/month** | R8/each | + Writing coach, paraphraser, source suggestions |
-| **Semester Pass** | R449/semester (5 months) | **40 AI checks total** | R8/each | All Pro features. ~R11/check. Best value for serious students. |
-| **Single Check** | R15 once-off | 1 AI check | — | No subscription. Assignment-night panic buy. |
+**Pricing philosophy:** Students (and parents) think in semesters, not months. The real comparison isn't "R300 vs Spotify" — it's "R300 vs failing an assignment and repeating a module at R5,000+." Position as academic insurance, not a software subscription.
+
+| Tier | Price | AI Checks | Who It's For |
+|------|-------|-----------|--------------|
+| **Free** | R0 | **2 AI checks total** (trial) + all local features unlimited | Try before you buy. Experience the full check once. |
+| **Semester** | R299/semester | **25 AI checks** (~5 subjects × 2 essays × 2-3 checks each) | The core plan. One semester of academic protection. |
+| **Year** | R499/year (2 semesters) | **50 AI checks** | Save R99 vs two semester passes. Best value. |
+| **Single Check** | R19 once-off | 1 AI check | Assignment-night panic buy. No commitment. |
+| **Top-up Pack** | R99 for 10 checks | 10 AI checks | Ran out mid-semester? Top up without upgrading. |
 
 **What counts as 1 "AI check":**
 A full "Run All Checks" = 1 check (grammar + citations + plagiarism + AI risk + grading + tone + advice). "Quick Check" (grammar + citations only) = 0.5 checks. Academize and Paraphrase each = 0.25 checks.
 
-**Per-essay budgeting guide for students:**
-- 1 assignment = typically 2-3 checks (draft + revision + final) = R30-R45 on pay-as-you-go
-- Semester of 6 assignments = ~15-18 checks = Starter plan covers it at R69/mo
-- Semester Pass at R449 for 40 checks is the best deal for consistent users
-- Even at R99/mo, TurnItOut is 83% cheaper than Grammarly Pro alone
+**Typical student usage:**
+- 5 subjects × 2 essays/semester = 10 essays
+- 2-3 checks per essay (draft + final + maybe revision) = 20-25 checks
+- **Semester plan (R299, 25 checks) covers this exactly**
+- Heavy user with 6 subjects? Year plan (R499, 50 checks) or top up
 
-**Why this pricing works:**
-- R69/mo is less than half of Grammarly Pro (R204/mo) — easy to justify
-- R99/mo replaces R586+/mo worth of tools — massive perceived value
-- R15/single check = assignment-night impulse buy (less than a McDonald's meal)
-- Free tier gives 2 checks total (not monthly) — enough to experience value, not enough to freeload
-- Semester Pass rewards commitment at semester start when students have money
+**What's always FREE (unlimited, no checks needed):**
+Readability, vocabulary analysis, ESL/Afrikaans patterns, citation cross-check, self-plagiarism, TTS read-aloud, academic phrasebank, submission checklist, writing provenance log, DOCX export, module rubrics, peer review. These alone beat Grammarly Free.
+
+**Why R299/semester is a no-brainer:**
+- vs Grammarly Pro: R204/mo × 5 months = **R1,020/semester** — TurnItOut is 71% cheaper
+- vs QuillBot Premium: R142/mo × 5 months = **R710/semester** — TurnItOut is 58% cheaper
+- vs Scribbr: 1 plagiarism check = **R340/doc** — TurnItOut covers 25 checks for R299
+- vs failing and repeating: 1 module = **R5,000+** — TurnItOut is 94% cheaper than failure
+- vs a parent's peace of mind: **priceless** (but R299 works)
+
+**Margin analysis:**
+| Plan | Revenue | API Cost (R1.48/check) | Margin |
+|------|---------|------------------------|--------|
+| Semester (25 checks) | R299 | R37 | **R262 (88%)** |
+| Year (50 checks) | R499 | R74 | **R425 (85%)** |
+| Single (1 check) | R19 | R1.48 | **R17.52 (92%)** |
+| Top-up (10 checks) | R99 | R14.80 | **R84.20 (85%)** |
 
 ---
 
 #### B2B Plans (Institutions)
 
+Institutional pricing = discounted vs individual (R499/year → from R149/student/year). The discount is justified by volume and predictable usage.
+
 | Tier | Price | Checks/Student/Year | What's Included |
 |------|-------|---------------------|-----------------|
-| **Starter** (up to 500 students) | R99/student/year | 25 AI checks | All features, admin dashboard, usage analytics |
-| **Growth** (500-2,000 students) | R79/student/year | 30 AI checks | + Priority support, custom rubrics, LMS integration |
-| **Enterprise** (2,000+ students) | Custom (from R59) | 40+ AI checks | + SSO, API access, account manager, on-site training |
+| **Starter** (up to 500 students) | R199/student/year | 30 AI checks | All features, admin dashboard, usage analytics |
+| **Growth** (500-2,000 students) | R149/student/year | 40 AI checks | + Priority support, custom rubrics, LMS integration |
+| **Enterprise** (2,000+ students) | Custom (from R99) | 50+ AI checks | + SSO, API access, account manager, on-site training |
 
-**Institutional margin calculation (post-Haiku optimization):**
-- API cost per check (optimized): ~R1.48
-- R79/student/year with 30 checks = R1.48 × 30 = R44.40 API cost → **R34.60 margin (44%)**
-- R99/student/year with 25 checks = R1.48 × 25 = R37 API cost → **R62 margin (63%)**
-- Still undercuts Turnitin at R50-R110/student/year, and offers far more features
-- Cornerstone deal: R79 × 2,000 students = **R158k/year**
+**Why institutions pay this:**
+- Individual student price is R499/year — institutional at R149-R199 is a 60-70% discount
+- Still undercuts Turnitin (R50-R110/student for detection only — no remediation)
+- Reduces plagiarism incidents = fewer disciplinary hearings (each costs admin time)
+- Cornerstone deal: R149 × 2,000 students = **R298k/year**
+
+**Institutional margin calculation:**
+| Tier | Revenue/student | API cost (R1.48 × checks) | Margin |
+|------|----------------|---------------------------|--------|
+| Starter (30 checks) | R199 | R44.40 | **R154.60 (78%)** |
+| Growth (40 checks) | R149 | R59.20 | **R89.80 (60%)** |
+| Enterprise (50 checks) | R99 | R74.00 | **R25.00 (25%)** — volume play |
 
 ---
 
@@ -235,25 +256,25 @@ A full "Run All Checks" = 1 check (grammar + citations + plagiarism + AI risk + 
 | Free users (Year 1) | 500 | 2,000 | 5,000 |
 | Conversion to paid | 3% | 5% | 8% |
 | Paying users | 15 | 100 | 400 |
-| Avg revenue/user/year | R449 (semester pass) | R594 (R99 × 6mo) | R828 (R69 × 12mo) |
-| **B2C Revenue Year 1** | **R6,735** | **R59,400** | **R331,200** |
+| Avg revenue/user/year | R299 (1 semester) | R449 (sem + topups) | R499 (annual) |
+| **B2C Revenue Year 1** | **R4,485** | **R44,900** | **R199,600** |
 
 ### B2B Revenue Model (the real play)
 | Metric | Conservative | Moderate | Aggressive |
 |--------|-------------|----------|------------|
 | Institutions | 1 (Cornerstone) | 3 | 8 |
 | Students covered | 500 | 3,000 | 12,000 |
-| Avg price/student/year | R99 | R79 | R69 |
-| **B2B Revenue Year 1** | **R49,500** | **R237,000** | **R828,000** |
+| Avg price/student/year | R199 | R149 | R119 |
+| **B2B Revenue Year 1** | **R99,500** | **R447,000** | **R1,428,000** |
 
 ### Combined Revenue
 | Scenario | Year 1 | Year 2 | Year 3 |
 |----------|--------|--------|--------|
-| **Conservative** | R56k | R180k | R400k |
-| **Moderate** | R296k | R900k | R2M |
-| **Aggressive** | R1.16M | R3.5M | R7M+ |
+| **Conservative** | R104k | R350k | R700k |
+| **Moderate** | R492k | R1.5M | R3.5M |
+| **Aggressive** | R1.63M | R5M | R10M+ |
 
-**Key insight:** B2C drives adoption. B2B drives revenue. One Cornerstone deal at R79/student × 2,000 = R158k/year. The higher B2C pricing also means individual subscribers are genuinely profitable — R99/mo with 15 checks = R1.48 × 15 = R22.20 API cost vs R99 revenue = **78% margin**.
+**Key insight:** A parent paying R299/semester for their child's academic success is the easiest sale in EdTech. Position to parents, not just students. One Cornerstone institutional deal at R149/student × 2,000 = R298k/year — covers all development costs in Year 1.
 
 ---
 
