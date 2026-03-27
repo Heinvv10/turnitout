@@ -119,9 +119,9 @@ TurnItOut replaces 5+ paid tools at 66% less than the competitor stack — and n
 |------|-------|--------|-------------------|-----------|---------|
 | **Free** | R0 | — | R0 | **2 AI checks total** (trial) + all local features unlimited | — |
 | **Pro Monthly** | R199/month | Month | R199 | **15 AI checks/month** | — |
-| **Term Pass** | R500/term (~10 weeks) | Term | R200/mo | **40 AI checks** | Predictable cost |
-| **Semester Pass** | R900/semester (~5 months) | Semester | R180/mo | **80 AI checks** | Save 10% vs monthly |
-| **Annual Pass** | R1,600/year | Year | R133/mo | **150 AI checks** | Save 33% vs monthly |
+| **Term Pass** | R499/term (~10 weeks) | Term | R200/mo | **40 AI checks** | Predictable cost |
+| **Semester Pass** | R899/semester (~5 months) | Semester | R180/mo | **80 AI checks** | Save 10% vs monthly |
+| **Annual Pass** | R1,699/year | Year | R142/mo | **150 AI checks** | Save 29% vs monthly |
 | **Single Check** | R25 once-off | — | — | 1 AI check | No commitment |
 
 **What counts as 1 "AI check":**
@@ -130,34 +130,34 @@ A full "Run All Checks" = 1 check (grammar + citations + plagiarism + AI risk + 
 **Typical student usage:**
 - 5 subjects × 2 essays/semester = 10 essays
 - 2-3 checks per essay (draft + revision + final) = 20-30 checks/semester
-- **Term Pass (R500, 40 checks) covers a full term comfortably**
-- **Semester Pass (R900, 80 checks) is generous — covers heavy revisers + coach usage**
-- **Annual Pass (R1,600, 150 checks) is for the serious student doing both semesters**
+- **Term Pass (R499, 40 checks) covers a full term comfortably**
+- **Semester Pass (R899, 80 checks) is generous — covers heavy revisers + coach usage**
+- **Annual Pass (R1,699, 150 checks) is for the serious student doing both semesters**
 
 **What's always FREE (unlimited, no checks needed):**
 Readability, vocabulary analysis, ESL/Afrikaans patterns, citation cross-check, self-plagiarism, TTS read-aloud, academic phrasebank, submission checklist, writing provenance log, DOCX export, module rubrics, peer review. These alone beat Grammarly Free.
 
 **Why this pricing is a no-brainer:**
-- vs Grammarly Pro: R204/mo × 12 months = **R2,448/year** — Annual Pass is **35% cheaper**
-- vs QuillBot Premium: R142/mo × 12 months = **R1,704/year** — Annual Pass is **6% cheaper** but with 5x the features
+- vs Grammarly Pro: R204/mo × 12 months = **R2,448/year** — Annual Pass is **31% cheaper**
+- vs QuillBot Premium: R142/mo × 12 months = **R1,704/year** — Annual Pass is **comparable** but with 5x the features
 - vs Scribbr: 1 plagiarism check = **R340/doc** — Annual Pass covers 150 checks
-- vs failing and repeating: 1 module = **R5,000+** — Annual Pass is 68% cheaper than failure
+- vs failing and repeating: 1 module = **R5,000+** — Annual Pass is 66% cheaper than failure
 - **We are the ONLY tool that offers all of this in one place, for ZAR, built for SA students**
 
 **Margin analysis:**
 | Plan | Revenue | Max checks | API Cost (R1.48/check) | Margin |
 |------|---------|------------|------------------------|--------|
 | Pro Monthly (15) | R199 | 15 | R22.20 | **R176.80 (89%)** |
-| Term (40) | R500 | 40 | R59.20 | **R440.80 (88%)** |
-| Semester (80) | R900 | 80 | R118.40 | **R781.60 (87%)** |
-| Annual (150) | R1,600 | 150 | R222.00 | **R1,378 (86%)** |
+| Term (40) | R499 | 40 | R59.20 | **R439.80 (88%)** |
+| Semester (80) | R899 | 80 | R118.40 | **R780.60 (87%)** |
+| Annual (150) | R1,699 | 150 | R222.00 | **R1,477 (87%)** |
 | Single (1) | R25 | 1 | R1.48 | **R23.52 (94%)** |
 
 **Average revenue per check across tiers:**
 - Monthly: R13.27/check
-- Term: R12.50/check
-- Semester: R11.25/check
-- Annual: R10.67/check
+- Term: R12.48/check
+- Semester: R11.24/check
+- Annual: R11.33/check
 - Single: R25/check
 - **All tiers profitable at 86-94% margin.** Even if students max out every check, we're healthy.
 
@@ -221,7 +221,7 @@ Institutional pricing = significant discount vs individual (R1,600/year → from
 | Free tier: 2 checks total (trial) | Enough to experience full value. Not enough to freeload. Local features provide ongoing daily value. |
 | R199/mo Pro | 66% cheaper than Grammarly Pro alone (R204/mo), while replacing R586+/mo of tools. Easy comparison. |
 | R25/single check | Less than a McDonald's meal. Assignment-night impulse buy. 94% margin. |
-| Semester/Annual discounts | R900/semester < one module repeat (R5,000+). Parents think in semesters. Annual at R1,600 saves 33% vs monthly. |
+| Semester/Annual discounts | R899/semester < one module repeat (R5,000+). Parents think in semesters. Annual at R1,699 saves 29% vs monthly. |
 | B2B at R299-R399/student/year | 75-81% off individual pricing. Each prevented disciplinary hearing saves R2,000-R5,000. Undercuts Turnitin while offering far more. |
 | ZAR-only pricing | Competitive advantage vs Grammarly/QuillBot (USD-only). No exchange rate surprises. |
 | Quick Check = 0.5 credits | Saves API costs. Students use lighter checks for drafts, save full checks for final submissions. |
@@ -267,8 +267,8 @@ Institutional pricing = significant discount vs individual (R1,600/year → from
 | Free users (Year 1) | 500 | 2,000 | 5,000 |
 | Conversion to paid | 3% | 5% | 8% |
 | Paying users | 15 | 100 | 400 |
-| Avg revenue/user/year | R900 (1 semester) | R1,250 (sem + topups) | R1,600 (annual) |
-| **B2C Revenue Year 1** | **R13,500** | **R125,000** | **R640,000** |
+| Avg revenue/user/year | R899 (1 semester) | R1,299 (sem + topups) | R1,699 (annual) |
+| **B2C Revenue Year 1** | **R13,485** | **R129,900** | **R679,600** |
 
 ### B2B Revenue Model (the real play)
 | Metric | Conservative | Moderate | Aggressive |
@@ -285,7 +285,7 @@ Institutional pricing = significant discount vs individual (R1,600/year → from
 | **Moderate** | R1.02M | R3M | R7M |
 | **Aggressive** | R3.63M | R10M | R20M+ |
 
-**Key insight:** A parent paying R900/semester for their child's academic success is an easy sell — it's less than one module repeat (R5,000+). One Cornerstone deal at R299/student × 2,000 = R598k/year. At the moderate scenario, TurnItOut is a R1M/year business in Year 1.
+**Key insight:** A parent paying R899/semester for their child's academic success is an easy sell — it's less than one module repeat (R5,000+). One Cornerstone deal at R299/student × 2,000 = R598k/year. At the moderate scenario, TurnItOut is a R1M/year business in Year 1.
 
 ---
 
