@@ -21,7 +21,7 @@ export function HeroSection() {
 
           {/* CTAs */}
           <div className="flex flex-wrap gap-3">
-            <Link href="/editor">
+            <Link href="/">
               <Button size="lg" className="h-11 px-6 text-base">
                 Start Free
               </Button>

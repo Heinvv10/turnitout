@@ -11,7 +11,7 @@ export function CtaSection() {
         <p className="mt-3 text-lg text-primary-foreground/80">
           Start free &mdash; no credit card required
         </p>
-        <Link href="/editor" className="mt-8 inline-block">
+        <Link href="/" className="mt-8 inline-block">
           <Button
             size="lg"
             className="h-12 bg-white px-8 text-base font-semibold text-primary hover:bg-white/90"

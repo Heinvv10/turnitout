@@ -132,7 +132,7 @@ function PricingCard({ plan }: { plan: Plan }) {
             </li>
           ))}
         </ul>
-        <Link href="/editor" className="mt-auto">
+        <Link href="/" className="mt-auto">
           <Button
             className="w-full"
             variant={isHighlighted ? "default" : "outline"}

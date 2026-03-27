@@ -36,7 +36,7 @@ export function LandingNav() {
               {link.label}
             </a>
           ))}
-          <Link href="/editor">
+          <Link href="/">
             <Button size="sm">Start Free</Button>
           </Link>
         </div>
@@ -66,7 +66,7 @@ export function LandingNav() {
               {link.label}
             </a>
           ))}
-          <Link href="/editor" className="mt-2 block">
+          <Link href="/" className="mt-2 block">
             <Button size="sm" className="w-full">
               Start Free
             </Button>
