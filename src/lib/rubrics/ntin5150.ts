@@ -1,0 +1,156 @@
+import type { ModuleRubric } from "../module-rubrics";
+
+export const NTIN5150_RUBRIC: ModuleRubric = {
+  moduleCode: "NTIN5150",
+  moduleName: "New Testament: An Introduction",
+  lecturer: "Dr J. Cornelius",
+  turnitinThreshold: 20,
+  learningOutcomes: [
+    "Demonstrate knowledge of the historical, cultural, and literary contexts of the New Testament",
+    "Engage critically with New Testament texts using appropriate hermeneutical methods",
+    "Articulate the theological themes of selected New Testament books",
+    "Apply New Testament insights to contemporary issues in church and society",
+  ],
+  topics: [
+    "The World of the New Testament",
+    "The Synoptic Problem",
+    "The Gospel of Matthew",
+    "The Gospel of Mark",
+    "The Gospel of Luke and Acts",
+    "The Gospel of John",
+    "Pauline Letters: Theology and Context",
+    "The General Epistles",
+    "Revelation: Apocalyptic Literature",
+    "New Testament Ethics",
+    "Hermeneutics and Application",
+  ],
+  assessments: [
+    {
+      name: "Theological Essay",
+      type: "Formative",
+      weighting: 35,
+      wordCount: "1500-2000",
+      dueWeek: 7,
+      question:
+        "Critically discuss the theological significance of one Synoptic Gospel. Analyse its key themes, intended audience, and distinctive Christological emphasis. Engage with at least three scholarly sources to support your argument.",
+      structure: [
+        "Cover page",
+        "Introduction (state your thesis and outline your approach)",
+        "Historical and literary context of the chosen Gospel",
+        "Analysis of key theological themes (minimum 3)",
+        "Christological emphasis and its significance",
+        "Conclusion (synthesise findings and reflect on contemporary relevance)",
+        "Bibliography",
+      ],
+      resources: [
+        "deSilva, D.A. 2018. An Introduction to the New Testament.",
+        "Burridge, R.A. 2018. Four Gospels, One Jesus?",
+        "At least three additional scholarly sources",
+      ],
+      aiPolicy:
+        "AI tools may only be used for grammar and spelling checks. All theological analysis must be the student's own work. AI use must be disclosed.",
+      referencing: "Harvard",
+    },
+    {
+      name: "Exegetical Assignment",
+      type: "Formative",
+      weighting: 25,
+      wordCount: "1000-1200",
+      dueWeek: 10,
+      question:
+        "Select a passage from the Pauline epistles (minimum 5 verses). Provide a careful exegetical analysis considering the historical context, literary structure, and theological message. Discuss the passage's relevance for contemporary Christian communities.",
+      structure: [
+        "Cover page",
+        "Introduction (identify passage and state purpose)",
+        "Historical context of the letter",
+        "Verse-by-verse analysis of the selected passage",
+        "Theological implications",
+        "Contemporary application",
+        "Bibliography",
+      ],
+      resources: [
+        "Fee, G.D. & Stuart, D. 2014. How to Read the Bible for All Its Worth.",
+        "At least three peer-reviewed journal articles",
+      ],
+      aiPolicy:
+        "AI tools may only be used for grammar checks. Exegetical work must be original. AI use must be disclosed.",
+      referencing: "Harvard",
+    },
+    {
+      name: "Final Examination",
+      type: "Summative",
+      weighting: 40,
+      wordCount: "3 hours",
+      dueWeek: 14,
+      question: "Comprehensive exam covering all module content: short answers, essay questions on Gospels, Pauline theology, and hermeneutics.",
+      structure: [],
+      resources: ["All prescribed readings and lecture slides"],
+      aiPolicy: "AI use is STRICTLY PROHIBITED during examinations.",
+      referencing: "Not required",
+    },
+  ],
+  rubrics: {
+    "Theological Essay": [
+      {
+        name: "Theological Understanding",
+        description: "Depth of engagement with the Gospel's theological themes and Christological emphasis",
+        maxMark: 30,
+        levels: {
+          excellent: "23-30: Sophisticated theological analysis with nuanced understanding of themes and Christology",
+          good: "21-22: Clear theological understanding with good engagement; minor gaps in depth",
+          satisfactory: "18-20: Adequate grasp of themes but analysis remains largely descriptive",
+          basic: "15-17: Limited theological engagement; superficial treatment of themes",
+          fail: "0-14: No meaningful theological analysis demonstrated",
+        },
+      },
+      {
+        name: "Critical Analysis",
+        description: "Ability to critically engage with scholarly perspectives and construct a coherent argument",
+        maxMark: 25,
+        levels: {
+          excellent: "19-25: Engages critically with multiple scholarly views; builds a compelling, well-reasoned argument",
+          good: "18: Good engagement with scholarship; argument is clear but less developed",
+          satisfactory: "15-17: Some engagement with sources but tends toward description over analysis",
+          basic: "13-14: Minimal critical engagement; relies heavily on one source",
+          fail: "0-12: No critical analysis; merely summarises without evaluation",
+        },
+      },
+      {
+        name: "Use of Sources",
+        description: "Quality and integration of scholarly sources to support arguments",
+        maxMark: 20,
+        levels: {
+          excellent: "16-20: Excellent use of diverse, relevant sources; seamlessly integrated into argument",
+          good: "14-15: Good source use with minor integration issues",
+          satisfactory: "12-13: Sources present but not always well integrated or relevant",
+          basic: "10-11: Few sources; poorly integrated",
+          fail: "0-9: Inadequate or no use of scholarly sources",
+        },
+      },
+      {
+        name: "Structure & Communication",
+        description: "Logical organisation, academic writing quality, and clarity of expression",
+        maxMark: 15,
+        levels: {
+          excellent: "12-15: Exceptionally well-organised; fluent academic writing throughout",
+          good: "11: Well-structured with minor language issues",
+          satisfactory: "9-10: Adequate structure; some clarity or grammar problems",
+          basic: "8: Weak organisation; frequent language errors",
+          fail: "0-7: Poorly structured; difficult to follow",
+        },
+      },
+      {
+        name: "Referencing",
+        description: "Correct and consistent Harvard referencing",
+        maxMark: 10,
+        levels: {
+          excellent: "8-10: Accurate Harvard referencing throughout",
+          good: "7: Minor referencing errors; mostly consistent",
+          satisfactory: "6: Referencing attempted with noticeable errors",
+          basic: "5: Inconsistent or minimal referencing",
+          fail: "0-4: No proper referencing",
+        },
+      },
+    ],
+  },
+};

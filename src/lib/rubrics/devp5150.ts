@@ -1,0 +1,158 @@
+import type { ModuleRubric } from "../module-rubrics";
+
+export const DEVP5150_RUBRIC: ModuleRubric = {
+  moduleCode: "DEVP5150",
+  moduleName: "Developmental Psychology 1",
+  lecturer: "Dr S. Adams",
+  turnitinThreshold: 20,
+  learningOutcomes: [
+    "Describe and compare major theories of human development across the lifespan",
+    "Apply developmental theory to real-world case studies using APA conventions",
+    "Critically evaluate research methods used in developmental psychology",
+    "Demonstrate understanding of South African contextual factors affecting development",
+  ],
+  topics: [
+    "Introduction to Developmental Psychology",
+    "Research Methods in Developmental Psychology",
+    "Prenatal Development and Birth",
+    "Piaget's Cognitive Development Theory",
+    "Vygotsky's Sociocultural Theory",
+    "Erikson's Psychosocial Development",
+    "Attachment Theory (Bowlby & Ainsworth)",
+    "Language Development",
+    "Middle Childhood: Cognitive and Social Development",
+    "Adolescent Development",
+    "Development in the South African Context",
+  ],
+  assessments: [
+    {
+      name: "Case Study Analysis",
+      type: "Formative",
+      weighting: 35,
+      wordCount: "1500-1800",
+      dueWeek: 7,
+      question:
+        "Analyse the provided case study of a child aged 4-7 using TWO developmental theories (e.g., Piaget and Erikson). Discuss how contextual factors (family, culture, socioeconomic status) influence the child's development. Provide recommendations for supporting the child's developmental needs.",
+      structure: [
+        "Title page (APA format)",
+        "Introduction (brief overview of the case and theories selected)",
+        "Theoretical Analysis 1 (apply first theory to the case)",
+        "Theoretical Analysis 2 (apply second theory to the case)",
+        "Contextual Factors (discuss SA-relevant factors)",
+        "Recommendations (evidence-based suggestions)",
+        "Conclusion",
+        "Reference list (APA 7th edition)",
+      ],
+      resources: [
+        "Hook, D. et al. 2022. Developmental Psychology. 3rd ed.",
+        "Donald, D. et al. 2020. Educational Psychology in Social Context.",
+        "At least four peer-reviewed journal articles",
+      ],
+      aiPolicy:
+        "AI tools may NOT be used to generate analysis or recommendations. Grammar checking only. AI use must be disclosed in an AI Disclosure Statement.",
+      referencing: "APA 7th",
+    },
+    {
+      name: "Theory Comparison Essay",
+      type: "Formative",
+      weighting: 25,
+      wordCount: "1200-1500",
+      dueWeek: 11,
+      question:
+        "Compare and contrast Piaget's cognitive development theory with Vygotsky's sociocultural theory. Evaluate the strengths and limitations of each theory in the South African educational context.",
+      structure: [
+        "Title page (APA format)",
+        "Introduction (state purpose and outline)",
+        "Overview of Piaget's theory",
+        "Overview of Vygotsky's theory",
+        "Comparison and contrast (similarities, differences)",
+        "Evaluation in the South African context",
+        "Conclusion",
+        "Reference list",
+      ],
+      resources: [
+        "Hook, D. et al. 2022. Developmental Psychology. 3rd ed.",
+        "At least three peer-reviewed journal articles",
+      ],
+      aiPolicy:
+        "AI tools may NOT be used for content generation. Grammar checking only with disclosure.",
+      referencing: "APA 7th",
+    },
+    {
+      name: "Final Examination",
+      type: "Summative",
+      weighting: 40,
+      wordCount: "3 hours",
+      dueWeek: 14,
+      question: "Comprehensive exam: MCQs, short answers, and essay questions on all developmental theories and their applications.",
+      structure: [],
+      resources: ["All prescribed readings and lecture content"],
+      aiPolicy: "AI use is STRICTLY PROHIBITED during examinations.",
+      referencing: "Not required",
+    },
+  ],
+  rubrics: {
+    "Case Study Analysis": [
+      {
+        name: "Theoretical Application",
+        description: "Accurate and insightful application of two developmental theories to the case study",
+        maxMark: 30,
+        levels: {
+          excellent: "23-30: Sophisticated application of both theories; demonstrates deep understanding with nuanced connections to the case",
+          good: "21-22: Good application of both theories with clear connections to the case; minor gaps in depth",
+          satisfactory: "18-20: Adequate application but tends toward description rather than analysis; uneven coverage of theories",
+          basic: "15-17: Limited or inaccurate application of theories; superficial connections to case",
+          fail: "0-14: Fails to apply theories meaningfully to the case",
+        },
+      },
+      {
+        name: "Contextual Analysis",
+        description: "Discussion of South African contextual factors affecting the child's development",
+        maxMark: 20,
+        levels: {
+          excellent: "16-20: Thorough and insightful discussion of contextual factors with relevant SA examples",
+          good: "14-15: Good discussion of context; some SA-specific insight",
+          satisfactory: "12-13: Adequate but generic discussion of context; limited SA relevance",
+          basic: "10-11: Minimal contextual discussion; mostly ignores SA factors",
+          fail: "0-9: No meaningful contextual analysis",
+        },
+      },
+      {
+        name: "Evidence & Sources",
+        description: "Quality of peer-reviewed sources and their integration into the analysis",
+        maxMark: 20,
+        levels: {
+          excellent: "16-20: Excellent use of diverse peer-reviewed sources; seamlessly integrated",
+          good: "14-15: Good source use; mostly well integrated",
+          satisfactory: "12-13: Some sources used but integration is uneven",
+          basic: "10-11: Few sources; poorly integrated",
+          fail: "0-9: Inadequate or no scholarly sources",
+        },
+      },
+      {
+        name: "Recommendations",
+        description: "Quality and feasibility of evidence-based recommendations",
+        maxMark: 15,
+        levels: {
+          excellent: "12-15: Practical, evidence-based recommendations clearly linked to theoretical analysis",
+          good: "11: Good recommendations with some evidence basis",
+          satisfactory: "9-10: Adequate recommendations but weak evidence link",
+          basic: "8: Vague or generic recommendations",
+          fail: "0-7: No meaningful recommendations",
+        },
+      },
+      {
+        name: "APA Format & Referencing",
+        description: "Correct APA 7th edition formatting, in-text citations, and reference list",
+        maxMark: 15,
+        levels: {
+          excellent: "12-15: Flawless APA formatting throughout; accurate citations and reference list",
+          good: "11: Minor APA errors; mostly consistent",
+          satisfactory: "9-10: Some APA errors; inconsistent formatting",
+          basic: "8: Frequent APA errors; poor formatting",
+          fail: "0-7: No evidence of APA formatting",
+        },
+      },
+    ],
+  },
+};

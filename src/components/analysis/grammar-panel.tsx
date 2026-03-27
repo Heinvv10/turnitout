@@ -1,13 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { SpellCheck, Loader2, AlertCircle, AlertTriangle, Info } from "lucide-react";
+import { SpellCheck, Loader2, AlertCircle, AlertTriangle, Info, Languages, ChevronDown } from "lucide-react";
 import type { GrammarIssue } from "@/types/analysis";
+import { ESLGrammarPanel } from "./esl-grammar-panel";
 
 function severityIcon(severity: GrammarIssue["severity"]) {
   switch (severity) {
@@ -196,6 +198,41 @@ export function GrammarPanel() {
           </p>
         </div>
       )}
+
+      {/* Collapsible ESL Writing Tips */}
+      <ESLCollapsible />
+    </div>
+  );
+}
+
+function ESLCollapsible() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="mt-4 rounded-lg border">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between px-4 py-3 cursor-pointer
+          hover:bg-secondary/50 transition-colors rounded-lg"
+      >
+        <div className="flex items-center gap-2">
+          <Languages className="h-4 w-4 text-primary" />
+          <span className="text-sm font-medium">ESL Writing Tips</span>
+        </div>
+        <ChevronDown
+          className={`h-4 w-4 text-muted-foreground transition-transform duration-200
+            ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-200
+          ${open ? "max-h-[4000px] opacity-100" : "max-h-0 opacity-0"}`}
+      >
+        <div className="border-t px-4 py-3">
+          <ESLGrammarPanel />
+        </div>
+      </div>
     </div>
   );
 }

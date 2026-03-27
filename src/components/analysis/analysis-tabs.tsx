@@ -13,9 +13,13 @@ import { TonePanel } from "./tone-panel";
 import { VocabularyPanel } from "./vocabulary-panel";
 import { AdvicePanel } from "./advice-panel";
 import { GrammarPanel } from "./grammar-panel";
+import { ESLGrammarPanel } from "./esl-grammar-panel";
 import { SourcesPanel } from "./sources-panel";
 import { PhrasebankPanel } from "./phrasebank-panel";
 import { CitationGenerator } from "./citation-generator";
+import { ProvenancePanel } from "./provenance-panel";
+import { SelfPlagiarismPanel } from "./self-plagiarism-panel";
+import { RubricBrowser } from "./rubric-browser";
 import {
   ShieldCheck,
   BookOpen,
@@ -33,6 +37,10 @@ import {
   Scale,
   ClipboardCheck,
   Quote,
+  History,
+  FileScan,
+  Languages,
+  FileSpreadsheet,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -86,6 +94,10 @@ const PANELS: Record<string, React.ComponentType> = {
   sources: SourcesPanel,
   phrasebank: PhrasebankPanel,
   "citation-gen": CitationGenerator,
+  provenance: ProvenancePanel,
+  "self-plagiarism": SelfPlagiarismPanel,
+  "esl-tips": ESLGrammarPanel,
+  rubric: RubricBrowser,
 };
 
 export function AnalysisTabs() {
@@ -105,6 +117,7 @@ export function AnalysisTabs() {
         { key: "grammar", label: "Grammar", icon: SpellCheck, color: analysisResults.grammar?.trafficLight || null },
         { key: "tone", label: "Tone", icon: MessageSquare, color: toneDot },
         { key: "vocabulary", label: "Vocabulary", icon: BookA, color: null },
+        { key: "esl-tips", label: "ESL Tips", icon: Languages, color: null },
       ],
     },
     {
@@ -116,6 +129,7 @@ export function AnalysisTabs() {
         { key: "originality", label: "Originality", icon: Fingerprint, color: analysisResults.plagiarism?.trafficLight || null },
         { key: "ai-risk", label: "AI Risk", icon: ShieldCheck, color: analysisResults.aiRisk?.trafficLight || null },
         { key: "citation-gen", label: "Cite Source", icon: Quote, color: null },
+        { key: "self-plagiarism", label: "Self-Check", icon: FileScan, color: null },
       ],
     },
     {
@@ -127,6 +141,8 @@ export function AnalysisTabs() {
         { key: "advice", label: "Advice", icon: Lightbulb, color: adviceDot },
         { key: "sources", label: "Sources", icon: BookMarked, color: null },
         { key: "phrasebank", label: "Phrasebank", icon: BookText, color: null },
+        { key: "provenance", label: "Writing Log", icon: History, color: null },
+        { key: "rubric", label: "Rubric", icon: FileSpreadsheet, color: null },
       ],
     },
   ];

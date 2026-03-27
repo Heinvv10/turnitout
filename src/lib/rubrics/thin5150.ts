@@ -1,0 +1,156 @@
+import type { ModuleRubric } from "../module-rubrics";
+
+export const THIN5150_RUBRIC: ModuleRubric = {
+  moduleCode: "THIN5150",
+  moduleName: "Theology: An Introduction",
+  lecturer: "Dr M. Johannes",
+  turnitinThreshold: 20,
+  learningOutcomes: [
+    "Demonstrate foundational knowledge of major theological traditions and their historical development",
+    "Analyse key theological concepts and their relevance to contemporary issues",
+    "Construct well-reasoned analytical essays engaging with theological scholarship",
+    "Reflect critically on the relationship between theology and the South African context",
+  ],
+  topics: [
+    "What is Theology? Definitions and Methods",
+    "The Doctrine of God: Classical and Contemporary Views",
+    "Christology: Person and Work of Christ",
+    "Pneumatology: The Holy Spirit",
+    "Theological Anthropology: Being Human",
+    "Soteriology: Salvation and Grace",
+    "Ecclesiology: The Nature of the Church",
+    "Eschatology: Hope and the Future",
+    "Theology and Ethics",
+    "Theology in the South African Context",
+    "Public Theology and Social Justice",
+  ],
+  assessments: [
+    {
+      name: "Analytical Essay",
+      type: "Formative",
+      weighting: 35,
+      wordCount: "1500-2000",
+      dueWeek: 7,
+      question:
+        "Critically analyse ONE of the following theological concepts and discuss its relevance for the South African context: (a) The doctrine of the Imago Dei and human dignity, (b) Soteriology and the concept of ubuntu, or (c) Ecclesiology and the role of the church in social justice. Engage with at least four scholarly sources.",
+      structure: [
+        "Cover page",
+        "Introduction (define the concept, state thesis, outline approach)",
+        "Historical and theological background",
+        "Critical analysis (engage with at least two scholarly perspectives)",
+        "Application to the South African context",
+        "Conclusion (synthesise findings and state significance)",
+        "Bibliography",
+      ],
+      resources: [
+        "McGrath, A.E. 2017. Christian Theology: An Introduction. 6th ed.",
+        "Koopman, N. & Vosloo, R. 2002. Die Ligtheid van die Lig.",
+        "At least two additional peer-reviewed theological sources",
+      ],
+      aiPolicy:
+        "AI tools may NOT be used for theological analysis or argument construction. Grammar checking only. AI use must be disclosed.",
+      referencing: "Harvard",
+    },
+    {
+      name: "Book Review",
+      type: "Formative",
+      weighting: 25,
+      wordCount: "1000-1200",
+      dueWeek: 10,
+      question:
+        "Write a critical book review of a prescribed theological text. Summarise the author's main arguments, evaluate their strengths and limitations, and discuss the book's contribution to your understanding of theology.",
+      structure: [
+        "Cover page",
+        "Bibliographic details of the book",
+        "Summary of main arguments (do not exceed 40% of word count)",
+        "Critical evaluation (strengths, weaknesses, gaps)",
+        "Personal reflection on the book's significance",
+        "Conclusion",
+        "Bibliography",
+      ],
+      resources: [
+        "Prescribed text as assigned by lecturer",
+        "At least two additional sources for comparative perspective",
+      ],
+      aiPolicy:
+        "AI tools may NOT be used for generating review content. Grammar checking only with disclosure.",
+      referencing: "Harvard",
+    },
+    {
+      name: "Final Examination",
+      type: "Summative",
+      weighting: 40,
+      wordCount: "3 hours",
+      dueWeek: 14,
+      question: "Comprehensive exam covering all theological themes, historical context, and SA applications.",
+      structure: [],
+      resources: ["All prescribed readings and lecture content"],
+      aiPolicy: "AI use is STRICTLY PROHIBITED during examinations.",
+      referencing: "Not required",
+    },
+  ],
+  rubrics: {
+    "Analytical Essay": [
+      {
+        name: "Theological Analysis",
+        description: "Depth and accuracy of theological analysis of the chosen concept",
+        maxMark: 30,
+        levels: {
+          excellent: "23-30: Sophisticated theological analysis demonstrating deep understanding; engages critically with multiple perspectives",
+          good: "21-22: Clear theological analysis with good engagement; minor gaps in depth or nuance",
+          satisfactory: "18-20: Adequate analysis but tends toward description rather than critical engagement",
+          basic: "15-17: Superficial analysis; limited engagement with theological concepts",
+          fail: "0-14: No meaningful theological analysis",
+        },
+      },
+      {
+        name: "Contextual Application",
+        description: "Quality of application to the South African context",
+        maxMark: 25,
+        levels: {
+          excellent: "19-25: Insightful and nuanced application to SA context with specific examples",
+          good: "18: Good contextual application; some specific SA references",
+          satisfactory: "15-17: Some SA context but application is generic",
+          basic: "13-14: Minimal contextual application",
+          fail: "0-12: No engagement with SA context",
+        },
+      },
+      {
+        name: "Scholarly Engagement",
+        description: "Quality of engagement with theological scholarship and sources",
+        maxMark: 20,
+        levels: {
+          excellent: "16-20: Excellent engagement with diverse theological sources; critically evaluates different positions",
+          good: "14-15: Good use of sources; mostly well integrated",
+          satisfactory: "12-13: Sources present but engagement is superficial",
+          basic: "10-11: Few sources; poorly integrated",
+          fail: "0-9: No meaningful engagement with scholarship",
+        },
+      },
+      {
+        name: "Structure & Communication",
+        description: "Logical organisation, clarity of argument, and academic writing quality",
+        maxMark: 15,
+        levels: {
+          excellent: "12-15: Exceptionally well-organised; clear, persuasive academic writing",
+          good: "11: Well-structured with minor issues",
+          satisfactory: "9-10: Adequate structure; some clarity or grammar problems",
+          basic: "8: Weak organisation; frequent language errors",
+          fail: "0-7: Poorly structured; difficult to follow",
+        },
+      },
+      {
+        name: "Referencing",
+        description: "Correct and consistent Harvard referencing",
+        maxMark: 10,
+        levels: {
+          excellent: "8-10: Accurate Harvard referencing throughout",
+          good: "7: Minor referencing errors; mostly consistent",
+          satisfactory: "6: Referencing attempted with noticeable errors",
+          basic: "5: Inconsistent or minimal referencing",
+          fail: "0-4: No proper referencing",
+        },
+      },
+    ],
+  },
+};

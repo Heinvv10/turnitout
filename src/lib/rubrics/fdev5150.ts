@@ -1,0 +1,155 @@
+import type { ModuleRubric } from "../module-rubrics";
+
+export const FDEV5150_RUBRIC: ModuleRubric = {
+  moduleCode: "FDEV5150",
+  moduleName: "Family and Development",
+  lecturer: "Ms R. Daniels",
+  turnitinThreshold: 20,
+  learningOutcomes: [
+    "Describe family structures and dynamics within the South African context",
+    "Analyse the impact of family systems on individual development across the lifespan",
+    "Critically evaluate research on family interventions and support programmes",
+    "Synthesise scholarly literature on family-related developmental issues",
+  ],
+  topics: [
+    "Defining Family: Structures and Systems",
+    "Family Systems Theory (Bowen, Minuchin)",
+    "Attachment and Family Bonds",
+    "Parenting Styles and Child Development",
+    "Family and Adolescent Development",
+    "Divorce, Separation, and Reconstituted Families",
+    "Poverty and Family Development in South Africa",
+    "Gender Roles and Family Dynamics",
+    "Family Violence and Its Developmental Impact",
+    "Family Interventions and Support Programmes",
+    "Resilience and Protective Factors in Families",
+  ],
+  assessments: [
+    {
+      name: "Research Summary",
+      type: "Formative",
+      weighting: 35,
+      wordCount: "1500-1800",
+      dueWeek: 7,
+      question:
+        "Write a research summary on the impact of ONE of the following on child development in South Africa: (a) Poverty and family functioning, (b) Parenting styles in diverse cultural contexts, or (c) Family violence and developmental outcomes. Use at least five peer-reviewed sources and integrate findings into a coherent summary.",
+      structure: [
+        "Title page (APA format)",
+        "Introduction (introduce the topic and its significance in SA)",
+        "Summary of key research findings (thematic organisation)",
+        "Discussion of implications for families in South Africa",
+        "Conclusion (key takeaways and recommendations)",
+        "Reference list (APA 7th edition)",
+      ],
+      resources: [
+        "Berk, L.E. 2023. Child Development. 10th ed.",
+        "Roman, N. et al. 2016. Parenting in South Africa.",
+        "At least three additional peer-reviewed journal articles",
+      ],
+      aiPolicy:
+        "AI tools may NOT be used to generate summaries or analysis. Grammar checking only. AI use must be disclosed.",
+      referencing: "APA 7th",
+    },
+    {
+      name: "Reflective Journal",
+      type: "Formative",
+      weighting: 25,
+      wordCount: "1000-1200",
+      dueWeek: 10,
+      question:
+        "Reflect on how family systems theory applies to your own family experience. Discuss how understanding family dynamics can inform your future role as a helping professional. Integrate at least three scholarly sources.",
+      structure: [
+        "Cover page",
+        "Introduction (brief overview of your reflective focus)",
+        "Family systems analysis (apply Bowen or Minuchin to your experience)",
+        "Personal insights and growth",
+        "Implications for future practice",
+        "Conclusion",
+        "Reference list",
+      ],
+      resources: [
+        "Goldenberg, H. & Goldenberg, I. 2017. Family Therapy: An Overview. 9th ed.",
+        "At least two additional scholarly sources",
+      ],
+      aiPolicy:
+        "AI tools may NOT be used to generate reflective content. Grammar checking only with disclosure.",
+      referencing: "APA 7th",
+    },
+    {
+      name: "Final Examination",
+      type: "Summative",
+      weighting: 40,
+      wordCount: "3 hours",
+      dueWeek: 14,
+      question: "Comprehensive exam covering family theories, research, and SA applications.",
+      structure: [],
+      resources: ["All prescribed readings and lecture content"],
+      aiPolicy: "AI use is STRICTLY PROHIBITED during examinations.",
+      referencing: "Not required",
+    },
+  ],
+  rubrics: {
+    "Research Summary": [
+      {
+        name: "Research Synthesis",
+        description: "Ability to integrate findings from multiple sources into a coherent thematic summary",
+        maxMark: 30,
+        levels: {
+          excellent: "23-30: Excellent synthesis across sources; findings are thematically organised with clear connections",
+          good: "21-22: Good synthesis; mostly thematic with minor lapses into source-by-source reporting",
+          satisfactory: "18-20: Some synthesis but largely summarises each source separately",
+          basic: "15-17: Minimal synthesis; reads as a series of disconnected summaries",
+          fail: "0-14: No synthesis; merely lists sources",
+        },
+      },
+      {
+        name: "SA Contextual Relevance",
+        description: "Discussion of implications specific to South African families and communities",
+        maxMark: 25,
+        levels: {
+          excellent: "19-25: Rich, nuanced discussion of SA context with specific examples and cultural sensitivity",
+          good: "18: Good SA contextual discussion with some specific examples",
+          satisfactory: "15-17: Some SA relevance but discussion is generic rather than context-specific",
+          basic: "13-14: Minimal SA context; mostly generic discussion",
+          fail: "0-12: No meaningful engagement with SA context",
+        },
+      },
+      {
+        name: "Source Quality",
+        description: "Use of peer-reviewed, relevant sources to support the summary",
+        maxMark: 20,
+        levels: {
+          excellent: "16-20: Excellent use of diverse, relevant peer-reviewed sources; exceeds minimum",
+          good: "14-15: Meets requirements; sources are relevant and appropriate",
+          satisfactory: "12-13: Meets minimum but quality or relevance of some sources is questionable",
+          basic: "10-11: Below minimum or relies heavily on non-academic sources",
+          fail: "0-9: Inadequate sources",
+        },
+      },
+      {
+        name: "Academic Writing",
+        description: "Clarity, structure, grammar, and academic tone",
+        maxMark: 15,
+        levels: {
+          excellent: "12-15: Polished academic writing; well-structured and error-free",
+          good: "11: Good writing with minor errors; clear structure",
+          satisfactory: "9-10: Adequate writing; some structural or grammatical issues",
+          basic: "8: Weak writing; frequent errors",
+          fail: "0-7: Poor writing; difficult to understand",
+        },
+      },
+      {
+        name: "APA Referencing",
+        description: "Correct APA 7th edition formatting throughout",
+        maxMark: 10,
+        levels: {
+          excellent: "8-10: Flawless APA referencing",
+          good: "7: Minor APA errors; mostly consistent",
+          satisfactory: "6: Noticeable APA errors",
+          basic: "5: Frequent APA errors",
+          fail: "0-4: No proper APA formatting",
+        },
+      },
+    ],
+  },
+};

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { Button } from "@/components/ui/button";
@@ -13,9 +14,11 @@ import {
   ShieldCheck,
   ShieldAlert,
   FileWarning,
+  Eye,
 } from "lucide-react";
 import { FixGuide, getFixGuide } from "./fix-guide";
 import { ParaphraseButton } from "./paraphrase-button";
+import { OriginalityViewer } from "./originality-viewer";
 
 const matchTypeLabels: Record<string, { label: string; color: string; icon: string }> = {
   direct_copy: { label: "Uncited Copy", color: "destructive", icon: "red" },
@@ -35,6 +38,7 @@ export function OriginalityPanel() {
   const { apiKey } = useSettingsStore();
   const result = analysisResults.plagiarism;
   const loading = isAnalyzing.plagiarism;
+  const [viewerMatch, setViewerMatch] = useState<number | null>(null);
 
   const runCheck = async () => {
     if (!currentPaper?.plainText) return;
@@ -287,8 +291,17 @@ export function OriginalityPanel() {
                   &ldquo;{match.passage}&rdquo;
                 </p>
                 {match.passage && (
-                  <div className="mb-1">
+                  <div className="mb-1 flex items-center gap-2">
                     <ParaphraseButton text={match.passage} />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 gap-1 text-xs"
+                      onClick={() => setViewerMatch(i)}
+                    >
+                      <Eye className="h-3 w-3" />
+                      View Details
+                    </Button>
                   </div>
                 )}
                 <p className="mb-1 text-xs text-muted-foreground">
@@ -339,6 +352,19 @@ export function OriginalityPanel() {
           <CheckCircle className="h-4 w-4" />
           No originality issues detected
         </div>
+      )}
+
+      {/* Side-by-side originality viewer */}
+      {viewerMatch !== null && uncitedMatches[viewerMatch] && (
+        <OriginalityViewer
+          open
+          passage={uncitedMatches[viewerMatch].passage}
+          source={uncitedMatches[viewerMatch].possibleSource}
+          similarity={uncitedMatches[viewerMatch].similarityPercent}
+          matchType={uncitedMatches[viewerMatch].matchType}
+          suggestion={uncitedMatches[viewerMatch].suggestion}
+          onClose={() => setViewerMatch(null)}
+        />
       )}
     </div>
   );

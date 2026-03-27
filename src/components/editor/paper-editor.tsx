@@ -7,6 +7,7 @@ import Highlight from "@tiptap/extension-highlight";
 import { useCallback, useRef, useEffect } from "react";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
+import { useProvenanceStore } from "@/store/provenance-store";
 import { EditorToolbar } from "./editor-toolbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -61,6 +62,9 @@ export function PaperEditor() {
     setIsSplitting,
   } = usePaperStore();
   const { apiKey, selectedModule, moduleOutlines } = useSettingsStore();
+  const { addEvent: addProvenanceEvent } = useProvenanceStore();
+  const prevCharCountRef = useRef<number>(0);
+  const isPasteRef = useRef(false);
 
   // Auto-fill title from outline
   const outline = moduleOutlines[selectedModule] || MODULE_RUBRICS[selectedModule];
@@ -118,6 +122,10 @@ export function PaperEditor() {
         class:
           "prose prose-sm sm:prose dark:prose-invert max-w-none min-h-[350px] p-4 focus:outline-none",
       },
+      handlePaste: () => {
+        isPasteRef.current = true;
+        return false; // let TipTap handle the paste normally
+      },
     },
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
@@ -155,6 +163,21 @@ export function PaperEditor() {
           words,
         );
       }
+
+      // Track provenance (metadata only, no text content)
+      const currentCharCount = text.length;
+      const charDelta = currentCharCount - prevCharCountRef.current;
+      if (charDelta !== 0 && selectedModule) {
+        if (isPasteRef.current) {
+          addProvenanceEvent(selectedModule, "pasted", charDelta, words);
+          isPasteRef.current = false;
+        } else if (charDelta < 0) {
+          addProvenanceEvent(selectedModule, "deleted", charDelta, words);
+        } else {
+          addProvenanceEvent(selectedModule, "typed", charDelta, words);
+        }
+      }
+      prevCharCountRef.current = currentCharCount;
 
       // Debounced AI split
       if (splitTimeoutRef.current) clearTimeout(splitTimeoutRef.current);

@@ -1,0 +1,155 @@
+import type { ModuleRubric } from "../module-rubrics";
+
+export const PSIN5150_RUBRIC: ModuleRubric = {
+  moduleCode: "PSIN5150",
+  moduleName: "Psychology: An Introduction",
+  lecturer: "Dr K. Petersen",
+  turnitinThreshold: 20,
+  learningOutcomes: [
+    "Demonstrate foundational knowledge of major psychological perspectives and their historical development",
+    "Critically evaluate psychological research and its methodology",
+    "Synthesise scholarly literature into a coherent literature review",
+    "Apply psychological concepts to understand behaviour in the South African context",
+  ],
+  topics: [
+    "What is Psychology? History and Scope",
+    "Research Methods in Psychology",
+    "Biological Bases of Behaviour",
+    "Sensation and Perception",
+    "Learning Theories (Classical and Operant Conditioning)",
+    "Memory and Cognition",
+    "Motivation and Emotion",
+    "Personality Theories",
+    "Social Psychology",
+    "Abnormal Psychology: An Introduction",
+    "Psychology in the South African Context",
+  ],
+  assessments: [
+    {
+      name: "Literature Review",
+      type: "Formative",
+      weighting: 35,
+      wordCount: "1500-2000",
+      dueWeek: 8,
+      question:
+        "Write a literature review on ONE of the following topics: (a) The effectiveness of classical and operant conditioning in educational settings, (b) The role of social psychology in understanding prejudice in South Africa, or (c) Biological vs psychological explanations of abnormal behaviour. Use at least six peer-reviewed sources published in 2015 or later.",
+      structure: [
+        "Title page (APA format)",
+        "Introduction (introduce topic, state purpose, outline scope)",
+        "Thematic review of literature (organised by themes, not source-by-source)",
+        "Critical evaluation of findings (identify gaps, contradictions, strengths)",
+        "Conclusion (summarise key findings and suggest future research directions)",
+        "Reference list (APA 7th edition)",
+      ],
+      resources: [
+        "Weiten, W. 2021. Psychology: Themes and Variations. 11th ed.",
+        "Swartz, L. et al. 2022. Psychology: An Introduction. 5th ed.",
+        "At least six peer-reviewed journal articles (2015 or later)",
+      ],
+      aiPolicy:
+        "AI tools may NOT be used to generate review content, summaries, or critical analysis. Grammar checking only. AI use must be disclosed.",
+      referencing: "APA 7th",
+    },
+    {
+      name: "Research Summary",
+      type: "Formative",
+      weighting: 25,
+      wordCount: "800-1000",
+      dueWeek: 11,
+      question:
+        "Select a published psychology research article and write a structured summary. Identify the research question, methodology, key findings, limitations, and implications for psychology in South Africa.",
+      structure: [
+        "Title page (APA format)",
+        "Overview of the article",
+        "Research question and methodology",
+        "Key findings",
+        "Limitations",
+        "Implications for SA psychology",
+        "Reference list",
+      ],
+      resources: [
+        "One published peer-reviewed psychology research article",
+        "At least two additional sources for contextualisation",
+      ],
+      aiPolicy:
+        "AI tools may NOT be used for content generation. Grammar checking only with disclosure.",
+      referencing: "APA 7th",
+    },
+    {
+      name: "Final Examination",
+      type: "Summative",
+      weighting: 40,
+      wordCount: "3 hours",
+      dueWeek: 14,
+      question: "Comprehensive exam: MCQs, short answers, and essay questions covering all major psychological perspectives.",
+      structure: [],
+      resources: ["All prescribed readings and lecture content"],
+      aiPolicy: "AI use is STRICTLY PROHIBITED during examinations.",
+      referencing: "Not required",
+    },
+  ],
+  rubrics: {
+    "Literature Review": [
+      {
+        name: "Synthesis & Organisation",
+        description: "Ability to synthesise sources thematically rather than summarising each source individually",
+        maxMark: 30,
+        levels: {
+          excellent: "23-30: Excellent thematic synthesis; sources are woven together to build a coherent narrative with clear progression",
+          good: "21-22: Good synthesis with mostly thematic organisation; occasional source-by-source tendencies",
+          satisfactory: "18-20: Some thematic organisation but largely summarises sources individually",
+          basic: "15-17: Mostly source-by-source summary with minimal synthesis",
+          fail: "0-14: No synthesis; simply lists or describes sources",
+        },
+      },
+      {
+        name: "Critical Evaluation",
+        description: "Identification of gaps, contradictions, strengths, and limitations in the literature",
+        maxMark: 25,
+        levels: {
+          excellent: "19-25: Sophisticated critical evaluation; identifies meaningful gaps, contradictions, and future directions",
+          good: "18: Good critical engagement; identifies some gaps and strengths",
+          satisfactory: "15-17: Some critical commentary but largely descriptive",
+          basic: "13-14: Minimal critical evaluation; accepts sources at face value",
+          fail: "0-12: No critical evaluation of literature",
+        },
+      },
+      {
+        name: "Source Quality & Range",
+        description: "Use of relevant, peer-reviewed sources (minimum six, published 2015 or later)",
+        maxMark: 20,
+        levels: {
+          excellent: "16-20: Excellent range of relevant peer-reviewed sources; exceeds minimum requirements",
+          good: "14-15: Meets source requirements; sources are relevant and appropriate",
+          satisfactory: "12-13: Meets minimum but some sources are less relevant or not peer-reviewed",
+          basic: "10-11: Below minimum source count or relies on non-academic sources",
+          fail: "0-9: Inadequate sources; fails to meet basic requirements",
+        },
+      },
+      {
+        name: "Academic Writing",
+        description: "Clarity, structure, grammar, and academic register",
+        maxMark: 15,
+        levels: {
+          excellent: "12-15: Polished academic writing; clear, well-structured, error-free",
+          good: "11: Good writing with minor errors; clear structure",
+          satisfactory: "9-10: Adequate writing; some structural or grammatical issues",
+          basic: "8: Weak writing; frequent errors affect readability",
+          fail: "0-7: Poor writing quality; difficult to understand",
+        },
+      },
+      {
+        name: "APA Referencing",
+        description: "Correct APA 7th edition in-text citations and reference list",
+        maxMark: 10,
+        levels: {
+          excellent: "8-10: Flawless APA referencing throughout",
+          good: "7: Minor APA errors; mostly consistent",
+          satisfactory: "6: Some APA errors; inconsistent formatting",
+          basic: "5: Frequent APA errors",
+          fail: "0-4: No evidence of APA formatting",
+        },
+      },
+    ],
+  },
+};

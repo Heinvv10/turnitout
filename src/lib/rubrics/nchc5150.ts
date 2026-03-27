@@ -1,0 +1,157 @@
+import type { ModuleRubric } from "../module-rubrics";
+
+export const NCHC5150_RUBRIC: ModuleRubric = {
+  moduleCode: "NCHC5150",
+  moduleName: "Navigating Change and Conflict",
+  lecturer: "Prof. L. van der Merwe",
+  turnitinThreshold: 20,
+  learningOutcomes: [
+    "Analyse the nature and dynamics of change and conflict in personal and organisational contexts",
+    "Critically evaluate theories and models of conflict resolution and change management",
+    "Construct persuasive, evidence-based arguments on conflict-related topics",
+    "Apply conflict resolution strategies to South African case scenarios",
+  ],
+  topics: [
+    "Understanding Change: Individual and Systemic",
+    "Models of Change (Lewin, Kotter)",
+    "The Nature of Conflict",
+    "Sources and Types of Conflict",
+    "Conflict Resolution Styles (Thomas-Kilmann)",
+    "Negotiation and Mediation",
+    "Restorative Justice",
+    "Conflict in South African Communities",
+    "Organisational Change and Resistance",
+    "Building Resilience Through Conflict",
+    "Ethics in Conflict Resolution",
+  ],
+  assessments: [
+    {
+      name: "Argumentative Essay",
+      type: "Formative",
+      weighting: 35,
+      wordCount: "1500-2000",
+      dueWeek: 7,
+      question:
+        "Argue for or against the following statement: 'Restorative justice is more effective than punitive justice in resolving conflict in South African communities.' Support your argument with at least five scholarly sources and relevant South African examples.",
+      structure: [
+        "Cover page",
+        "Introduction (state your position and outline key arguments)",
+        "Background (brief overview of restorative vs punitive justice)",
+        "Argument 1 with supporting evidence",
+        "Argument 2 with supporting evidence",
+        "Counter-argument and rebuttal",
+        "Conclusion (restate position and implications)",
+        "Reference list",
+      ],
+      resources: [
+        "Bradshaw, W. & Roseborough, D. 2005. Restorative Justice Dialogue.",
+        "Skelton, A. & Frank, C. 2001. Conferencing in South Africa.",
+        "At least three additional peer-reviewed sources",
+      ],
+      aiPolicy:
+        "AI tools may NOT be used to generate argument content or analysis. Grammar checking only. AI use must be disclosed.",
+      referencing: "Harvard",
+    },
+    {
+      name: "Case Analysis",
+      type: "Formative",
+      weighting: 25,
+      wordCount: "1000-1200",
+      dueWeek: 10,
+      question:
+        "Analyse a provided South African conflict scenario using the Thomas-Kilmann Conflict Mode Instrument. Identify the conflict styles present and recommend a resolution strategy grounded in theory.",
+      structure: [
+        "Cover page",
+        "Introduction (describe the scenario and analytical framework)",
+        "Identification of conflict styles",
+        "Theoretical analysis (Thomas-Kilmann model)",
+        "Recommended resolution strategy",
+        "Conclusion",
+        "Reference list",
+      ],
+      resources: [
+        "Thomas, K.W. & Kilmann, R.H. 2008. Thomas-Kilmann Conflict Mode Instrument.",
+        "At least three peer-reviewed journal articles",
+      ],
+      aiPolicy:
+        "AI tools may NOT be used for analysis or recommendations. Grammar checking only with disclosure.",
+      referencing: "Harvard",
+    },
+    {
+      name: "Final Examination",
+      type: "Summative",
+      weighting: 40,
+      wordCount: "3 hours",
+      dueWeek: 14,
+      question: "Comprehensive exam covering all module content: short answers, essay questions on change models, conflict theory, and resolution strategies.",
+      structure: [],
+      resources: ["All prescribed readings and lecture slides"],
+      aiPolicy: "AI use is STRICTLY PROHIBITED during examinations.",
+      referencing: "Not required",
+    },
+  ],
+  rubrics: {
+    "Argumentative Essay": [
+      {
+        name: "Argument Quality",
+        description: "Clarity, coherence, and persuasiveness of the central argument",
+        maxMark: 30,
+        levels: {
+          excellent: "23-30: Compelling, well-structured argument with clear thesis; anticipates and refutes counter-arguments effectively",
+          good: "21-22: Clear argument with logical structure; counter-argument addressed but less developed",
+          satisfactory: "18-20: Argument present but lacks consistency or depth; counter-argument weak or missing",
+          basic: "15-17: Unclear or inconsistent argument; no meaningful counter-argument",
+          fail: "0-14: No discernible argument; merely describes the topic",
+        },
+      },
+      {
+        name: "Use of Evidence",
+        description: "Integration of scholarly sources and South African examples to support claims",
+        maxMark: 25,
+        levels: {
+          excellent: "19-25: Excellent use of diverse sources and SA examples; evidence seamlessly supports arguments",
+          good: "18: Good evidence use; SA examples present but could be stronger",
+          satisfactory: "15-17: Some evidence used but integration is uneven; limited SA relevance",
+          basic: "13-14: Minimal evidence; relies on one or two sources",
+          fail: "0-12: No meaningful use of evidence",
+        },
+      },
+      {
+        name: "Critical Thinking",
+        description: "Depth of analysis, evaluation of perspectives, and original insight",
+        maxMark: 20,
+        levels: {
+          excellent: "16-20: Demonstrates sophisticated critical thinking; evaluates multiple perspectives with original insight",
+          good: "14-15: Good critical engagement with some original thought",
+          satisfactory: "12-13: Some critical thinking but tends toward description",
+          basic: "10-11: Limited critical engagement; mostly descriptive",
+          fail: "0-9: No evidence of critical thinking",
+        },
+      },
+      {
+        name: "Structure & Communication",
+        description: "Logical organisation, academic writing quality, and clarity",
+        maxMark: 15,
+        levels: {
+          excellent: "12-15: Exceptionally well-organised; fluent, persuasive academic writing",
+          good: "11: Well-structured with minor language issues",
+          satisfactory: "9-10: Adequate structure; some clarity or grammar problems",
+          basic: "8: Weak organisation; frequent language errors",
+          fail: "0-7: Poorly structured; difficult to follow",
+        },
+      },
+      {
+        name: "Referencing",
+        description: "Correct and consistent Harvard referencing",
+        maxMark: 10,
+        levels: {
+          excellent: "8-10: Accurate Harvard referencing throughout",
+          good: "7: Minor referencing errors; mostly consistent",
+          satisfactory: "6: Referencing attempted with noticeable errors",
+          basic: "5: Inconsistent or minimal referencing",
+          fail: "0-4: No proper referencing",
+        },
+      },
+    ],
+  },
+};
