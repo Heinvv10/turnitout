@@ -1,16 +1,20 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { OnboardingModal } from "@/components/layout/onboarding-modal";
+import { OfflineBanner } from "@/components/layout/offline-banner";
 import { OutlineGate } from "@/components/analysis/outline-gate";
 import { PaperEditor } from "@/components/editor/paper-editor";
 import { AnalysisTabs } from "@/components/analysis/analysis-tabs";
+import { OfflineToast } from "@/components/ui/offline-toast";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { useHistoryStore } from "@/store/history-store";
 import { useDraftHistoryStore } from "@/store/draft-history-store";
+import { useOfflineQueueStore } from "@/store/offline-queue-store";
+import { useOnlineStatus } from "@/hooks/use-online-status";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -32,6 +36,16 @@ import { TTSButton } from "@/components/editor/tts-button";
 import { AcademizeButton } from "@/components/editor/academize-button";
 import { safeFetch } from "@/lib/safe-fetch";
 import { Loader2, PlayCircle, PanelRightOpen, Download, Eye, Settings2, Zap } from "lucide-react";
+
+/** API check endpoint mappings for offline queue replay */
+const API_CHECKS = [
+  { type: "analyze-ai-risk", endpoint: "/api/analyze-ai-risk", key: "aiRisk" },
+  { type: "check-citations", endpoint: "/api/check-citations", key: "citations" },
+  { type: "grade-paper", endpoint: "/api/grade-paper", key: "grading" },
+  { type: "check-plagiarism", endpoint: "/api/check-plagiarism", key: "plagiarism" },
+  { type: "check-grammar", endpoint: "/api/check-grammar", key: "grammar" },
+  { type: "check-tone", endpoint: "/api/check-tone", key: "tone" },
+] as const;
 
 export default function Home() {
   return (
@@ -59,12 +73,18 @@ function HomeContent() {
     setSections,
     clearResults,
   } = usePaperStore();
-  const { selectedModule, setSelectedModule, moduleOutlines, apiKey, gradingScale, referencingStyle, language, saveModulePaper, getModulePaper } =
+  const { selectedModule, setSelectedModule, moduleOutlines, apiKey, gradingScale, referencingStyle, language, saveModulePaper, getModulePaper, lowDataMode } =
     useSettingsStore();
   const { addEntry } = useHistoryStore();
   const { addSnapshot } = useDraftHistoryStore();
+  const { enqueue, getQueue, clearQueue } = useOfflineQueueStore();
+  const { isOnline } = useOnlineStatus();
   const searchParams = useSearchParams();
   const prevModuleRef = useRef(selectedModule);
+  const wasOfflineRef = useRef(false);
+
+  // Toast state for offline notifications
+  const [toastMsg, setToastMsg] = useState<{ message: string; type: "queued" | "reconnected" } | null>(null);
 
   // Handle ?module=XXXX from dashboard links
   useEffect(() => {
@@ -116,6 +136,73 @@ function HomeContent() {
     prevModuleRef.current = selectedModule;
   }, [selectedModule]);
 
+  /** Map a queued check type to the correct store setter */
+  const applyCheckResult = useCallback((checkType: string, result: unknown) => {
+    switch (checkType) {
+      case "analyze-ai-risk":
+        setAIRiskResult(result as Parameters<typeof setAIRiskResult>[0]);
+        setAnalyzing("aiRisk", false);
+        break;
+      case "check-citations":
+        setCitationResult(result as Parameters<typeof setCitationResult>[0]);
+        setAnalyzing("citations", false);
+        break;
+      case "grade-paper":
+        setGradingResult(result as Parameters<typeof setGradingResult>[0]);
+        setAnalyzing("grading", false);
+        break;
+      case "check-plagiarism":
+        setPlagiarismResult(result as Parameters<typeof setPlagiarismResult>[0]);
+        setAnalyzing("plagiarism", false);
+        break;
+      case "check-grammar":
+        setGrammarResult(result as Parameters<typeof setGrammarResult>[0]);
+        setAnalyzing("grammar", false);
+        break;
+      case "check-tone":
+        setToneResult(result as Parameters<typeof setToneResult>[0]);
+        break;
+    }
+  }, [setAIRiskResult, setCitationResult, setGradingResult, setPlagiarismResult, setGrammarResult, setToneResult, setAnalyzing]);
+
+  /** Replay all queued checks when back online */
+  const processQueue = useCallback(async () => {
+    const pending = getQueue();
+    if (pending.length === 0) return;
+
+    setToastMsg({ message: "Back online! Running queued checks...", type: "reconnected" });
+
+    const analyzeKeys = ["aiRisk", "citations", "grading", "plagiarism", "grammar"] as const;
+    type AnalyzeKey = typeof analyzeKeys[number];
+
+    for (const item of pending) {
+      const check = API_CHECKS.find(c => c.type === item.type);
+      if (!check) continue;
+      const isAnalyzable = analyzeKeys.includes(check.key as AnalyzeKey);
+      if (isAnalyzable) setAnalyzing(check.key as AnalyzeKey, true);
+      try {
+        const result = await safeFetch(check.endpoint, item.payload as Record<string, unknown>);
+        applyCheckResult(item.type, result);
+      } catch {
+        if (isAnalyzable) setAnalyzing(check.key as AnalyzeKey, false);
+      }
+    }
+
+    clearQueue();
+  }, [getQueue, clearQueue, applyCheckResult, setAnalyzing]);
+
+  // Auto-process queue when coming back online
+  useEffect(() => {
+    if (!isOnline) {
+      wasOfflineRef.current = true;
+      return;
+    }
+    if (wasOfflineRef.current) {
+      wasOfflineRef.current = false;
+      processQueue();
+    }
+  }, [isOnline, processQueue]);
+
   const anyLoading =
     isAnalyzing.aiRisk || isAnalyzing.citations || isAnalyzing.grading || isAnalyzing.plagiarism || isAnalyzing.grammar;
 
@@ -140,6 +227,16 @@ function HomeContent() {
 
   const runQuickCheck = async () => {
     if (!currentPaper?.plainText) return;
+
+    // Quick check requires network — queue if offline
+    if (!isOnline) {
+      const body = buildRequestBody();
+      enqueue("check-grammar", body);
+      enqueue("check-citations", body);
+      setToastMsg({ message: "Local checks complete. API checks queued for when you're back online.", type: "queued" });
+      return;
+    }
+
     setIsQuickChecking(true);
     const body = buildRequestBody();
 
@@ -162,59 +259,83 @@ function HomeContent() {
     if (!currentPaper?.plainText) return;
     const body = buildRequestBody();
 
-    setAnalyzing("aiRisk", true);
-    setAnalyzing("citations", true);
-    setAnalyzing("grading", true);
-    setAnalyzing("plagiarism", true);
-    setAnalyzing("grammar", true);
+    // Offline: queue all API checks, local panels auto-update from store
+    if (!isOnline) {
+      for (const check of API_CHECKS) {
+        enqueue(check.type, body);
+      }
+      setToastMsg({ message: "Local checks complete. API checks queued for when you're back online.", type: "queued" });
+      return;
+    }
 
-    // Fire all 6 checks simultaneously with staggered starts (500ms apart to avoid rate spikes)
-    const checkPromises = [
-      safeFetch("/api/analyze-ai-risk", body, { delay: 0 }).then(v => { setAIRiskResult(v as Parameters<typeof setAIRiskResult>[0]); setAnalyzing("aiRisk", false); }),
-      safeFetch("/api/check-citations", body, { delay: 500 }).then(v => { setCitationResult(v as Parameters<typeof setCitationResult>[0]); setAnalyzing("citations", false); }),
-      safeFetch("/api/grade-paper", body, { delay: 1000 }).then(v => { setGradingResult(v as Parameters<typeof setGradingResult>[0]); setAnalyzing("grading", false); }),
-      safeFetch("/api/check-plagiarism", body, { delay: 1500 }).then(v => { setPlagiarismResult(v as Parameters<typeof setPlagiarismResult>[0]); setAnalyzing("plagiarism", false); }),
-      safeFetch("/api/check-grammar", body, { delay: 2000 }).then(v => { setGrammarResult(v as Parameters<typeof setGrammarResult>[0]); setAnalyzing("grammar", false); }),
-      safeFetch("/api/check-tone", body, { delay: 2500 }).then(v => { setToneResult(v as Parameters<typeof setToneResult>[0]); }),
-    ];
+    // In low-data mode, only run grammar + citations (no AI API calls)
+    if (lowDataMode) {
+      setAnalyzing("grammar", true);
+      setAnalyzing("citations", true);
 
-    // Each check updates the UI as soon as it completes (no waiting for others)
-    await Promise.allSettled(checkPromises.map(p => p.catch(() => {})));
+      const lightPromises = [
+        safeFetch("/api/check-grammar", body).then(v => { setGrammarResult(v as Parameters<typeof setGrammarResult>[0]); setAnalyzing("grammar", false); }),
+        safeFetch("/api/check-citations", body).then(v => { setCitationResult(v as Parameters<typeof setCitationResult>[0]); setAnalyzing("citations", false); }),
+      ];
 
-    // Ensure all analyzing states are cleared
-    setAnalyzing("aiRisk", false);
-    setAnalyzing("citations", false);
-    setAnalyzing("grading", false);
-    setAnalyzing("plagiarism", false);
-    setAnalyzing("grammar", false);
+      await Promise.allSettled(lightPromises.map(p => p.catch(() => {})));
+      setAnalyzing("grammar", false);
+      setAnalyzing("citations", false);
+    } else {
+      setAnalyzing("aiRisk", true);
+      setAnalyzing("citations", true);
+      setAnalyzing("grading", true);
+      setAnalyzing("plagiarism", true);
+      setAnalyzing("grammar", true);
 
-    // Auto-trigger advice after all checks complete
-    const latestResults = usePaperStore.getState().analysisResults;
-    if (currentPaper?.plainText && (latestResults.aiRisk || latestResults.grading)) {
-      fetch("/api/get-advice", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: currentPaper.plainText.slice(0, 3000),
-          moduleCode: selectedModule,
-          assessmentName: "",
-          results: {
-            aiRisk: latestResults.aiRisk ? { overallScore: latestResults.aiRisk.overallScore, summary: latestResults.aiRisk.summary, topIssues: latestResults.aiRisk.topIssues } : null,
-            citations: latestResults.citations ? { score: latestResults.citations.score, issues: latestResults.citations.issues } : null,
-            grading: latestResults.grading ? { totalScore: latestResults.grading.totalScore, saGrade: latestResults.grading.saGrade, rubricScores: latestResults.grading.rubricScores, overallFeedback: latestResults.grading.overallFeedback } : null,
-            plagiarism: latestResults.plagiarism ? { overallSimilarity: latestResults.plagiarism.overallSimilarity, summary: latestResults.plagiarism.summary, matches: latestResults.plagiarism.matches } : null,
-          },
-          verifiedData: {
-            wordCount: currentPaper.wordCount,
-            referenceCount: currentPaper.referenceCount,
-          },
-          apiKey,
-        }),
-      }).then(r => r.json()).then(data => {
-        if (!data.error) {
-          setAdviceResult(data);
-        }
-      }).catch(() => {});
+      // Fire all 6 checks simultaneously with staggered starts (500ms apart to avoid rate spikes)
+      const checkPromises = [
+        safeFetch("/api/analyze-ai-risk", body, { delay: 0 }).then(v => { setAIRiskResult(v as Parameters<typeof setAIRiskResult>[0]); setAnalyzing("aiRisk", false); }),
+        safeFetch("/api/check-citations", body, { delay: 500 }).then(v => { setCitationResult(v as Parameters<typeof setCitationResult>[0]); setAnalyzing("citations", false); }),
+        safeFetch("/api/grade-paper", body, { delay: 1000 }).then(v => { setGradingResult(v as Parameters<typeof setGradingResult>[0]); setAnalyzing("grading", false); }),
+        safeFetch("/api/check-plagiarism", body, { delay: 1500 }).then(v => { setPlagiarismResult(v as Parameters<typeof setPlagiarismResult>[0]); setAnalyzing("plagiarism", false); }),
+        safeFetch("/api/check-grammar", body, { delay: 2000 }).then(v => { setGrammarResult(v as Parameters<typeof setGrammarResult>[0]); setAnalyzing("grammar", false); }),
+        safeFetch("/api/check-tone", body, { delay: 2500 }).then(v => { setToneResult(v as Parameters<typeof setToneResult>[0]); }),
+      ];
+
+      // Each check updates the UI as soon as it completes (no waiting for others)
+      await Promise.allSettled(checkPromises.map(p => p.catch(() => {})));
+
+      // Ensure all analyzing states are cleared
+      setAnalyzing("aiRisk", false);
+      setAnalyzing("citations", false);
+      setAnalyzing("grading", false);
+      setAnalyzing("plagiarism", false);
+      setAnalyzing("grammar", false);
+
+      // Auto-trigger advice after all checks complete
+      const latestResults = usePaperStore.getState().analysisResults;
+      if (currentPaper?.plainText && (latestResults.aiRisk || latestResults.grading)) {
+        fetch("/api/get-advice", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: currentPaper.plainText.slice(0, 3000),
+            moduleCode: selectedModule,
+            assessmentName: "",
+            results: {
+              aiRisk: latestResults.aiRisk ? { overallScore: latestResults.aiRisk.overallScore, summary: latestResults.aiRisk.summary, topIssues: latestResults.aiRisk.topIssues } : null,
+              citations: latestResults.citations ? { score: latestResults.citations.score, issues: latestResults.citations.issues } : null,
+              grading: latestResults.grading ? { totalScore: latestResults.grading.totalScore, saGrade: latestResults.grading.saGrade, rubricScores: latestResults.grading.rubricScores, overallFeedback: latestResults.grading.overallFeedback } : null,
+              plagiarism: latestResults.plagiarism ? { overallSimilarity: latestResults.plagiarism.overallSimilarity, summary: latestResults.plagiarism.summary, matches: latestResults.plagiarism.matches } : null,
+            },
+            verifiedData: {
+              wordCount: currentPaper.wordCount,
+              referenceCount: currentPaper.referenceCount,
+            },
+            apiKey,
+          }),
+        }).then(r => r.json()).then(data => {
+          if (!data.error) {
+            setAdviceResult(data);
+          }
+        }).catch(() => {});
+      }
     }
 
     // Save to history (localStorage)
@@ -250,7 +371,7 @@ function HomeContent() {
               grade: updatedResults.grading?.totalScore ?? null,
             },
           }),
-        }).catch((err) => console.error("DB history save failed:", err));
+        }).catch(() => {});
       }
 
       // Save draft snapshot for progress tracking
@@ -283,6 +404,7 @@ function HomeContent() {
     <div className="flex h-screen flex-col">
       <OnboardingModal />
       <Header />
+      <OfflineBanner isOnline={isOnline} />
       <OutlineGate />
 
       <div className="flex items-center justify-between border-b px-4 py-2">
@@ -317,7 +439,7 @@ function HomeContent() {
             ) : (
               <PlayCircle className="mr-2 h-4 w-4" />
             )}
-            Run All Checks
+            {lowDataMode ? "Run Light Checks" : "Run All Checks"}
           </Button>
 
           <Dialog>
@@ -378,6 +500,15 @@ function HomeContent() {
 
       {/* Writing Coach Chat */}
       <ChatPanel />
+
+      {/* Offline toast notifications */}
+      {toastMsg && (
+        <OfflineToast
+          message={toastMsg.message}
+          type={toastMsg.type}
+          onDismiss={() => setToastMsg(null)}
+        />
+      )}
     </div>
   );
 }

@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Settings, Save, Key } from "lucide-react";
+import { Settings, Save, Key, WifiOff } from "lucide-react";
 
 export function SettingsDialog() {
   const {
@@ -48,6 +48,8 @@ export function SettingsDialog() {
     setGradingScale,
     setReferencingStyle,
     setLanguage,
+    lowDataMode,
+    setLowDataMode,
   } = useSettingsStore();
 
   const [open, setOpen] = useState(false);
@@ -107,6 +109,31 @@ export function SettingsDialog() {
               value={localKey}
               onChange={(e) => setLocalKey(e.target.value)}
             />
+          </div>
+
+          {/* Low Data Mode */}
+          <div className="flex items-center justify-between rounded-md border p-3">
+            <div className="flex items-center gap-2">
+              <WifiOff className="h-4 w-4 text-amber-600" />
+              <div>
+                <p className="text-sm font-medium">Low Data Mode</p>
+                <p className="text-xs text-muted-foreground">
+                  Only run local checks to save mobile data
+                </p>
+              </div>
+            </div>
+            <Button
+              variant={lowDataMode ? "default" : "outline"}
+              size="sm"
+              onClick={() => setLowDataMode(!lowDataMode)}
+              className={
+                lowDataMode
+                  ? "bg-amber-600 text-white hover:bg-amber-700"
+                  : ""
+              }
+            >
+              {lowDataMode ? "On" : "Off"}
+            </Button>
           </div>
 
           <Separator />

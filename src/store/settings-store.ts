@@ -22,8 +22,10 @@ interface SettingsState {
   gradingScale: string;
   referencingStyle: string;
   language: string;
+  lowDataMode: boolean;
   onboardingComplete: boolean;
 
+  setLowDataMode: (enabled: boolean) => void;
   setStudentName: (name: string) => void;
   setStudentNumber: (number: string) => void;
   setStudentDbId: (id: number | null) => void;
@@ -63,8 +65,10 @@ export const useSettingsStore = create<SettingsState>()(
       gradingScale: "south_africa",
       referencingStyle: "harvard",
       language: "en-ZA",
+      lowDataMode: false,
       onboardingComplete: false,
 
+      setLowDataMode: (enabled) => set({ lowDataMode: enabled }),
       setStudentName: (name) => set({ studentName: name }),
       setStudentNumber: (number) => set({ studentNumber: number }),
       setStudentDbId: (id) => set({ studentDbId: id }),

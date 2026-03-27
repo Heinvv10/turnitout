@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Shield, Moon, Sun, LayoutDashboard, CalendarDays, Library, Menu } from "lucide-react";
+import { Shield, Moon, Sun, LayoutDashboard, CalendarDays, Library, Menu, WifiOff, Building } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UserMenu } from "@/components/auth/user-menu";
@@ -32,6 +32,7 @@ import { useTheme } from "./theme-provider";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SettingsDialog } from "./settings-dialog";
+import { LowDataToggle, LowDataBanner } from "./low-data-toggle";
 
 function getNextDueDate(
   moduleCode: string,
@@ -146,6 +147,7 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
+    <>
     <header className="sticky top-0 z-30 border-b bg-card px-4 py-3 dark:border-b-primary/10 header-frosted">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <div className="flex items-center gap-4">
@@ -194,6 +196,15 @@ export function Header() {
                 Dashboard
               </Button>
             </Link>
+            <Link href="/institutional">
+              <Button
+                variant={pathname === "/institutional" ? "secondary" : "ghost"}
+                size="sm"
+              >
+                <Building className="mr-1.5 h-3.5 w-3.5" />
+                For Institutions
+              </Button>
+            </Link>
           </nav>
         </div>
 
@@ -232,6 +243,7 @@ export function Header() {
             <AssignmentCountdown moduleCode={selectedModule} />
           </div>
 
+          <LowDataToggle />
           <SettingsDialog />
 
           <Button
@@ -292,6 +304,19 @@ export function Header() {
                 </Link>
               }
             />
+            <SheetClose
+              render={
+                <Link href="/institutional">
+                  <Button
+                    variant={pathname === "/institutional" ? "secondary" : "ghost"}
+                    className="w-full justify-start"
+                  >
+                    <Building className="mr-1.5 h-3.5 w-3.5" />
+                    For Institutions
+                  </Button>
+                </Link>
+              }
+            />
           </nav>
           <div className="border-t px-4 py-3">
             <p className="mb-2 text-xs font-semibold text-muted-foreground">Module</p>
@@ -328,5 +353,7 @@ export function Header() {
         </SheetContent>
       </Sheet>
     </header>
+    <LowDataBanner />
+    </>
   );
 }

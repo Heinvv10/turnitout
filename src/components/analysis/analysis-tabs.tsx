@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { usePaperStore } from "@/store/paper-store";
+import { useSettingsStore } from "@/store/settings-store";
+import { detectAfrikaans } from "@/lib/afrikaans-patterns";
 import { AIRiskPanel } from "./ai-risk-panel";
 import { CitationPanel } from "./citation-panel";
 import { GraderPanel } from "./grader-panel";
@@ -14,12 +16,14 @@ import { VocabularyPanel } from "./vocabulary-panel";
 import { AdvicePanel } from "./advice-panel";
 import { GrammarPanel } from "./grammar-panel";
 import { ESLGrammarPanel } from "./esl-grammar-panel";
+import { AfrikaansPanel } from "./afrikaans-panel";
 import { SourcesPanel } from "./sources-panel";
 import { PhrasebankPanel } from "./phrasebank-panel";
 import { CitationGenerator } from "./citation-generator";
 import { ProvenancePanel } from "./provenance-panel";
 import { SelfPlagiarismPanel } from "./self-plagiarism-panel";
 import { RubricBrowser } from "./rubric-browser";
+import { PeerReviewPanel } from "./peer-review-panel";
 import {
   ShieldCheck,
   BookOpen,
@@ -41,6 +45,7 @@ import {
   FileScan,
   Languages,
   FileSpreadsheet,
+  Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -97,28 +102,44 @@ const PANELS: Record<string, React.ComponentType> = {
   provenance: ProvenancePanel,
   "self-plagiarism": SelfPlagiarismPanel,
   "esl-tips": ESLGrammarPanel,
+  afrikaans: AfrikaansPanel,
   rubric: RubricBrowser,
+  "peer-review": PeerReviewPanel,
 };
 
 export function AnalysisTabs() {
   const { analysisResults, currentPaper } = usePaperStore();
+  const language = useSettingsStore((s) => s.language);
+
+  const showAfrikaans = useMemo(() => {
+    if (language === "af" || language === "af-ZA") return true;
+    if (currentPaper?.plainText) {
+      return detectAfrikaans(currentPaper.plainText) >= 0.15;
+    }
+    return false;
+  }, [language, currentPaper?.plainText]);
 
   const readabilityDot: TrafficColor = currentPaper?.plainText ? "green" : null;
   const toneDot = analysisResults.tone?.trafficLight || null;
   const adviceDot: TrafficColor = analysisResults.advice ? "green" : null;
+
+  const writingItems: SubItem[] = [
+    { key: "readability", label: "Readability", icon: BarChart3, color: readabilityDot },
+    { key: "grammar", label: "Grammar", icon: SpellCheck, color: analysisResults.grammar?.trafficLight || null },
+    { key: "tone", label: "Tone", icon: MessageSquare, color: toneDot },
+    { key: "vocabulary", label: "Vocabulary", icon: BookA, color: null },
+    { key: "esl-tips", label: "ESL Tips", icon: Languages, color: null },
+  ];
+  if (showAfrikaans) {
+    writingItems.push({ key: "afrikaans", label: "Afrikaans", icon: Languages, color: null });
+  }
 
   const groups: Group[] = [
     {
       key: "writing",
       label: "Writing Quality",
       icon: PenLine,
-      items: [
-        { key: "readability", label: "Readability", icon: BarChart3, color: readabilityDot },
-        { key: "grammar", label: "Grammar", icon: SpellCheck, color: analysisResults.grammar?.trafficLight || null },
-        { key: "tone", label: "Tone", icon: MessageSquare, color: toneDot },
-        { key: "vocabulary", label: "Vocabulary", icon: BookA, color: null },
-        { key: "esl-tips", label: "ESL Tips", icon: Languages, color: null },
-      ],
+      items: writingItems,
     },
     {
       key: "integrity",
@@ -143,6 +164,7 @@ export function AnalysisTabs() {
         { key: "phrasebank", label: "Phrasebank", icon: BookText, color: null },
         { key: "provenance", label: "Writing Log", icon: History, color: null },
         { key: "rubric", label: "Rubric", icon: FileSpreadsheet, color: null },
+        { key: "peer-review", label: "Peer Review", icon: Users, color: null },
       ],
     },
   ];

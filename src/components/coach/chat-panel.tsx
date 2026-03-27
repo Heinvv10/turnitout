@@ -69,7 +69,7 @@ export function ChatPanel() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { currentPaper, analysisResults } = usePaperStore();
-  const { selectedModule, apiKey } = useSettingsStore();
+  const { selectedModule, apiKey, lowDataMode } = useSettingsStore();
 
   const hasAnalysis = !!(analysisResults.aiRisk || analysisResults.grading || analysisResults.citations);
 
@@ -147,6 +147,9 @@ export function ChatPanel() {
       sendMessage();
     }
   };
+
+  // Hide chat panel entirely in low-data mode
+  if (lowDataMode) return null;
 
   return (
     <>

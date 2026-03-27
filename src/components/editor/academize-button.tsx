@@ -43,6 +43,7 @@ export function AcademizeButton() {
   const [applied, setApplied] = useState(false);
   const [open, setOpen] = useState(false);
 
+  const lowDataMode = useSettingsStore((s) => s.lowDataMode);
   const hasText = Boolean(currentPaper?.plainText);
 
   const handleAcademize = async () => {
@@ -120,8 +121,9 @@ export function AcademizeButton() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger
-        disabled={!hasText}
+        disabled={!hasText || lowDataMode}
         className="inline-flex items-center justify-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+        title={lowDataMode ? "Disabled in Low Data Mode" : undefined}
       >
         <GraduationCap className="h-4 w-4" />
         Academize
