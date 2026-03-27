@@ -307,7 +307,7 @@ function HomeContent() {
           </Button>
 
           <Dialog>
-            <DialogTrigger className="inline-flex items-center justify-center gap-1.5 rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50">
+            <DialogTrigger className="inline-flex items-center justify-center gap-1.5 rounded-md bg-green-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-800 disabled:opacity-50">
               <Download className="h-3.5 w-3.5" />
               Export .docx
             </DialogTrigger>

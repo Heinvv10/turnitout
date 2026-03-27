@@ -109,7 +109,7 @@ export function OutlineGate() {
             <> · Turnitin threshold: {outline.turnitinThreshold}%</>
           )}
         </span>
-        <label className="ml-auto cursor-pointer text-xs text-green-600 hover:underline dark:text-green-400">
+        <label className="ml-auto cursor-pointer text-xs text-green-700 hover:underline dark:text-green-400">
           Re-upload
           <input
             type="file"

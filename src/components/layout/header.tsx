@@ -105,10 +105,10 @@ function AssignmentCountdown({ moduleCode }: { moduleCode: string }) {
     badgeColor = "bg-red-500 text-white";
     label = `Due in ${diffDays}d`;
   } else if (diffDays <= 7) {
-    badgeColor = "bg-yellow-500 text-white dark:bg-yellow-600";
+    badgeColor = "bg-yellow-600 text-white dark:bg-yellow-500";
     label = `Due in ${diffDays}d`;
   } else {
-    badgeColor = "bg-green-500 text-white dark:bg-green-600";
+    badgeColor = "bg-green-700 text-white dark:bg-green-600";
     label = `Due in ${diffDays}d`;
   }
 
