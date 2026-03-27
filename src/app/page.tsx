@@ -29,6 +29,7 @@ import { DocumentPreview } from "@/components/template/document-preview";
 import { Tabs as ExportTabs, TabsContent as ETC, TabsList as ETL, TabsTrigger as ETT } from "@/components/ui/tabs";
 import { ChatPanel } from "@/components/coach/chat-panel";
 import { TTSButton } from "@/components/editor/tts-button";
+import { AcademizeButton } from "@/components/editor/academize-button";
 import { safeFetch } from "@/lib/safe-fetch";
 import { Loader2, PlayCircle, PanelRightOpen, Download, Eye, Settings2, Zap } from "lucide-react";
 
@@ -292,6 +293,7 @@ function HomeContent() {
         </p>
         <div className="flex items-center gap-2">
           <TTSButton />
+          <AcademizeButton />
           <Button
             variant="outline"
             onClick={runQuickCheck}

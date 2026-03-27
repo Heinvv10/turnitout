@@ -10,9 +10,12 @@ import { SubmissionChecklist } from "./submission-checklist";
 import { OriginalityPanel } from "./originality-panel";
 import { ReadabilityPanel } from "./readability-panel";
 import { TonePanel } from "./tone-panel";
+import { VocabularyPanel } from "./vocabulary-panel";
 import { AdvicePanel } from "./advice-panel";
 import { GrammarPanel } from "./grammar-panel";
 import { SourcesPanel } from "./sources-panel";
+import { PhrasebankPanel } from "./phrasebank-panel";
+import { CitationGenerator } from "./citation-generator";
 import {
   ShieldCheck,
   BookOpen,
@@ -23,10 +26,13 @@ import {
   MessageSquare,
   SpellCheck,
   BookMarked,
+  BookText,
+  BookA,
   ChevronDown,
   PenLine,
   Scale,
   ClipboardCheck,
+  Quote,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -71,12 +77,15 @@ const PANELS: Record<string, React.ComponentType> = {
   readability: ReadabilityPanel,
   grammar: GrammarPanel,
   tone: TonePanel,
+  vocabulary: VocabularyPanel,
   citations: CitationPanel,
   originality: OriginalityPanel,
   "ai-risk": AIRiskPanel,
   grade: GraderPanel,
   advice: AdvicePanel,
   sources: SourcesPanel,
+  phrasebank: PhrasebankPanel,
+  "citation-gen": CitationGenerator,
 };
 
 export function AnalysisTabs() {
@@ -95,6 +104,7 @@ export function AnalysisTabs() {
         { key: "readability", label: "Readability", icon: BarChart3, color: readabilityDot },
         { key: "grammar", label: "Grammar", icon: SpellCheck, color: analysisResults.grammar?.trafficLight || null },
         { key: "tone", label: "Tone", icon: MessageSquare, color: toneDot },
+        { key: "vocabulary", label: "Vocabulary", icon: BookA, color: null },
       ],
     },
     {
@@ -105,6 +115,7 @@ export function AnalysisTabs() {
         { key: "citations", label: "Citations", icon: BookOpen, color: analysisResults.citations?.trafficLight || null },
         { key: "originality", label: "Originality", icon: Fingerprint, color: analysisResults.plagiarism?.trafficLight || null },
         { key: "ai-risk", label: "AI Risk", icon: ShieldCheck, color: analysisResults.aiRisk?.trafficLight || null },
+        { key: "citation-gen", label: "Cite Source", icon: Quote, color: null },
       ],
     },
     {
@@ -115,6 +126,7 @@ export function AnalysisTabs() {
         { key: "grade", label: "Grade", icon: GraduationCap, color: analysisResults.grading?.trafficLight || null },
         { key: "advice", label: "Advice", icon: Lightbulb, color: adviceDot },
         { key: "sources", label: "Sources", icon: BookMarked, color: null },
+        { key: "phrasebank", label: "Phrasebank", icon: BookText, color: null },
       ],
     },
   ];
@@ -176,7 +188,7 @@ export function AnalysisTabs() {
                 {/* Sub-items with smooth expand */}
                 <div
                   className={`overflow-hidden transition-all duration-200 ease-in-out
-                    ${isExpanded ? "max-h-48 opacity-100" : "max-h-0 opacity-0"}`}
+                    ${isExpanded ? "max-h-60 opacity-100" : "max-h-0 opacity-0"}`}
                 >
                   <div className="flex flex-col gap-0.5 py-1 pl-4 pr-1">
                     {group.items.map((item) => {

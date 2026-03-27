@@ -15,6 +15,7 @@ import {
   FileWarning,
 } from "lucide-react";
 import { FixGuide, getFixGuide } from "./fix-guide";
+import { ParaphraseButton } from "./paraphrase-button";
 
 const matchTypeLabels: Record<string, { label: string; color: string; icon: string }> = {
   direct_copy: { label: "Uncited Copy", color: "destructive", icon: "red" },
@@ -285,6 +286,11 @@ export function OriginalityPanel() {
                 <p className="mb-1 text-xs text-muted-foreground line-clamp-2">
                   &ldquo;{match.passage}&rdquo;
                 </p>
+                {match.passage && (
+                  <div className="mb-1">
+                    <ParaphraseButton text={match.passage} />
+                  </div>
+                )}
                 <p className="mb-1 text-xs text-muted-foreground">
                   Likely source: {match.possibleSource}
                 </p>
