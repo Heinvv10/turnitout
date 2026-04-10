@@ -3,11 +3,14 @@ import { execSync } from "child_process";
 import { writeFileSync, readFileSync, unlinkSync, existsSync } from "fs";
 import { join } from "path";
 
-const VLM_URL = "http://localhost:8100/v1/chat/completions";
-const VLM_MODEL = "Qwen/Qwen3-VL-8B-Instruct";
+const VLM_API_URL = process.env.VLM_API_URL;
+if (!VLM_API_URL) throw new Error("VLM_API_URL environment variable is required");
+const VLM_URL = `${VLM_API_URL}/v1/chat/completions`;
+const VLM_MODEL = process.env.VLM_MODEL;
+if (!VLM_MODEL) throw new Error("VLM_MODEL environment variable is required");
 
 /**
- * Extract text from PDF using Qwen3-VL on the local velo server.
+ * Extract text from PDF using VLM (configured via VLM_MODEL env var).
  * Converts each page to an image and sends to the VLM for OCR + understanding.
  */
 export async function POST(request: Request) {

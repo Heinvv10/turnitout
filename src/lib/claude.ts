@@ -35,13 +35,15 @@ export async function callClaude(
         message.content[0].type === "text" ? message.content[0].text : "";
       return text;
     } catch (err: unknown) {
-      const isOverloaded =
+      const isRetryable =
         err instanceof Error &&
         (err.message.includes("overloaded") ||
           err.message.includes("529") ||
-          err.message.includes("rate"));
+          err.message.includes("rate") ||
+          err.message.includes("rate_limit") ||
+          err.message.includes("429"));
 
-      if (isOverloaded && attempt < maxRetries) {
+      if (isRetryable && attempt < maxRetries) {
         const delay = attempt * 3000;
         await new Promise((r) => setTimeout(r, delay));
         continue;

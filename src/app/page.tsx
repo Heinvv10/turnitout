@@ -317,11 +317,11 @@ function HomeContent() {
       // Fire all 6 checks simultaneously with staggered starts (500ms apart to avoid rate spikes)
       const checkPromises = [
         safeFetch("/api/analyze-ai-risk", body, { delay: 0 }).then(v => { setAIRiskResult(v as Parameters<typeof setAIRiskResult>[0]); setAnalyzing("aiRisk", false); }),
-        safeFetch("/api/check-citations", body, { delay: 500 }).then(v => { setCitationResult(v as Parameters<typeof setCitationResult>[0]); setAnalyzing("citations", false); }),
-        safeFetch("/api/grade-paper", body, { delay: 1000 }).then(v => { setGradingResult(v as Parameters<typeof setGradingResult>[0]); setAnalyzing("grading", false); }),
-        safeFetch("/api/check-plagiarism", body, { delay: 1500 }).then(v => { setPlagiarismResult(v as Parameters<typeof setPlagiarismResult>[0]); setAnalyzing("plagiarism", false); }),
-        safeFetch("/api/check-grammar", body, { delay: 2000 }).then(v => { setGrammarResult(v as Parameters<typeof setGrammarResult>[0]); setAnalyzing("grammar", false); }),
-        safeFetch("/api/check-tone", body, { delay: 2500 }).then(v => { setToneResult(v as Parameters<typeof setToneResult>[0]); }),
+        safeFetch("/api/check-citations", body, { delay: 1000 }).then(v => { setCitationResult(v as Parameters<typeof setCitationResult>[0]); setAnalyzing("citations", false); }),
+        safeFetch("/api/grade-paper", body, { delay: 2000 }).then(v => { setGradingResult(v as Parameters<typeof setGradingResult>[0]); setAnalyzing("grading", false); }),
+        safeFetch("/api/check-plagiarism", body, { delay: 3000 }).then(v => { setPlagiarismResult(v as Parameters<typeof setPlagiarismResult>[0]); setAnalyzing("plagiarism", false); }),
+        safeFetch("/api/check-grammar", body, { delay: 4000 }).then(v => { setGrammarResult(v as Parameters<typeof setGrammarResult>[0]); setAnalyzing("grammar", false); }),
+        safeFetch("/api/check-tone", body, { delay: 5000 }).then(v => { setToneResult(v as Parameters<typeof setToneResult>[0]); }),
       ];
 
       // Each check updates the UI as soon as it completes (no waiting for others)

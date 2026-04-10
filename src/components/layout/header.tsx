@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSettingsStore } from "@/store/settings-store";
 import { MODULES, SEMESTER_DATES } from "@/lib/constants";
 import { MODULE_RUBRICS } from "@/lib/module-rubrics";
@@ -80,13 +80,18 @@ function getNextDueDate(
 
 function AssignmentCountdown({ moduleCode }: { moduleCode: string }) {
   const moduleOutlines = useSettingsStore((s) => s.moduleOutlines);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const dueInfo = useMemo(
     () => getNextDueDate(moduleCode, moduleOutlines),
     [moduleCode, moduleOutlines],
   );
 
-  if (!dueInfo) return null;
+  if (!dueInfo || !mounted) return null;
 
   const now = new Date();
   const diffMs = dueInfo.dueDate.getTime() - now.getTime();

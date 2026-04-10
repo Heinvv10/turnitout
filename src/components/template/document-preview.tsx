@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { usePaperStore } from "@/store/paper-store";
 import { useSettingsStore } from "@/store/settings-store";
 import { MODULES } from "@/lib/constants";
@@ -12,16 +13,20 @@ export function DocumentPreview() {
   const { currentPaper, sections } = usePaperStore();
   const { studentName, studentNumber, selectedModule } = useSettingsStore();
   const module = MODULES.find((m) => m.code === selectedModule);
+  const [date, setDate] = useState("");
+
+  useEffect(() => {
+    setDate(new Date().toLocaleDateString("en-ZA", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }));
+  }, []);
 
   const intro = sections?.introduction || "";
   const body = sections?.body || "";
   const conclusion = sections?.conclusion || "";
   const refs = sections?.references || currentPaper?.references || "";
-  const date = new Date().toLocaleDateString("en-ZA", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
 
   return (
     <div className="mx-auto max-w-[600px] bg-white text-black shadow-lg">

@@ -18,14 +18,14 @@ export async function safeFetch(
         body: JSON.stringify(payload),
       });
       const data = await r.json();
-      if (
+      const isRetryable =
+        r.status === 429 ||
         data.error?.includes("overloaded") ||
-        data.error?.includes("529")
-      ) {
-        if (i < retries) {
-          await new Promise((r) => setTimeout(r, (i + 1) * 3000));
-          continue;
-        }
+        data.error?.includes("529") ||
+        data.error?.includes("rate");
+      if (isRetryable && i < retries) {
+        await new Promise((r) => setTimeout(r, (i + 1) * 3000));
+        continue;
       }
       if (data.error) throw new Error(data.error);
       return data;
@@ -33,7 +33,7 @@ export async function safeFetch(
       if (
         i < retries &&
         err instanceof Error &&
-        (err.message.includes("overloaded") || err.message.includes("529"))
+        (err.message.includes("overloaded") || err.message.includes("529") || err.message.includes("rate"))
       ) {
         await new Promise((r) => setTimeout(r, (i + 1) * 3000));
         continue;
