@@ -67,8 +67,8 @@ function createRateLimiter(options: RateLimiterOptions): RateLimiter {
   return { check };
 }
 
-/** AI API routes: 10 requests per minute per IP */
-export const aiRateLimiter = createRateLimiter({ windowMs: 60_000, max: 10 });
+/** AI API routes: 20 requests per minute per IP (6 checks x 3 retries) */
+export const aiRateLimiter = createRateLimiter({ windowMs: 60_000, max: 20 });
 
 /** Auth routes: 5 requests per minute per IP */
 export const authRateLimiter = createRateLimiter({ windowMs: 60_000, max: 5 });

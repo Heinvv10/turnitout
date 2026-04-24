@@ -98,36 +98,33 @@ export function AdvicePanel() {
     }
   };
 
-  if (!hasResults && !advice && !loading) {
-    return (
-      <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <Lightbulb className="h-14 w-14 text-primary/30" />
-        <div>
-          <p className="text-lg font-medium">Improvement Advice</p>
-          <p className="text-sm text-muted-foreground">
-            Run the checks first, then get personalised advice.
-          </p>
-        </div>
-        <Button disabled>Run checks first</Button>
-      </div>
-    );
-  }
-
   if (!advice && !loading) {
     return (
-      <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <Lightbulb className="h-12 w-12 text-yellow-500/60" />
+      <div className="flex flex-col items-center gap-4 py-6 text-center">
+        <Lightbulb className="h-10 w-10 text-primary/30" />
         <div>
-          <p className="text-lg font-medium">Ready for Advice</p>
+          <p className="text-base font-medium">
+            {hasResults ? "Get Improvement Advice" : "Run checks first"}
+          </p>
           <p className="text-sm text-muted-foreground">
-            Your checks are complete. Get personalised improvement advice.
+            {hasResults
+              ? "Your checks are done. Get personalised tips to improve your essay."
+              : "Run checks to unlock personalised improvement advice."}
           </p>
         </div>
-        <Button onClick={getAdvice} disabled={loading}>
-          {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Lightbulb className="mr-2 h-4 w-4" />}
-          Get Improvement Advice
+        <Button onClick={getAdvice} disabled={!hasResults || loading}>
+          {loading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Lightbulb className="mr-2 h-4 w-4" />
+          )}
+          Get Advice
         </Button>
-        {error && <p className="text-xs text-red-500 max-w-xs">{error}</p>}
+        {error && (
+          <div className="rounded-md border border-destructive/50 bg-destructive/10 p-2 text-xs text-destructive max-w-xs">
+            {error}
+          </div>
+        )}
       </div>
     );
   }

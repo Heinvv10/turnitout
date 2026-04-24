@@ -44,6 +44,7 @@ export async function POST(request: Request) {
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Analysis failed";
     console.error("AI risk analysis error:", message);
-    return NextResponse.json({ error: message }, { status: 500 });
+    const isRateLimit = message.includes("429") || message.includes("rate_limit");
+    return NextResponse.json({ error: message }, { status: isRateLimit ? 429 : 500 });
   }
 }

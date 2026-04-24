@@ -26,6 +26,7 @@ Return valid JSON (no markdown, no commentary) with this structure:
     {
       "name": "<assessment name>",
       "type": "<Formative or Summative>",
+      "format": "<essay, presentation, exam, portfolio, or other>",
       "weighting": <percentage>,
       "wordCount": "<word count requirement>",
       "dueWeek": <week number>,

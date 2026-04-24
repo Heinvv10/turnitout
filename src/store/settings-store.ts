@@ -11,6 +11,7 @@ interface SettingsState {
   studentNumber: string;
   studentDbId: number | null;
   selectedModule: string;
+  selectedAssessment: string;
   template: StoredTemplate | null;
   lecturers: Record<string, string>;
   moduleOutlines: Record<string, ModuleRubric>;
@@ -30,6 +31,7 @@ interface SettingsState {
   setStudentNumber: (number: string) => void;
   setStudentDbId: (id: number | null) => void;
   setSelectedModule: (code: string) => void;
+  setSelectedAssessment: (name: string) => void;
   setTemplate: (template: StoredTemplate | null) => void;
   setLecturer: (moduleCode: string, lecturer: string) => void;
   setModuleOutline: (moduleCode: string, outline: ModuleRubric) => void;
@@ -54,6 +56,7 @@ export const useSettingsStore = create<SettingsState>()(
       studentNumber: "",
       studentDbId: null,
       selectedModule: "ACDF5150",
+      selectedAssessment: "",
       template: null,
       lecturers: {},
       moduleOutlines: {},
@@ -72,7 +75,8 @@ export const useSettingsStore = create<SettingsState>()(
       setStudentName: (name) => set({ studentName: name }),
       setStudentNumber: (number) => set({ studentNumber: number }),
       setStudentDbId: (id) => set({ studentDbId: id }),
-      setSelectedModule: (code) => set({ selectedModule: code }),
+      setSelectedModule: (code) => set({ selectedModule: code, selectedAssessment: "" }),
+      setSelectedAssessment: (name) => set({ selectedAssessment: name }),
       setTemplate: (template) => set({ template }),
       setLecturer: (moduleCode, lecturer) =>
         set({ lecturers: { ...get().lecturers, [moduleCode]: lecturer } }),

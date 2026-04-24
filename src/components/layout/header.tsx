@@ -11,9 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Shield, Moon, Sun, LayoutDashboard, CalendarDays, Library, Menu, WifiOff, Building } from "lucide-react";
+import { Shield, Moon, Sun, LayoutDashboard, CalendarDays, Library, Menu, Building } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { UserMenu } from "@/components/auth/user-menu";
 import {
   Tooltip,
@@ -150,9 +149,28 @@ function AssignmentCountdown({ moduleCode }: { moduleCode: string }) {
 export function Header() {
   const selectedModule = useSettingsStore((s) => s.selectedModule);
   const setSelectedModule = useSettingsStore((s) => s.setSelectedModule);
+  const selectedAssessment = useSettingsStore((s) => s.selectedAssessment);
+  const setSelectedAssessment = useSettingsStore((s) => s.setSelectedAssessment);
+  const moduleOutlines = useSettingsStore((s) => s.moduleOutlines);
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Get assessments for the selected module
+  const outline = moduleOutlines[selectedModule] || MODULE_RUBRICS[selectedModule];
+  const assessments = useMemo(() => {
+    if (!outline?.assessments) return [];
+    return outline.assessments;
+  }, [outline]);
+
+  // Auto-select first essay assessment, or reset if current selection doesn't exist in this module
+  useEffect(() => {
+    const exists = assessments.some((a: { name: string }) => a.name === selectedAssessment);
+    if (assessments.length > 0 && (!selectedAssessment || !exists)) {
+      const firstEssay = assessments.find((a: { format?: string }) => !a.format || a.format === "essay");
+      setSelectedAssessment((firstEssay || assessments[0]).name);
+    }
+  }, [assessments, selectedAssessment, setSelectedAssessment]);
 
   return (
     <>
@@ -246,6 +264,26 @@ export function Header() {
               ))}
             </SelectContent>
           </Select>
+
+          {assessments.length > 0 && (
+            <Select value={selectedAssessment} onValueChange={(v) => v && setSelectedAssessment(v)}>
+              <SelectTrigger className="hidden sm:flex w-[160px] md:w-[200px] text-xs">
+                <SelectValue placeholder="Select assessment" />
+              </SelectTrigger>
+              <SelectContent>
+                {assessments.map((a: { name: string; type: string; format?: string }) => (
+                  <SelectItem key={a.name} value={a.name}>
+                    {a.name}
+                    {a.format && a.format !== "essay" && (
+                      <span className="ml-1 text-[10px] text-muted-foreground">
+                        ({a.format})
+                      </span>
+                    )}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
 
           <div className="hidden sm:block">
             <AssignmentCountdown moduleCode={selectedModule} />

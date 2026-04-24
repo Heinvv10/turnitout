@@ -19,6 +19,7 @@ export function ReadinessBadge() {
   const analysisResults = usePaperStore((s) => s.analysisResults);
   const resultsStale = usePaperStore((s) => s.resultsStale);
   const selectedModule = useSettingsStore((s) => s.selectedModule);
+  const selectedAssessment = useSettingsStore((s) => s.selectedAssessment);
   const moduleOutlines = useSettingsStore((s) => s.moduleOutlines);
   const { overall, trafficLight, aiRisk, citations, grading, plagiarism } =
     analysisResults;
@@ -27,9 +28,9 @@ export function ReadinessBadge() {
 
   // Get word count requirement from outline
   const outline = moduleOutlines[selectedModule] || MODULE_RUBRICS[selectedModule];
-  const activeAssessment = outline?.assessments?.find(
-    (a) => a.type !== "Summative",
-  );
+  const activeAssessment = selectedAssessment
+    ? outline?.assessments?.find((a: { name: string }) => a.name === selectedAssessment)
+    : outline?.assessments?.find((a) => a.type !== "Summative");
   const wordCountReq = activeAssessment?.wordCount || "";
   const wordCountMatch = wordCountReq.match(/(\d+)\s*[-–]\s*(\d+)/);
   const minWords = wordCountMatch ? parseInt(wordCountMatch[1]) : null;

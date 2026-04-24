@@ -28,6 +28,7 @@ export const CALS5150_RUBRIC: ModuleRubric = {
     {
       name: "Reflective Essay",
       type: "Formative",
+      format: "essay" as const,
       weighting: 30,
       wordCount: "1000-1200",
       dueWeek: 6,
@@ -52,6 +53,7 @@ export const CALS5150_RUBRIC: ModuleRubric = {
     {
       name: "Presentation",
       type: "Formative",
+      format: "presentation" as const,
       weighting: 30,
       wordCount: "1000-1500 words + 8-10 slides",
       dueWeek: 9,
@@ -75,6 +77,7 @@ export const CALS5150_RUBRIC: ModuleRubric = {
     {
       name: "Class Test",
       type: "Summative",
+      format: "exam" as const,
       weighting: 40,
       wordCount: "2 hours",
       dueWeek: 13,

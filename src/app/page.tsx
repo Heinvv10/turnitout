@@ -37,10 +37,8 @@ import { TemplateExport } from "@/components/template/template-export";
 import { DocumentPreview } from "@/components/template/document-preview";
 import { Tabs as ExportTabs, TabsContent as ETC, TabsList as ETL, TabsTrigger as ETT } from "@/components/ui/tabs";
 import { ChatPanel } from "@/components/coach/chat-panel";
-import { TTSButton } from "@/components/editor/tts-button";
-import { AcademizeButton } from "@/components/editor/academize-button";
 import { safeFetch } from "@/lib/safe-fetch";
-import { Loader2, PlayCircle, PanelRightOpen, Download, Eye, Settings2, Zap } from "lucide-react";
+import { Loader2, PlayCircle, PanelRightOpen, Download, Eye, Settings2, Zap, ChevronDown } from "lucide-react";
 
 /** API check endpoint mappings for offline queue replay */
 const API_CHECKS = [
@@ -233,6 +231,8 @@ function HomeContent() {
   const [authGateFeature, setAuthGateFeature] = useState("");
 
   const [isQuickChecking, setIsQuickChecking] = useState(false);
+  const [activeRightTab, setActiveRightTab] = useState("scores");
+  const [checkMenuOpen, setCheckMenuOpen] = useState(false);
 
   const buildRequestBody = () => {
     const uploadedOutline = moduleOutlines[selectedModule] || undefined;
@@ -314,18 +314,24 @@ function HomeContent() {
       setAnalyzing("plagiarism", true);
       setAnalyzing("grammar", true);
 
-      // Fire all 6 checks simultaneously with staggered starts (500ms apart to avoid rate spikes)
-      const checkPromises = [
-        safeFetch("/api/analyze-ai-risk", body, { delay: 0 }).then(v => { setAIRiskResult(v as Parameters<typeof setAIRiskResult>[0]); setAnalyzing("aiRisk", false); }),
-        safeFetch("/api/check-citations", body, { delay: 1000 }).then(v => { setCitationResult(v as Parameters<typeof setCitationResult>[0]); setAnalyzing("citations", false); }),
-        safeFetch("/api/grade-paper", body, { delay: 2000 }).then(v => { setGradingResult(v as Parameters<typeof setGradingResult>[0]); setAnalyzing("grading", false); }),
-        safeFetch("/api/check-plagiarism", body, { delay: 3000 }).then(v => { setPlagiarismResult(v as Parameters<typeof setPlagiarismResult>[0]); setAnalyzing("plagiarism", false); }),
-        safeFetch("/api/check-grammar", body, { delay: 4000 }).then(v => { setGrammarResult(v as Parameters<typeof setGrammarResult>[0]); setAnalyzing("grammar", false); }),
-        safeFetch("/api/check-tone", body, { delay: 5000 }).then(v => { setToneResult(v as Parameters<typeof setToneResult>[0]); }),
+      // Run checks sequentially to avoid Anthropic API rate limits (1 active request at a time)
+      const checks = [
+        { key: "aiRisk" as const, url: "/api/analyze-ai-risk", set: (v: unknown) => { setAIRiskResult(v as Parameters<typeof setAIRiskResult>[0]); setAnalyzing("aiRisk", false); } },
+        { key: "citations" as const, url: "/api/check-citations", set: (v: unknown) => { setCitationResult(v as Parameters<typeof setCitationResult>[0]); setAnalyzing("citations", false); } },
+        { key: "grading" as const, url: "/api/grade-paper", set: (v: unknown) => { setGradingResult(v as Parameters<typeof setGradingResult>[0]); setAnalyzing("grading", false); } },
+        { key: "plagiarism" as const, url: "/api/check-plagiarism", set: (v: unknown) => { setPlagiarismResult(v as Parameters<typeof setPlagiarismResult>[0]); setAnalyzing("plagiarism", false); } },
+        { key: "grammar" as const, url: "/api/check-grammar", set: (v: unknown) => { setGrammarResult(v as Parameters<typeof setGrammarResult>[0]); setAnalyzing("grammar", false); } },
+        { key: "tone" as const, url: "/api/check-tone", set: (v: unknown) => { setToneResult(v as Parameters<typeof setToneResult>[0]); } },
       ];
 
-      // Each check updates the UI as soon as it completes (no waiting for others)
-      await Promise.allSettled(checkPromises.map(p => p.catch(() => {})));
+      for (const check of checks) {
+        try {
+          const result = await safeFetch(check.url, body);
+          check.set(result);
+        } catch {
+          if (check.key !== "tone") setAnalyzing(check.key, false);
+        }
+      }
 
       // Ensure all analyzing states are cleared
       setAnalyzing("aiRisk", false);
@@ -359,6 +365,7 @@ function HomeContent() {
         }).then(r => r.json()).then(data => {
           if (!data.error) {
             setAdviceResult(data);
+            setActiveRightTab("fix");
           }
         }).catch(() => {});
       }
@@ -446,52 +453,69 @@ function HomeContent() {
             : "Start writing to begin"}
         </p>
         <div className="flex items-center gap-2">
-          <TTSButton />
-          <AcademizeButton />
-          <Button
-            variant="outline"
-            onClick={() => {
-              if (!isAuthenticated) {
-                setAuthGateFeature("Quick Check");
-                setAuthGateOpen(true);
-                return;
-              }
-              runQuickCheck();
-            }}
-            disabled={!currentPaper?.plainText || anyLoading || isQuickChecking}
-            size="sm"
-          >
-            {isQuickChecking ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Zap className="mr-2 h-4 w-4" />
+          {/* Primary check button with dropdown for quick check */}
+          <div className="relative">
+            <div className="flex">
+              <Button
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    setAuthGateFeature("Check My Essay");
+                    setAuthGateOpen(true);
+                    return;
+                  }
+                  runAllChecks();
+                }}
+                disabled={!currentPaper?.plainText || anyLoading || isQuickChecking}
+                size="sm"
+                className="rounded-r-none"
+              >
+                {anyLoading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <PlayCircle className="mr-2 h-4 w-4" />
+                )}
+                {anyLoading || isQuickChecking ? "Checking..." : lowDataMode ? "Light Check" : "Check My Essay"}
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                className="rounded-l-none border-l border-primary-foreground/20 px-1.5"
+                onClick={() => setCheckMenuOpen((v) => !v)}
+                disabled={!currentPaper?.plainText || anyLoading || isQuickChecking}
+              >
+                <ChevronDown className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+            {checkMenuOpen && (
+              <>
+              <div className="fixed inset-0 z-40" onClick={() => setCheckMenuOpen(false)} />
+              <div className="absolute right-0 top-full z-50 mt-1 rounded-md border bg-popover p-1 shadow-md">
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-2 rounded-sm px-3 py-1.5 text-sm hover:bg-muted cursor-pointer"
+                  onClick={() => {
+                    setCheckMenuOpen(false);
+                    if (!isAuthenticated) {
+                      setAuthGateFeature("Quick Check");
+                      setAuthGateOpen(true);
+                      return;
+                    }
+                    runQuickCheck();
+                  }}
+                >
+                  <Zap className="h-3.5 w-3.5" />
+                  Quick Check
+                  <span className="text-xs text-muted-foreground">(grammar + citations)</span>
+                </button>
+              </div>
+              </>
             )}
-            {isQuickChecking ? "Checking..." : "Quick Check"}
-          </Button>
-          <Button
-            onClick={() => {
-              if (!isAuthenticated) {
-                setAuthGateFeature("Run All Checks");
-                setAuthGateOpen(true);
-                return;
-              }
-              runAllChecks();
-            }}
-            disabled={!currentPaper?.plainText || anyLoading || isQuickChecking}
-            size="sm"
-          >
-            {anyLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <PlayCircle className="mr-2 h-4 w-4" />
-            )}
-            {lowDataMode ? "Run Light Checks" : "Run All Checks"}
-          </Button>
+          </div>
 
           <Dialog>
-            <DialogTrigger className="inline-flex items-center justify-center gap-1.5 rounded-md bg-green-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-800 disabled:opacity-50">
+            <DialogTrigger className="inline-flex items-center justify-center gap-1.5 rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent hover:text-accent-foreground">
               <Download className="h-3.5 w-3.5" />
-              Export .docx
+              Export
             </DialogTrigger>
             <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
               <DialogHeader>
@@ -528,17 +552,30 @@ function HomeContent() {
 
         {/* Analysis Panel - Desktop */}
         <div className="hidden flex-1 overflow-y-auto bg-card lg:block">
-          {isAuthenticated ? <AnalysisTabs /> : <LockedPanel />}
+          {isAuthenticated ? (
+            <AnalysisTabs activeTab={activeRightTab} onTabChange={setActiveRightTab} />
+          ) : (
+            <LockedPanel />
+          )}
         </div>
 
         {/* Analysis Panel - Mobile (Sheet) */}
         <div className="fixed bottom-4 right-4 lg:hidden z-50">
           <Sheet>
-            <SheetTrigger className="inline-flex items-center justify-center h-12 w-12 rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90">
+            <SheetTrigger className="relative inline-flex items-center justify-center h-12 w-12 rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90">
               <PanelRightOpen className="h-5 w-5" />
+              {analysisResults.overall != null && (
+                <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                  {analysisResults.overall}%
+                </span>
+              )}
             </SheetTrigger>
             <SheetContent side="bottom" className="h-[80vh] overflow-y-auto p-0">
-              {isAuthenticated ? <AnalysisTabs /> : <LockedPanel />}
+              {isAuthenticated ? (
+                <AnalysisTabs activeTab={activeRightTab} onTabChange={setActiveRightTab} />
+              ) : (
+                <LockedPanel />
+              )}
             </SheetContent>
           </Sheet>
         </div>

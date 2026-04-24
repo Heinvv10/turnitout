@@ -22,9 +22,10 @@ export async function safeFetch(
         r.status === 429 ||
         data.error?.includes("overloaded") ||
         data.error?.includes("529") ||
-        data.error?.includes("rate");
+        data.error?.includes("rate_limit") ||
+        data.error?.includes("429");
       if (isRetryable && i < retries) {
-        await new Promise((r) => setTimeout(r, (i + 1) * 3000));
+        await new Promise((r) => setTimeout(r, (i + 1) * 5000));
         continue;
       }
       if (data.error) throw new Error(data.error);
@@ -33,9 +34,9 @@ export async function safeFetch(
       if (
         i < retries &&
         err instanceof Error &&
-        (err.message.includes("overloaded") || err.message.includes("529") || err.message.includes("rate"))
+        (err.message.includes("overloaded") || err.message.includes("529") || err.message.includes("rate_limit") || err.message.includes("429"))
       ) {
-        await new Promise((r) => setTimeout(r, (i + 1) * 3000));
+        await new Promise((r) => setTimeout(r, (i + 1) * 5000));
         continue;
       }
       throw err;

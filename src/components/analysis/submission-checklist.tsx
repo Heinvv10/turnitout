@@ -24,15 +24,16 @@ function buildChecklist(
   currentPaper: ReturnType<typeof usePaperStore.getState>["currentPaper"],
   analysisResults: ReturnType<typeof usePaperStore.getState>["analysisResults"],
   selectedModule: string,
-  moduleOutlines: Record<string, { assessments?: { type: string; wordCount: string }[] }>,
+  selectedAssessment: string,
+  moduleOutlines: Record<string, { assessments?: { type: string; name: string; wordCount: string }[] }>,
 ): ChecklistItem[] {
   const items: ChecklistItem[] = [];
 
   // 1. Word count meets target
   const outline = moduleOutlines[selectedModule] || MODULE_RUBRICS[selectedModule];
-  const activeAssessment = outline?.assessments?.find(
-    (a: { type: string }) => a.type !== "Summative",
-  );
+  const activeAssessment = selectedAssessment
+    ? outline?.assessments?.find((a: { name: string }) => a.name === selectedAssessment)
+    : outline?.assessments?.find((a: { type: string }) => a.type !== "Summative");
   const wordCountReq = activeAssessment?.wordCount || "";
   const wordCountMatch = wordCountReq.match(/(\d+)\s*[-–]\s*(\d+)/);
   const minWords = wordCountMatch ? parseInt(wordCountMatch[1]) : null;
@@ -62,14 +63,14 @@ function buildChecklist(
     const readability = calculateReadability(text);
     const fkGood = readability.fleschKincaid >= 12;
     items.push({
-      label: "Readability is academic level (FK > 12)",
+      label: "Readability is academic level (Grade 12+)",
       passed: fkGood,
-      value: `FK ${readability.fleschKincaid}`,
+      value: `Grade ${readability.fleschKincaid}`,
       available: true,
     });
   } else {
     items.push({
-      label: "Readability is academic level (FK > 12)",
+      label: "Readability is academic level (Grade 12+)",
       passed: false,
       value: "No text",
       available: false,
@@ -161,6 +162,7 @@ export function SubmissionChecklist() {
   const currentPaper = usePaperStore((s) => s.currentPaper);
   const analysisResults = usePaperStore((s) => s.analysisResults);
   const selectedModule = useSettingsStore((s) => s.selectedModule);
+  const selectedAssessment = useSettingsStore((s) => s.selectedAssessment);
   const moduleOutlines = useSettingsStore((s) => s.moduleOutlines);
 
   const items = useMemo(
@@ -168,9 +170,10 @@ export function SubmissionChecklist() {
       currentPaper,
       analysisResults,
       selectedModule,
-      moduleOutlines as Record<string, { assessments?: { type: string; wordCount: string }[] }>,
+      selectedAssessment,
+      moduleOutlines as Record<string, { assessments?: { type: string; name: string; wordCount: string }[] }>,
     ),
-    [currentPaper?.plainText, currentPaper?.wordCount, analysisResults, selectedModule, moduleOutlines],
+    [currentPaper?.plainText, currentPaper?.wordCount, analysisResults, selectedModule, selectedAssessment, moduleOutlines],
   );
 
   const availableItems = items.filter((i) => i.available);

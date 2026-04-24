@@ -45,6 +45,7 @@ export async function POST(request: Request) {
     const message =
       error instanceof Error ? error.message : "Plagiarism check failed";
     console.error("Plagiarism check error:", message);
-    return NextResponse.json({ error: message }, { status: 500 });
+    const isRateLimit = message.includes("429") || message.includes("rate_limit");
+    return NextResponse.json({ error: message }, { status: isRateLimit ? 429 : 500 });
   }
 }

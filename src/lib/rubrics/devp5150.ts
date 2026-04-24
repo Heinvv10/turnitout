@@ -28,6 +28,7 @@ export const DEVP5150_RUBRIC: ModuleRubric = {
     {
       name: "Case Study Analysis",
       type: "Formative",
+      format: "essay" as const,
       weighting: 35,
       wordCount: "1500-1800",
       dueWeek: 7,
@@ -55,6 +56,7 @@ export const DEVP5150_RUBRIC: ModuleRubric = {
     {
       name: "Theory Comparison Essay",
       type: "Formative",
+      format: "essay" as const,
       weighting: 25,
       wordCount: "1200-1500",
       dueWeek: 11,
@@ -81,6 +83,7 @@ export const DEVP5150_RUBRIC: ModuleRubric = {
     {
       name: "Final Examination",
       type: "Summative",
+      format: "exam" as const,
       weighting: 40,
       wordCount: "3 hours",
       dueWeek: 14,

@@ -28,6 +28,7 @@ export const NTIN5150_RUBRIC: ModuleRubric = {
     {
       name: "Theological Essay",
       type: "Formative",
+      format: "essay" as const,
       weighting: 35,
       wordCount: "1500-2000",
       dueWeek: 7,
@@ -54,6 +55,7 @@ export const NTIN5150_RUBRIC: ModuleRubric = {
     {
       name: "Exegetical Assignment",
       type: "Formative",
+      format: "essay" as const,
       weighting: 25,
       wordCount: "1000-1200",
       dueWeek: 10,
@@ -79,6 +81,7 @@ export const NTIN5150_RUBRIC: ModuleRubric = {
     {
       name: "Final Examination",
       type: "Summative",
+      format: "exam" as const,
       weighting: 40,
       wordCount: "3 hours",
       dueWeek: 14,

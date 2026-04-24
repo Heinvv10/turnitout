@@ -25,7 +25,7 @@ export async function callClaude(
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       const message = await client.messages.create({
-        model: model || "claude-sonnet-4-20250514",
+        model: model || "claude-haiku-4-5-20251001",
         max_tokens: maxTokens || 4096,
         system: systemPrompt,
         messages: [{ role: "user", content: userMessage }],
@@ -44,7 +44,7 @@ export async function callClaude(
           err.message.includes("429"));
 
       if (isRetryable && attempt < maxRetries) {
-        const delay = attempt * 3000;
+        const delay = attempt * 5000;
         await new Promise((r) => setTimeout(r, delay));
         continue;
       }

@@ -6,6 +6,7 @@
 export interface AssessmentBrief {
   name: string;
   type: string;
+  format?: "essay" | "presentation" | "exam" | "portfolio" | "other";
   weighting: number;
   wordCount: string;
   dueWeek: number;

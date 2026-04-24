@@ -28,6 +28,7 @@ export const FDEV5150_RUBRIC: ModuleRubric = {
     {
       name: "Research Summary",
       type: "Formative",
+      format: "essay" as const,
       weighting: 35,
       wordCount: "1500-1800",
       dueWeek: 7,
@@ -53,6 +54,7 @@ export const FDEV5150_RUBRIC: ModuleRubric = {
     {
       name: "Reflective Journal",
       type: "Formative",
+      format: "essay" as const,
       weighting: 25,
       wordCount: "1000-1200",
       dueWeek: 10,
@@ -78,6 +80,7 @@ export const FDEV5150_RUBRIC: ModuleRubric = {
     {
       name: "Final Examination",
       type: "Summative",
+      format: "exam" as const,
       weighting: 40,
       wordCount: "3 hours",
       dueWeek: 14,

@@ -28,6 +28,7 @@ export const PSIN5150_RUBRIC: ModuleRubric = {
     {
       name: "Literature Review",
       type: "Formative",
+      format: "essay" as const,
       weighting: 35,
       wordCount: "1500-2000",
       dueWeek: 8,
@@ -53,6 +54,7 @@ export const PSIN5150_RUBRIC: ModuleRubric = {
     {
       name: "Research Summary",
       type: "Formative",
+      format: "essay" as const,
       weighting: 25,
       wordCount: "800-1000",
       dueWeek: 11,
@@ -78,6 +80,7 @@ export const PSIN5150_RUBRIC: ModuleRubric = {
     {
       name: "Final Examination",
       type: "Summative",
+      format: "exam" as const,
       weighting: 40,
       wordCount: "3 hours",
       dueWeek: 14,
