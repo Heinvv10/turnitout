@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { usePaperStore } from "@/store/paper-store";
 import { Card } from "@/components/ui/card";
+import { calculateReadability } from "@/lib/readability";
 import {
   BarChart3,
   SpellCheck,
@@ -120,14 +121,32 @@ export function ScoreGrid() {
   const currentPaper = usePaperStore((s) => s.currentPaper);
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
+  // Matches the academic-level threshold used in submission-checklist
+  // (FK >= 12 counts as meeting the academic bar).
+  const readability = useMemo(() => {
+    const text = currentPaper?.plainText || "";
+    if (text.length < 50) return null;
+    return calculateReadability(text);
+  }, [currentPaper?.plainText]);
+
   const cards: ScoreCardData[] = [
     {
       key: "readability",
       label: "Readability",
       icon: BarChart3,
-      score: currentPaper?.plainText ? 100 : null,
-      traffic: currentPaper?.plainText ? "green" : null,
-      detail: "Auto-calculated — higher is better",
+      score: readability
+        ? Math.min(100, Math.round((readability.fleschKincaid / 12) * 100))
+        : null,
+      traffic: readability
+        ? readability.fleschKincaid >= 12
+          ? "green"
+          : readability.fleschKincaid >= 8
+            ? "yellow"
+            : "red"
+        : null,
+      detail: readability
+        ? `FK Grade ${readability.fleschKincaid} — aim for 12+ (academic)`
+        : "Write at least 50 characters to measure",
       panel: ReadabilityPanel,
     },
     {

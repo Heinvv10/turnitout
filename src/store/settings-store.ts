@@ -130,6 +130,16 @@ export const useSettingsStore = create<SettingsState>()(
         }
       },
     }),
-    { name: "turnitout-settings" },
+    {
+      name: "turnitout-settings",
+      version: 1,
+      migrate: (persisted, version) => {
+        const state = (persisted ?? {}) as Partial<SettingsState>;
+        if (version < 1 && typeof state.selectedAssessment !== "string") {
+          state.selectedAssessment = "";
+        }
+        return state as SettingsState;
+      },
+    },
   ),
 );

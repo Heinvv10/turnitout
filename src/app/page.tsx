@@ -314,7 +314,8 @@ function HomeContent() {
       setAnalyzing("plagiarism", true);
       setAnalyzing("grammar", true);
 
-      // Run checks sequentially to avoid Anthropic API rate limits (1 active request at a time)
+      // Run checks with bounded concurrency (2 at a time) — balances throughput
+      // against Anthropic rate limits. safeFetch already retries on 429/529.
       const checks = [
         { key: "aiRisk" as const, url: "/api/analyze-ai-risk", set: (v: unknown) => { setAIRiskResult(v as Parameters<typeof setAIRiskResult>[0]); setAnalyzing("aiRisk", false); } },
         { key: "citations" as const, url: "/api/check-citations", set: (v: unknown) => { setCitationResult(v as Parameters<typeof setCitationResult>[0]); setAnalyzing("citations", false); } },
@@ -324,14 +325,21 @@ function HomeContent() {
         { key: "tone" as const, url: "/api/check-tone", set: (v: unknown) => { setToneResult(v as Parameters<typeof setToneResult>[0]); } },
       ];
 
-      for (const check of checks) {
-        try {
-          const result = await safeFetch(check.url, body);
-          check.set(result);
-        } catch {
-          if (check.key !== "tone") setAnalyzing(check.key, false);
+      const CONCURRENCY = 2;
+      const queue = [...checks];
+      const workers = Array.from({ length: CONCURRENCY }, async () => {
+        while (queue.length > 0) {
+          const check = queue.shift();
+          if (!check) break;
+          try {
+            const result = await safeFetch(check.url, body);
+            check.set(result);
+          } catch {
+            if (check.key !== "tone") setAnalyzing(check.key, false);
+          }
         }
-      }
+      });
+      await Promise.all(workers);
 
       // Ensure all analyzing states are cleared
       setAnalyzing("aiRisk", false);
